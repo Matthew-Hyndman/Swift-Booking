@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { Appointment, Analytics, Employee } from './booking.models';
 import { BookingApiService } from './booking-api.service';
 
@@ -78,26 +79,32 @@ export class AppComponent implements OnInit {
   }
 
   private loadDashboard(): void {
-    this.bookingApiService.getEmployees(this.businessId).subscribe((employees) => {
-      this.employees = employees;
-      if (!this.form.employeeId && employees.length > 0) {
-        this.form.employeeId = employees[0].id;
+    forkJoin({
+      employees: this.bookingApiService.getEmployees(this.businessId),
+      appointments: this.bookingApiService.getAppointments(this.businessId),
+      analytics: this.bookingApiService.getAnalytics(this.businessId)
+    }).subscribe({
+      next: ({ employees, appointments, analytics }) => {
+        this.employees = employees;
+        this.appointments = appointments;
+        this.analytics = analytics;
+        if (!this.form.employeeId && employees.length > 0) {
+          this.form.employeeId = employees[0].id;
+        }
+        this.loadError = '';
+      },
+      error: (error) => {
+        const url = error?.url ?? '';
+        if (url.includes('/employees')) {
+          this.loadError = 'Unable to load employees.';
+        } else if (url.includes('/appointments')) {
+          this.loadError = 'Unable to load appointments.';
+        } else if (url.includes('/analytics')) {
+          this.loadError = 'Unable to load analytics.';
+        } else {
+          this.loadError = 'Unable to load booking data right now.';
+        }
       }
-      this.loadError = '';
-    }, () => {
-      this.loadError = 'Unable to load booking data right now.';
-    });
-
-    this.bookingApiService.getAppointments(this.businessId).subscribe((appointments) => {
-      this.appointments = appointments;
-    }, () => {
-      this.loadError = 'Unable to load booking data right now.';
-    });
-
-    this.bookingApiService.getAnalytics(this.businessId).subscribe((analytics) => {
-      this.analytics = analytics;
-    }, () => {
-      this.loadError = 'Unable to load booking data right now.';
     });
   }
 }
