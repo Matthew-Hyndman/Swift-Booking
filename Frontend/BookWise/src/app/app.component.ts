@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Appointment, Analytics, Employee } from './booking.models';
 import { BookingApiService } from './booking-api.service';
 
@@ -29,10 +30,15 @@ export class AppComponent implements OnInit {
     startTime: ''
   };
 
-  constructor(private readonly bookingApiService: BookingApiService) {}
+  constructor(
+    private readonly bookingApiService: BookingApiService,
+    @Inject(PLATFORM_ID) private readonly platformId: object
+  ) {}
 
   ngOnInit(): void {
-    this.loadDashboard();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadDashboard();
+    }
   }
 
   submitAppointment(): void {
