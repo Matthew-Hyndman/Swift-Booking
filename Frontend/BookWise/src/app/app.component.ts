@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Appointment, Analytics, Employee } from './booking.models';
+import { BookingApiService } from './booking-api.service';
 
 @Component({
   selector: 'app-root',
@@ -6,6 +8,74 @@ import { Component } from '@angular/core';
   standalone: false,
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'BookWise';
+  readonly businessId = 'business-1';
+
+  employees: Employee[] = [];
+  appointments: Appointment[] = [];
+  analytics: Analytics = {
+    totalAppointments: 0,
+    completedAppointments: 0,
+    scheduledAppointments: 0,
+    cancelledAppointments: 0,
+    appointmentsByEmployee: {}
+  };
+
+  form = {
+    customerName: '',
+    serviceName: '',
+    employeeId: '',
+    startTime: ''
+  };
+
+  constructor(private readonly bookingApiService: BookingApiService) {}
+
+  ngOnInit(): void {
+    this.loadDashboard();
+  }
+
+  submitAppointment(): void {
+    if (!this.form.customerName || !this.form.serviceName || !this.form.employeeId || !this.form.startTime) {
+      return;
+    }
+
+    const start = new Date(this.form.startTime);
+    const end = new Date(start.getTime() + 30 * 60 * 1000);
+
+    this.bookingApiService.createAppointment(this.businessId, {
+      customerName: this.form.customerName,
+      serviceName: this.form.serviceName,
+      employeeId: this.form.employeeId,
+      startTime: start.toISOString(),
+      endTime: end.toISOString()
+    }).subscribe(() => {
+      this.form.customerName = '';
+      this.form.serviceName = '';
+      this.form.startTime = '';
+      this.loadDashboard();
+    });
+  }
+
+  employeeStats(): Array<{ employee: string; count: number }> {
+    return Object.entries(this.analytics.appointmentsByEmployee)
+      .map(([employee, count]) => ({ employee, count }));
+  }
+
+  private loadDashboard(): void {
+    this.bookingApiService.getEmployees(this.businessId).subscribe((employees) => {
+      this.employees = employees;
+      if (!this.form.employeeId && employees.length > 0) {
+        this.form.employeeId = employees[0].id;
+      }
+    });
+
+    this.bookingApiService.getAppointments(this.businessId).subscribe((appointments) => {
+      this.appointments = appointments;
+    });
+
+    this.bookingApiService.getAnalytics(this.businessId).subscribe((analytics) => {
+      this.analytics = analytics;
+    });
+  }
 }
