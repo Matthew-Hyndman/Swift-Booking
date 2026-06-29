@@ -26,7 +26,7 @@ public class BookingController {
 
     @GetMapping("/employees")
     public List<Employee> getEmployees(@PathVariable String businessId) {
-        return bookingService.getEmployees();
+        return bookingService.getEmployees(businessId);
     }
 
     @GetMapping("/appointments")

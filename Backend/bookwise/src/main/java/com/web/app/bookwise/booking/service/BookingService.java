@@ -27,7 +27,7 @@ public class BookingService {
             new Employee("emp-3", "Jamie Morgan")
     );
 
-    public List<Employee> getEmployees() {
+    public List<Employee> getEmployees(String businessId) {
         return defaultEmployees;
     }
 

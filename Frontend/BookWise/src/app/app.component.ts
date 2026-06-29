@@ -15,6 +15,8 @@ export class AppComponent implements OnInit {
 
   employees: Employee[] = [];
   appointments: Appointment[] = [];
+  loadError = '';
+  submitError = '';
   analytics: Analytics = {
     totalAppointments: 0,
     completedAppointments: 0,
@@ -43,8 +45,10 @@ export class AppComponent implements OnInit {
 
   submitAppointment(): void {
     if (!this.form.customerName || !this.form.serviceName || !this.form.employeeId || !this.form.startTime) {
+      this.submitError = 'Please complete all booking fields before submitting.';
       return;
     }
+    this.submitError = '';
 
     const start = new Date(this.form.startTime);
     const end = new Date(start.getTime() + 30 * 60 * 1000);
@@ -55,11 +59,16 @@ export class AppComponent implements OnInit {
       employeeId: this.form.employeeId,
       startTime: start.toISOString(),
       endTime: end.toISOString()
-    }).subscribe(() => {
-      this.form.customerName = '';
-      this.form.serviceName = '';
-      this.form.startTime = '';
-      this.loadDashboard();
+    }).subscribe({
+      next: () => {
+        this.form.customerName = '';
+        this.form.serviceName = '';
+        this.form.startTime = '';
+        this.loadDashboard();
+      },
+      error: () => {
+        this.submitError = 'Unable to create appointment. Please try again.';
+      }
     });
   }
 
@@ -74,14 +83,21 @@ export class AppComponent implements OnInit {
       if (!this.form.employeeId && employees.length > 0) {
         this.form.employeeId = employees[0].id;
       }
+      this.loadError = '';
+    }, () => {
+      this.loadError = 'Unable to load booking data right now.';
     });
 
     this.bookingApiService.getAppointments(this.businessId).subscribe((appointments) => {
       this.appointments = appointments;
+    }, () => {
+      this.loadError = 'Unable to load booking data right now.';
     });
 
     this.bookingApiService.getAnalytics(this.businessId).subscribe((analytics) => {
       this.analytics = analytics;
+    }, () => {
+      this.loadError = 'Unable to load booking data right now.';
     });
   }
 }

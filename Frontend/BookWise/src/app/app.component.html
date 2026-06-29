@@ -23,6 +23,10 @@
     </article>
   </section>
 
+  @if (loadError) {
+    <p class="error-banner">{{ loadError }}</p>
+  }
+
   <section class="content-grid">
     <article class="panel">
       <h2>New Appointment</h2>
@@ -48,6 +52,9 @@
           <input name="startTime" type="datetime-local" [(ngModel)]="form.startTime" required>
         </label>
         <button type="submit">Book appointment</button>
+        @if (submitError) {
+          <p class="error-text">{{ submitError }}</p>
+        }
       </form>
     </article>
 
