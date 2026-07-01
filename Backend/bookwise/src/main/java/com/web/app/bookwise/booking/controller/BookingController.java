@@ -1,21 +1,27 @@
 package com.web.app.bookwise.booking.controller;
 
 import com.web.app.bookwise.booking.dto.AnalyticsResponse;
-import com.web.app.bookwise.booking.dto.CreateAppointmentRequest;
-import com.web.app.bookwise.booking.model.Appointment;
-import com.web.app.bookwise.booking.model.Employee;
+import com.web.app.bookwise.booking.dto.BookingResponse;
+import com.web.app.bookwise.booking.dto.BusinessResponse;
+import com.web.app.bookwise.booking.dto.CreateBookingRequest;
+import com.web.app.bookwise.booking.dto.CustomerResponse;
+import com.web.app.bookwise.booking.dto.EmployeeResponse;
 import com.web.app.bookwise.booking.service.BookingService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/businesses/{businessId}")
+@RequestMapping("/api")
 public class BookingController {
 
     private final BookingService bookingService;
@@ -24,23 +30,37 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    @GetMapping("/employees")
-    public List<Employee> getEmployees(@PathVariable String businessId) {
+    @GetMapping("/businesses")
+    public List<BusinessResponse> getBusinesses() {
+        return bookingService.getBusinesses();
+    }
+
+    @GetMapping("/businesses/{businessId}/employees")
+    public List<EmployeeResponse> getEmployees(@PathVariable Integer businessId) {
         return bookingService.getEmployees(businessId);
     }
 
-    @GetMapping("/appointments")
-    public List<Appointment> getAppointments(@PathVariable String businessId) {
-        return bookingService.getAppointmentsByBusiness(businessId);
+    @GetMapping("/customers")
+    public List<CustomerResponse> getCustomers(@RequestParam(required = false) String search) {
+        return bookingService.getCustomers(search);
     }
 
-    @PostMapping("/appointments")
-    public Appointment createAppointment(@PathVariable String businessId, @RequestBody CreateAppointmentRequest request) {
-        return bookingService.createAppointment(businessId, request);
+    @GetMapping("/businesses/{businessId}/bookings")
+    public List<BookingResponse> getBookings(@PathVariable Integer businessId) {
+        return bookingService.getBookingsByBusiness(businessId);
     }
 
-    @GetMapping("/analytics")
-    public AnalyticsResponse getAnalytics(@PathVariable String businessId) {
+    @PostMapping("/businesses/{businessId}/bookings")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookingResponse createBooking(
+            @PathVariable Integer businessId,
+            @Valid @RequestBody CreateBookingRequest request
+    ) {
+        return bookingService.createBooking(businessId, request);
+    }
+
+    @GetMapping("/businesses/{businessId}/analytics")
+    public AnalyticsResponse getAnalytics(@PathVariable Integer businessId) {
         return bookingService.getAnalytics(businessId);
     }
 }

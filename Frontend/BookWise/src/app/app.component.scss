@@ -21,6 +21,10 @@ header p {
   color: #45607a;
 }
 
+.auth-actions {
+  margin-top: 1rem;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

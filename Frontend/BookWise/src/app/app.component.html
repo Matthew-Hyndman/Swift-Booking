@@ -1,25 +1,36 @@
 <main class="dashboard">
   <header>
     <h1>{{ title }} Booking Studio</h1>
-    <p>Manage appointments, staff assignment, and booking insights for your business.</p>
+    <p>Manage bookings, staff assignment, and operational insights for your business.</p>
+    <div class="auth-actions">
+      @if (authService.isAuthenticated()) {
+        <button type="button" (click)="logout()">Logout</button>
+      } @else {
+        <button type="button" (click)="login()">Login with Keycloak</button>
+      }
+    </div>
   </header>
 
   <section class="cards">
     <article>
       <h2>Total</h2>
-      <p>{{ analytics.totalAppointments }}</p>
+      <p>{{ analytics.totalBookings }}</p>
     </article>
     <article>
-      <h2>Scheduled</h2>
-      <p>{{ analytics.scheduledAppointments }}</p>
+      <h2>Pending</h2>
+      <p>{{ analytics.pendingBookings }}</p>
+    </article>
+    <article>
+      <h2>Confirmed</h2>
+      <p>{{ analytics.confirmedBookings }}</p>
     </article>
     <article>
       <h2>Completed</h2>
-      <p>{{ analytics.completedAppointments }}</p>
+      <p>{{ analytics.completedBookings }}</p>
     </article>
     <article>
       <h2>Cancelled</h2>
-      <p>{{ analytics.cancelledAppointments }}</p>
+      <p>{{ analytics.cancelledBookings }}</p>
     </article>
   </section>
 
@@ -29,29 +40,45 @@
 
   <section class="content-grid">
     <article class="panel">
-      <h2>New Appointment</h2>
-      <form (ngSubmit)="submitAppointment()">
+      <h2>New Booking</h2>
+      <form (ngSubmit)="submitBooking()">
         <label>
-          Customer name
-          <input name="customerName" [(ngModel)]="form.customerName" required>
-        </label>
-        <label>
-          Service
-          <input name="serviceName" [(ngModel)]="form.serviceName" required>
-        </label>
-        <label>
-          Employee
-          <select name="employeeId" [(ngModel)]="form.employeeId" required>
-            @for (employee of employees; track employee.id) {
-              <option [value]="employee.id">{{ employee.name }}</option>
+          Customer
+          <select name="customerId" [(ngModel)]="form.customerId" required>
+            @for (customer of customers; track customer.customerId) {
+              <option [ngValue]="customer.customerId">{{ customer.fullName }}</option>
             }
           </select>
         </label>
         <label>
-          Start time
-          <input name="startTime" type="datetime-local" [(ngModel)]="form.startTime" required>
+          Employee
+          <select name="employeeId" [(ngModel)]="form.employeeId" required>
+            @for (employee of employees; track employee.employeeId) {
+              <option [ngValue]="employee.employeeId">{{ employee.fullName }}</option>
+            }
+          </select>
         </label>
-        <button type="submit">Book appointment</button>
+        <label>
+          Booking date
+          <input name="bookingDate" type="date" [(ngModel)]="form.bookingDate" required>
+        </label>
+        <label>
+          Start time (24h)
+          <input name="startTime" type="time" [(ngModel)]="form.startTime" required>
+        </label>
+        <label>
+          End time (24h)
+          <input name="endTime" type="time" [(ngModel)]="form.endTime" required>
+        </label>
+        <label>
+          Service description
+          <input name="serviceDescription" [(ngModel)]="form.serviceDescription">
+        </label>
+        <label>
+          Notes
+          <input name="notes" [(ngModel)]="form.notes">
+        </label>
+        <button type="submit">Create booking</button>
         @if (submitError) {
           <p class="error-text">{{ submitError }}</p>
         }
@@ -59,23 +86,23 @@
     </article>
 
     <article class="panel">
-      <h2>Appointments</h2>
+      <h2>Bookings</h2>
       <ul>
-        @for (appointment of appointments; track appointment.id) {
+        @for (booking of bookings; track booking.bookingId) {
           <li>
-            <strong>{{ appointment.customerName }}</strong>
-            <span>{{ appointment.serviceName }} · {{ appointment.employeeName }}</span>
-            <time>{{ appointment.startTime | date: 'medium' }}</time>
-            <em>{{ appointment.status }}</em>
+            <strong>{{ booking.customerName }}</strong>
+            <span>{{ booking.serviceDescription }} · {{ booking.employeeName }}</span>
+            <time>{{ booking.bookingDate }} {{ booking.startTime }}-{{ booking.endTime }}</time>
+            <em>{{ booking.status }}</em>
           </li>
         } @empty {
-          <li>No appointments yet.</li>
+          <li>No bookings yet.</li>
         }
       </ul>
     </article>
 
     <article class="panel full-width">
-      <h2>Appointments by Employee</h2>
+      <h2>Bookings by Employee</h2>
       <ul>
         @for (stat of employeeStats(); track stat.employee) {
           <li>{{ stat.employee }}: {{ stat.count }}</li>

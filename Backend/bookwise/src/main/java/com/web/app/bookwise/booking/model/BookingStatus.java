@@ -1,7 +1,8 @@
 package com.web.app.bookwise.booking.model;
 
-public enum AppointmentStatus {
-    SCHEDULED,
+public enum BookingStatus {
+    PENDING,
+    CONFIRMED,
     COMPLETED,
     CANCELLED
 }

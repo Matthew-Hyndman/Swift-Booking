@@ -1,32 +1,64 @@
-export interface Employee {
-  id: string;
-  name: string;
+export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
+
+export interface Business {
+  businessId: number;
+  businessName: string;
+  description: string;
+  phone: string;
+  email: string;
 }
 
-export interface Appointment {
-  id: number;
-  businessId: string;
-  customerName: string;
-  serviceName: string;
-  employeeId: string;
+export interface Employee {
+  employeeId: number;
+  businessId: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  jobTitle: string;
+  email: string;
+  phone: string;
+  isActive: boolean;
+}
+
+export interface Customer {
+  customerId: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
+export interface Booking {
+  bookingId: number;
+  businessId: number;
+  employeeId: number;
   employeeName: string;
+  customerId: number;
+  customerName: string;
+  bookingDate: string;
   startTime: string;
   endTime: string;
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
+  serviceDescription: string;
+  status: BookingStatus;
+  notes: string;
 }
 
 export interface Analytics {
-  totalAppointments: number;
-  completedAppointments: number;
-  scheduledAppointments: number;
-  cancelledAppointments: number;
-  appointmentsByEmployee: Record<string, number>;
+  totalBookings: number;
+  completedBookings: number;
+  confirmedBookings: number;
+  pendingBookings: number;
+  cancelledBookings: number;
+  bookingsByEmployee: Record<string, number>;
 }
 
-export interface CreateAppointmentRequest {
-  customerName: string;
-  serviceName: string;
-  employeeId: string;
+export interface CreateBookingRequest {
+  employeeId: number;
+  customerId: number;
+  bookingDate: string;
   startTime: string;
   endTime: string;
+  serviceDescription: string;
+  notes: string;
 }
