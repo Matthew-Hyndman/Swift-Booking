@@ -1,4 +1,4 @@
-package com.web.app.bookwise.booking.model;
+package com.web.app.bookwise.booking.entity;
 
 public enum BookingStatus {
     PENDING,

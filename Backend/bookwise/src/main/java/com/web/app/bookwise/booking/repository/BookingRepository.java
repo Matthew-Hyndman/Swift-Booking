@@ -1,10 +1,11 @@
 package com.web.app.bookwise.booking.repository;
 
-import com.web.app.bookwise.booking.model.Booking;
-import com.web.app.bookwise.booking.model.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.web.app.bookwise.booking.entity.Booking;
+import com.web.app.bookwise.booking.entity.BookingStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

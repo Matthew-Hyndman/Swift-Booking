@@ -1,4 +1,4 @@
-package com.web.app.bookwise.booking.model;
+package com.web.app.bookwise.booking.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,34 +14,28 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "addresses")
+@Table(name = "customers")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Address {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
-    private Integer addressId;
+    @Column(name = "customer_id")
+    private Integer customerId;
 
-    @Column(name = "street_line1", nullable = false)
-    private String streetLine1;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
-    @Column(name = "street_line2")
-    private String streetLine2;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
 
-    @Column(name = "city", nullable = false)
-    private String city;
+    @Column(name = "email", nullable = false)
+    private String email;
 
-    @Column(name = "county")
-    private String county;
-
-    @Column(name = "postal_code")
-    private String postalCode;
-
-    @Column(name = "country", nullable = false)
-    private String country;
+    @Column(name = "phone")
+    private String phone;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -51,5 +45,9 @@ public class Address {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
+    }
+
+    public String fullName() {
+        return (firstName + " " + lastName).trim();
     }
 }

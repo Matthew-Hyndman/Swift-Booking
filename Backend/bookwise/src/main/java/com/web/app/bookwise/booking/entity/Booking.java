@@ -1,6 +1,7 @@
-package com.web.app.bookwise.booking.model;
+package com.web.app.bookwise.booking.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,47 +18,50 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Table(name = "employees")
+@Table(name = "bookings")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Employee {
+public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "employee_id")
-    private Integer employeeId;
+    @Column(name = "booking_id")
+    private Integer bookingId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "business_id", nullable = false)
     private Business business;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "employee_id", nullable = false)
+    private Employee employee;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "booking_date", nullable = false)
+    private LocalDate bookingDate;
 
-    @Column(name = "phone")
-    private String phone;
+    @Column(name = "start_time", nullable = false)
+    private LocalTime startTime;
 
-    @Column(name = "job_title")
-    private String jobTitle;
+    @Column(name = "end_time", nullable = false)
+    private LocalTime endTime;
 
-    @Column(name = "hire_date")
-    private LocalDate hireDate;
+    @Column(name = "service_description")
+    private String serviceDescription;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
-    private Address address;
+    @Convert(converter = BookingStatusConverter.class)
+    @Column(name = "status", nullable = false)
+    private BookingStatus status;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    @Column(name = "notes")
+    private String notes;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -74,17 +78,13 @@ public class Employee {
         if (updatedAt == null) {
             updatedAt = now;
         }
-        if (isActive == null) {
-            isActive = true;
+        if (status == null) {
+            status = BookingStatus.PENDING;
         }
     }
 
     @PreUpdate
     void preUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public String fullName() {
-        return (firstName + " " + lastName).trim();
     }
 }

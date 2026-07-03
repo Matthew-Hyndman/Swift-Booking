@@ -1,9 +1,9 @@
 package com.web.app.bookwise.booking.dto;
 
-import com.web.app.bookwise.booking.model.BookingStatus;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import com.web.app.bookwise.booking.entity.BookingStatus;
 
 public record BookingResponse(
         Integer bookingId,

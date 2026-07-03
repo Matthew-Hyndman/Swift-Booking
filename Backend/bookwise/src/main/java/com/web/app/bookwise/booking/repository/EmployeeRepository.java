@@ -1,7 +1,8 @@
 package com.web.app.bookwise.booking.repository;
 
-import com.web.app.bookwise.booking.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.web.app.bookwise.booking.entity.Employee;
 
 import java.util.List;
 import java.util.Optional;

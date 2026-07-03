@@ -1,4 +1,4 @@
-package com.web.app.bookwise.booking.model;
+package com.web.app.bookwise.booking.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

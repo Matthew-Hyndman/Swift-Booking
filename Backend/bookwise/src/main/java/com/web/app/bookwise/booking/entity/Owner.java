@@ -1,4 +1,4 @@
-package com.web.app.bookwise.booking.model;
+package com.web.app.bookwise.booking.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,16 +14,16 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "customers")
+@Table(name = "owners")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Customer {
+public class Owner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "customer_id")
-    private Integer customerId;
+    @Column(name = "owner_id")
+    private Integer ownerId;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -45,9 +45,5 @@ public class Customer {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
-    }
-
-    public String fullName() {
-        return (firstName + " " + lastName).trim();
     }
 }

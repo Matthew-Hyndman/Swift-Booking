@@ -1,8 +1,9 @@
 package com.web.app.bookwise.booking.repository;
 
-import com.web.app.bookwise.booking.model.BusinessOwner;
-import com.web.app.bookwise.booking.model.BusinessOwnerId;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.web.app.bookwise.booking.entity.BusinessOwner;
+import com.web.app.bookwise.booking.entity.BusinessOwnerId;
 
 public interface BusinessOwnerRepository extends JpaRepository<BusinessOwner, BusinessOwnerId> {
 }

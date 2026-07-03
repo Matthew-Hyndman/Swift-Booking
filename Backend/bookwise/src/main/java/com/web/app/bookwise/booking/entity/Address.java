@@ -1,4 +1,4 @@
-package com.web.app.bookwise.booking.model;
+package com.web.app.bookwise.booking.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,28 +14,34 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "owners")
+@Table(name = "addresses")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Owner {
+public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "owner_id")
-    private Integer ownerId;
+    @Column(name = "address_id")
+    private Integer addressId;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(name = "street_line1", nullable = false)
+    private String streetLine1;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @Column(name = "street_line2")
+    private String streetLine2;
 
-    @Column(name = "email", nullable = false)
-    private String email;
+    @Column(name = "city", nullable = false)
+    private String city;
 
-    @Column(name = "phone")
-    private String phone;
+    @Column(name = "county")
+    private String county;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @Column(name = "country", nullable = false)
+    private String country;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
