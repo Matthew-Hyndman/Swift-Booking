@@ -1,4 +1,4 @@
--- BookWise Database Schema
+-- Small-Business-Appointments Database Schema
 -- PostgreSQL booking system with business, owners, addresses, employees, bookings and customers tables
 
 DROP TABLE IF EXISTS owners CASCADE;
