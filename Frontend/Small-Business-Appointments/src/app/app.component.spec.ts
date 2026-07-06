@@ -30,10 +30,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('Small-Business-Appointments');
   });
 
-  it('should render dashboard title', () => {
+  it('should render BookWise brand', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Small-Business-Appointments Booking Studio');
+    expect(compiled.querySelector('.brand')?.textContent).toContain('BookWise');
   });
 });

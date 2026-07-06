@@ -1,0 +1,74 @@
+<section class="glass-page">
+  <article class="glass-panel panel stack">
+    <h1>Create A Booking</h1>
+    <p>Capture booking details and assign staff in one step.</p>
+
+    <form (ngSubmit)="submitBooking()" #bookingForm="ngForm" class="stack">
+      <label>
+        Business
+        <select name="selectedBusinessId" [(ngModel)]="selectedBusinessId" (ngModelChange)="onBusinessChange()">
+          @for (business of businesses; track business.businessId) {
+            <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Customer
+        <select name="customerId" [(ngModel)]="form.customerId" required>
+          @for (customer of customers; track customer.customerId) {
+            <option [ngValue]="customer.customerId">{{ customer.fullName }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Employee
+        <select name="employeeId" [(ngModel)]="form.employeeId" required>
+          @for (employee of employees; track employee.employeeId) {
+            <option [ngValue]="employee.employeeId">{{ employee.fullName }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="field-grid">
+        <label>
+          Booking Date
+          <input name="bookingDate" type="date" [(ngModel)]="form.bookingDate" required>
+        </label>
+
+        <label>
+          Start Time
+          <input name="startTime" type="time" [(ngModel)]="form.startTime" required>
+        </label>
+
+        <label>
+          End Time
+          <input name="endTime" type="time" [(ngModel)]="form.endTime" required>
+        </label>
+      </div>
+
+      <label>
+        Service Description
+        <input name="serviceDescription" [(ngModel)]="form.serviceDescription">
+      </label>
+
+      <label>
+        Notes
+        <textarea name="notes" [(ngModel)]="form.notes"></textarea>
+      </label>
+
+      <button type="submit" [disabled]="bookingForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Creating...' : 'Create Booking' }}
+      </button>
+
+      @if (error) {
+        <p class="error-text">{{ error }}</p>
+      }
+
+      @if (success) {
+        <p class="success-text">{{ success }}</p>
+      }
+    </form>
+  </article>
+</section>

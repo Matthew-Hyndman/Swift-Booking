@@ -62,3 +62,14 @@ export interface CreateBookingRequest {
   serviceDescription: string;
   notes: string;
 }
+
+export interface UpdateBookingRequest {
+  employeeId: number;
+  customerId: number;
+  bookingDate: string;
+  startTime: string;
+  endTime: string;
+  serviceDescription: string;
+  status: BookingStatus;
+  notes: string;
+}

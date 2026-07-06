@@ -1,1 +1,152 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+	--base-light: #f3f3f3;
+	--neutral: #898989;
+	--aqua: #a7fdff;
+	--violet: #a34aff;
+	--lilac: #d291ff;
+	--ink-strong: #1e2330;
+	--ink-muted: #4f5666;
+	--danger: #c23a53;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: 'Manrope', 'Segoe UI', sans-serif;
+	color: var(--ink-strong);
+	background:
+		radial-gradient(circle at 9% 14%, rgba(167, 253, 255, 0.56), transparent 36%),
+		radial-gradient(circle at 89% 5%, rgba(210, 145, 255, 0.52), transparent 35%),
+		radial-gradient(circle at 72% 84%, rgba(163, 74, 255, 0.22), transparent 32%),
+		linear-gradient(125deg, #fafafa 0%, #f3f3f3 45%, #ece8fb 100%);
+	background-attachment: fixed;
+}
+
+.glass-panel {
+	border: 1px solid rgba(255, 255, 255, 0.62);
+	background: linear-gradient(140deg, rgba(243, 243, 243, 0.48), rgba(243, 243, 243, 0.2));
+	backdrop-filter: blur(16px);
+	box-shadow: 0 10px 30px rgba(56, 69, 92, 0.14);
+	border-radius: 1rem;
+}
+
+.glass-page {
+	display: grid;
+	gap: 1rem;
+	padding: 1.1rem;
+}
+
+.glass-page h1,
+.glass-page h2,
+.glass-page h3 {
+	margin: 0;
+	font-family: 'Space Grotesk', 'Trebuchet MS', sans-serif;
+	letter-spacing: -0.02em;
+}
+
+.glass-page p {
+	margin: 0;
+	color: var(--ink-muted);
+}
+
+.glass-grid {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.stack {
+	display: grid;
+	gap: 0.75rem;
+}
+
+label {
+	display: grid;
+	gap: 0.3rem;
+	font-size: 0.92rem;
+	color: var(--ink-muted);
+}
+
+input,
+select,
+textarea {
+	width: 100%;
+	border: 1px solid rgba(137, 137, 137, 0.34);
+	border-radius: 0.7rem;
+	padding: 0.65rem 0.75rem;
+	font: inherit;
+	background: rgba(255, 255, 255, 0.63);
+	color: var(--ink-strong);
+}
+
+textarea {
+	min-height: 84px;
+	resize: vertical;
+}
+
+button,
+.button-link {
+	border: 0;
+	border-radius: 999px;
+	padding: 0.55rem 0.92rem;
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+	color: #fff;
+	background: linear-gradient(145deg, var(--violet), var(--lilac));
+	box-shadow: 0 8px 20px rgba(163, 74, 255, 0.28);
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover,
+.button-link:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 12px 22px rgba(163, 74, 255, 0.36);
+}
+
+.ghost-button {
+	color: var(--ink-strong);
+	background: rgba(243, 243, 243, 0.48);
+	box-shadow: inset 0 0 0 1px rgba(137, 137, 137, 0.32);
+}
+
+.error-text {
+	color: var(--danger);
+	font-weight: 600;
+}
+
+.success-text {
+	color: #246b49;
+	font-weight: 600;
+}
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	border-radius: 999px;
+	padding: 0.2rem 0.58rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	background: rgba(167, 253, 255, 0.55);
+	color: #135163;
+}
+
+@media (max-width: 640px) {
+	.glass-page {
+		padding: 0.65rem;
+	}
+}

@@ -1,0 +1,47 @@
+<section class="glass-page">
+  <article class="glass-panel panel stack">
+    <h1>Account</h1>
+    <p>View, edit, or remove account holder details used for profile and billing communication.</p>
+
+    <form class="stack" (ngSubmit)="save()" #accountForm="ngForm">
+      <label>
+        Full Name
+        <input name="fullName" [(ngModel)]="form.fullName" [readonly]="!isEditing" required>
+      </label>
+
+      <label>
+        Email
+        <input name="email" type="email" [(ngModel)]="form.email" [readonly]="!isEditing" required>
+      </label>
+
+      <label>
+        Phone
+        <input name="phone" [(ngModel)]="form.phone" [readonly]="!isEditing">
+      </label>
+
+      <label>
+        Business Name
+        <input name="businessName" [(ngModel)]="form.businessName" [readonly]="!isEditing" required>
+      </label>
+
+      <div class="action-row">
+        @if (!isEditing) {
+          <button type="button" (click)="startEdit()">Edit</button>
+        } @else {
+          <button type="submit" [disabled]="accountForm.invalid">Save</button>
+          <button type="button" class="ghost-button" (click)="cancelEdit()">Cancel</button>
+        }
+
+        <button type="button" class="ghost-button danger" (click)="deleteAccount()">Delete Account</button>
+      </div>
+
+      @if (error) {
+        <p class="error-text">{{ error }}</p>
+      }
+
+      @if (message) {
+        <p class="success-text">{{ message }}</p>
+      }
+    </form>
+  </article>
+</section>

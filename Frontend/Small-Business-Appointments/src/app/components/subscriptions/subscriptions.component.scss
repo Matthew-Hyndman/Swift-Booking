@@ -1,0 +1,31 @@
+.intro,
+.plan-card {
+  padding: 1.2rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.plans-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.price-wrap {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.price-wrap strong {
+  font-size: 1.45rem;
+}
+
+.price-wrap span {
+  color: var(--ink-muted);
+}
+
+ul {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--ink-muted);
+  display: grid;
+  gap: 0.35rem;
+}

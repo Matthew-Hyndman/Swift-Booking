@@ -1,0 +1,87 @@
+<section class="glass-page">
+  <article class="glass-panel panel stack">
+    <h1>Booking</h1>
+    <p>View or edit the selected booking.</p>
+
+    <label>
+      Business
+      <select name="selectedBusinessId" [(ngModel)]="selectedBusinessId" (ngModelChange)="onBusinessChange()">
+        @for (business of businesses; track business.businessId) {
+          <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+        }
+      </select>
+    </label>
+
+    @if (isLoading) {
+      <p>Loading booking details...</p>
+    } @else {
+      <form class="stack" (ngSubmit)="saveBooking()" #bookingForm="ngForm">
+        <label>
+          Customer
+          <select name="customerId" [(ngModel)]="form.customerId" required>
+            @for (customer of customers; track customer.customerId) {
+              <option [ngValue]="customer.customerId">{{ customer.fullName }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Employee
+          <select name="employeeId" [(ngModel)]="form.employeeId" required>
+            @for (employee of employees; track employee.employeeId) {
+              <option [ngValue]="employee.employeeId">{{ employee.fullName }}</option>
+            }
+          </select>
+        </label>
+
+        <div class="field-grid">
+          <label>
+            Booking Date
+            <input name="bookingDate" type="date" [(ngModel)]="form.bookingDate" required>
+          </label>
+
+          <label>
+            Start Time
+            <input name="startTime" type="time" [(ngModel)]="form.startTime" required>
+          </label>
+
+          <label>
+            End Time
+            <input name="endTime" type="time" [(ngModel)]="form.endTime" required>
+          </label>
+        </div>
+
+        <label>
+          Service Description
+          <input name="serviceDescription" [(ngModel)]="form.serviceDescription">
+        </label>
+
+        <label>
+          Status
+          <select name="status" [(ngModel)]="form.status" required>
+            @for (status of statuses; track status) {
+              <option [ngValue]="status">{{ status }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Notes
+          <textarea name="notes" [(ngModel)]="form.notes"></textarea>
+        </label>
+
+        <button type="submit" [disabled]="bookingForm.invalid || isSaving">
+          {{ isSaving ? 'Saving...' : 'Save Booking' }}
+        </button>
+      </form>
+    }
+
+    @if (error) {
+      <p class="error-text">{{ error }}</p>
+    }
+
+    @if (message) {
+      <p class="success-text">{{ message }}</p>
+    }
+  </article>
+</section>

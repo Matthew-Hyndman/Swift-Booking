@@ -1,0 +1,28 @@
+.hero {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.5rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.info-card {
+  padding: 1rem;
+  min-height: 120px;
+  align-items: center;
+  display: grid;
+}
+
+.info-card h2 {
+  font-size: 1.02rem;
+  line-height: 1.4;
+}

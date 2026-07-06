@@ -1,0 +1,61 @@
+<section class="glass-page">
+  <article class="glass-panel panel">
+    <h1>Payment</h1>
+    <p>Secure your subscription by adding billing details for your selected plan.</p>
+
+    <form (ngSubmit)="submitPayment()" class="stack" #paymentForm="ngForm">
+      <label>
+        Plan
+        <select name="plan" [(ngModel)]="form.plan" required>
+          @for (plan of planOptions; track plan) {
+            <option [value]="plan">{{ plan }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Full Name
+        <input name="fullName" [(ngModel)]="form.fullName" required>
+      </label>
+
+      <label>
+        Email
+        <input name="email" type="email" [(ngModel)]="form.email" required>
+      </label>
+
+      <label>
+        Card Number
+        <input name="cardNumber" [(ngModel)]="form.cardNumber" minlength="12" maxlength="19" required>
+      </label>
+
+      <div class="field-grid">
+        <label>
+          Expiry
+          <input name="expiry" placeholder="MM/YY" [(ngModel)]="form.expiry" required>
+        </label>
+
+        <label>
+          CVC
+          <input name="cvc" [(ngModel)]="form.cvc" minlength="3" maxlength="4" required>
+        </label>
+      </div>
+
+      <label>
+        Billing Postcode
+        <input name="billingPostcode" [(ngModel)]="form.billingPostcode">
+      </label>
+
+      <button type="submit" [disabled]="isSubmitting || paymentForm.invalid">
+        {{ isSubmitting ? 'Processing...' : 'Save Payment Details' }}
+      </button>
+
+      @if (error) {
+        <p class="error-text">{{ error }}</p>
+      }
+
+      @if (message) {
+        <p class="success-text">{{ message }}</p>
+      }
+    </form>
+  </article>
+</section>
