@@ -1,0 +1,22 @@
+<section class="glass-page home-page">
+  <article class="glass-panel hero">
+    <span class="badge">Appointment Operations</span>
+    <h1>Swift Booking helps small businesses organize appointments without friction.</h1>
+    <p>
+      Use one workspace to create bookings, monitor upcoming services, and track outcomes across your team.
+      The platform is designed for salons, wellness clinics, consultancies, and service-led businesses.
+    </p>
+    <div class="hero-actions">
+      <a routerLink="/bookings/new" class="button-link">Create A Booking</a>
+      <a routerLink="/subscriptions" class="ghost-button button-link">See Pricing</a>
+    </div>
+  </article>
+
+  <section class="glass-grid">
+    @for (highlight of highlights; track highlight) {
+      <article class="glass-panel info-card">
+        <h2>{{ highlight }}</h2>
+      </article>
+    }
+  </section>
+</section>

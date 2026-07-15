@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: swift_booking
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Swift-Booking-DB
+    username: Swift-Booking-DB-Admin
+    password: Swift-Booking-DB-Admin64!
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${BOOKWISE_ISSUER_URI:http://localhost:8080}
+          jwk-set-uri: ${BOOKWISE_JWK_SET_URI:http://localhost:8080/.well-known/jwks.json}
+
+  data:
+    rest:
+      base-path: /api
+      detection-strategy: annotated    
+
+  logging:
+    level:
+      org:
+        springframework:
+          security: DEBUG          
+
+server:
+  port: 8443
+
+allowed-origins:
+  - http://localhost:5432
+  - http://localhost:4200

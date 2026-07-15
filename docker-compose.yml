@@ -1,12 +1,12 @@
 services:
     keycloak:
       image: quay.io/keycloak/keycloak:latest
-      container_name: small-business-appointments-keycloak
+      container_name: swift-booking-keycloak
       environment:
         KC_DB: postgres
-        KC_DB_URL: "jdbc:postgresql://host.docker.internal:5432/Small-Business-Appointments-DB"
-        KC_DB_USERNAME: Small-Business-Appointments-DB-Admin
-        KC_DB_PASSWORD: Small-Business-Appointments-DB-Admin64!
+        KC_DB_URL: "jdbc:postgresql://host.docker.internal:5432/Swift-Booking-DB"
+        KC_DB_USERNAME: Swift-Booking-DB-Admin
+        KC_DB_PASSWORD: Swift-Booking-DB-Admin64!
 
         PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         LANG: en_US.UTF-8
