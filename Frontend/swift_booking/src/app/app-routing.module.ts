@@ -11,7 +11,7 @@ import { BookingComponent } from './components/booking/booking.component';
 import { AuthGuard } from './common/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
   { path: 'about', component: AboutComponent },
   { path: 'subscriptions', component: SubscriptionsComponent },
   { path: 'payment', component: PaymentComponent },
@@ -19,7 +19,7 @@ export const routes: Routes = [
   { path: 'bookings', component: ViewBookingsComponent, canActivate: [AuthGuard] },
   { path: 'bookings/new', component: CreateBookingComponent, canActivate: [AuthGuard] },
   { path: 'bookings/:id', component: BookingComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'home' }
 ];
 
 @NgModule({

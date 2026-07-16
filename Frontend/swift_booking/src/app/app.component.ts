@@ -13,7 +13,7 @@ import { NavLinks } from './common/classes/nav-links';
 export class AppComponent implements OnInit {
   title = 'Swift-Booking';
 
-  protected navLinks = NavLinks.links;
+  public navLinks = NavLinks.links;
 
   constructor(
     readonly authService: AuthService,

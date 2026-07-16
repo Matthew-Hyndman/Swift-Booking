@@ -8,7 +8,7 @@
     /></a>
     <nav aria-label="Primary navigation">
       @for (link of navLinks; track link) {
-        @if (link.enabled == true) {
+        @if (link.enabled === true) {
           <a [routerLink]="link.path" routerLinkActive="is-active">{{
             link.label
           }}</a>

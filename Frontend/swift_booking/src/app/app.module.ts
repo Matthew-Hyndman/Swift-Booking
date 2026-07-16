@@ -58,6 +58,7 @@ import { routes } from './app-routing.module';
   providers: [
     provideHttpClient(withFetch()),
     provideZoneChangeDetection(),
+    provideClientHydration(withEventReplay()),
     //withNoIncrementalHydration(),
     /*provideClientHydration(withEventReplay()),
     {
