@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, provideZoneChangeDetection } from '@angular/core';
 import {
   BrowserModule,
   provideClientHydration,
@@ -56,6 +56,7 @@ import { routes } from './app-routing.module';
   ],
   providers: [
     provideHttpClient(withFetch()),
+    provideZoneChangeDetection()
     /*provideClientHydration(withEventReplay()),
     {
       provide: HTTP_INTERCEPTORS,
