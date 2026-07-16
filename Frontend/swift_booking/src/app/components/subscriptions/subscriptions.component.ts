@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 interface SubscriptionPlan {
   name: string;
@@ -12,6 +12,7 @@ interface SubscriptionPlan {
   selector: 'app-subscriptions',
   standalone: false,
   templateUrl: './subscriptions.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './subscriptions.component.scss'
 })
 export class SubscriptionsComponent {

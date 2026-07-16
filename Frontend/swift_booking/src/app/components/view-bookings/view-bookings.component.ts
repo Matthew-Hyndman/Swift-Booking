@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Booking, BookingStatus, Business, Employee } from '../../booking.models';
 import { BookingApiService } from '../../services/booking-api.service';
@@ -7,6 +7,7 @@ import { BookingApiService } from '../../services/booking-api.service';
   selector: 'app-view-bookings',
   standalone: false,
   templateUrl: './view-bookings.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './view-bookings.component.scss'
 })
 export class ViewBookingsComponent implements OnInit {

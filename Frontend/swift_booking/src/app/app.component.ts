@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './common/auth/auth.service';
 import { NavLinks } from './common/classes/nav-links';
@@ -7,6 +7,7 @@ import { NavLinks } from './common/classes/nav-links';
   selector: 'app-root',
   templateUrl: './app.component.html',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {

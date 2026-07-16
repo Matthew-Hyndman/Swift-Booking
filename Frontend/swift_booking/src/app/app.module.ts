@@ -3,6 +3,7 @@ import {
   BrowserModule,
   provideClientHydration,
   withEventReplay,
+  withNoIncrementalHydration,
 } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -56,7 +57,8 @@ import { routes } from './app-routing.module';
   ],
   providers: [
     provideHttpClient(withFetch()),
-    provideZoneChangeDetection()
+    provideZoneChangeDetection(),
+    //withNoIncrementalHydration(),
     /*provideClientHydration(withEventReplay()),
     {
       provide: HTTP_INTERCEPTORS,
@@ -67,3 +69,5 @@ import { routes } from './app-routing.module';
   bootstrap: [AppComponent],
 })
 export class AppModule {}
+
+
