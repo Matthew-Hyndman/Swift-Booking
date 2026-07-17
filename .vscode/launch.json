@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-SwiftBookingApplication<swift_booking>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.web.app.swift_booking.SwiftBookingApplication",
+            "projectName": "swift_booking",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

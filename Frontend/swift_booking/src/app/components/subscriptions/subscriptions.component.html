@@ -1,0 +1,28 @@
+<section class="glass-page">
+  <article class="glass-panel intro">
+    <h1>Subscriptions</h1>
+    <p>
+      Choose the plan that matches your booking volume now, then scale up whenever your business grows.
+      Every plan includes secure access and full appointment workflows.
+    </p>
+  </article>
+
+  <section class="glass-grid plans-grid">
+    @for (plan of plans; track plan.name) {
+      <article class="glass-panel plan-card">
+        <h2>{{ plan.name }}</h2>
+        <p>{{ plan.description }}</p>
+        <div class="price-wrap">
+          <strong>{{ plan.monthlyPrice }}/month</strong>
+          <span>{{ plan.yearlyPrice }}/year</span>
+        </div>
+        <ul>
+          @for (item of plan.highlights; track item) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+        <a routerLink="/payment" [queryParams]="{ plan: plan.name }" class="button-link">Choose {{ plan.name }}</a>
+      </article>
+    }
+  </section>
+</section>

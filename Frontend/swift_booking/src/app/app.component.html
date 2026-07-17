@@ -1,0 +1,34 @@
+<div class="app-shell">
+  <header class="topbar glass-panel">
+    <a routerLink="/"
+      ><img
+        class="brand-img"
+        src="assets/images/swift_book_logo_And_Title_Transparent.png"
+        alt="swift booking Logo"
+    /></a>
+    <nav aria-label="Primary navigation">
+      @for (link of navLinks; track link) {
+        @if (link.enabled === true) {
+          <a [routerLink]="link.path" routerLinkActive="is-active">{{
+            link.label
+          }}</a>
+        }
+      }
+    </nav>
+    <div class="auth-actions">
+      @if (authService.isAuthenticated()) {
+        <button type="button" class="ghost-button" (click)="logout()">
+          Logout
+        </button>
+      } @else {
+        <button type="button" class="ghost-button" (click)="login()">
+          Login
+        </button>
+      }
+    </div>
+  </header>
+
+  <main class="page-container">
+    <router-outlet></router-outlet>
+  </main>
+</div>

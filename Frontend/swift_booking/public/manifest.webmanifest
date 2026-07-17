@@ -1,0 +1,16 @@
+{
+  "name": "Swift-Booking",
+  "short_name": "Swift-Booking",
+  "description": "SaaS booking management platform for small businesses",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#2b6cb0",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

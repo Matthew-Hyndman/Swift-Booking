@@ -1,0 +1,88 @@
+<section class="glass-page">
+  <article class="glass-panel panel stack">
+    <h1>View Bookings</h1>
+    <p>Browse all business bookings with search and filtering controls.</p>
+
+    <div class="filters">
+      <label>
+        Business
+        <select name="selectedBusiness" [(ngModel)]="selectedBusinessId" (ngModelChange)="reloadBookings()">
+          @for (business of businesses; track business.businessId) {
+            <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Search
+        <input name="searchTerm" [(ngModel)]="searchTerm" placeholder="Customer, service, notes...">
+      </label>
+
+      <label>
+        Status
+        <select name="statusFilter" [(ngModel)]="statusFilter">
+          @for (status of statuses; track status) {
+            <option [ngValue]="status">{{ status }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Employee
+        <select name="employeeFilter" [(ngModel)]="employeeFilter">
+          <option [ngValue]="0">All</option>
+          @for (employee of employees; track employee.employeeId) {
+            <option [ngValue]="employee.employeeId">{{ employee.fullName }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (error) {
+      <p class="error-text">{{ error }}</p>
+    }
+  </article>
+
+  <article class="glass-panel panel">
+    @if (isLoading) {
+      <p>Loading bookings...</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Employee</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of filteredBookings(); track booking.bookingId) {
+              <tr>
+                <td>{{ booking.customerName }}</td>
+                <td>{{ booking.employeeName }}</td>
+                <td>{{ booking.bookingDate }}</td>
+                <td>{{ booking.startTime }} - {{ booking.endTime }}</td>
+                <td>{{ booking.serviceDescription || 'N/A' }}</td>
+                <td>
+                  <span class="badge">{{ booking.status }}</span>
+                </td>
+                <td>
+                  <button type="button" class="ghost-button" (click)="openBooking(booking.bookingId)">Open</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7">No bookings match your current filters.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </article>
+</section>

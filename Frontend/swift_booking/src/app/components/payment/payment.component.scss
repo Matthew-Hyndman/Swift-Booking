@@ -1,0 +1,12 @@
+.panel {
+  max-width: 720px;
+  padding: 1.2rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.field-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
