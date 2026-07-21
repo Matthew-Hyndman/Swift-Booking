@@ -16,7 +16,7 @@
       }
     </nav>
     <div class="auth-actions">
-      @if (authService.isAuthenticated()) {
+      @if (isLoggedIn) {
         <button type="button" class="ghost-button" (click)="logout()">
           Logout
         </button>
