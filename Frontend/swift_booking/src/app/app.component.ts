@@ -38,9 +38,8 @@ export class AppComponent implements OnInit {
   }
 
   toggleNavbButtons() {
-    let authenticatedNavLinks = ['View Bookings', 'Create Booking', 'Account'];
     this.navLinks.forEach((link) => {
-      if (authenticatedNavLinks.includes(link.label)) {        
+      if (NavLinks.authenticatedNavLinkLabels.includes(link.label)) {
         link.enabled = this.isLoggedIn;
       }
     });
