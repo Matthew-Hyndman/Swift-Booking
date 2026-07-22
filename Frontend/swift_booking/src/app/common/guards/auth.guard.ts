@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from '../../services/auth';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -11,15 +11,16 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   canActivate(): boolean {
-    if (!environment.keycloak.enabled) {
+    let isLoggedIn = false;
+    this.authService.isLoggedIn$.subscribe(value => {
+      isLoggedIn = value ?? false;
+    });
+
+    if (isLoggedIn) {
       return true;
     }
 
-    if (this.authService.isAuthenticated()) {
-      return true;
-    }
-
-    this.authService.login(window.location.pathname);
+    this.authService.login();
     return false;
   }
 }

@@ -1,6 +1,12 @@
-import { Component, Inject, OnInit, PLATFORM_ID, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  PLATFORM_ID,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { AuthService } from './common/auth/auth.service';
+import { AuthService } from './services/auth';
 import { NavLinks } from './common/classes/nav-links';
 
 @Component({
@@ -8,26 +14,39 @@ import { NavLinks } from './common/classes/nav-links';
   templateUrl: './app.component.html',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
   title = 'Swift-Booking';
 
   public navLinks = NavLinks.links;
 
+  protected isLoggedIn = false;
+
   constructor(
     readonly authService: AuthService,
-    @Inject(PLATFORM_ID) private readonly platformId: object
+    @Inject(PLATFORM_ID) private readonly platformId: object,
   ) {}
 
   ngOnInit(): void {
+    this.authService.isLoggedIn$.subscribe((value) => {
+      this.isLoggedIn = value ?? false;
+    });
     if (isPlatformBrowser(this.platformId)) {
-      this.authService.handleAuthCallback();
+      this.toggleNavbButtons();
     }
   }
 
+  toggleNavbButtons() {
+    this.navLinks.forEach((link) => {
+      if (NavLinks.authenticatedNavLinkLabels.includes(link.label)) {
+        link.enabled = this.isLoggedIn;
+      }
+    });
+  }
+
   login(): void {
-    this.authService.login(window.location.pathname || '/');
+    this.authService.login();
   }
 
   logout(): void {

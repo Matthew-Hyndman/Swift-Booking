@@ -7,3 +7,4 @@ this is repo for Bookwise Project. The ambition of this project is to create a S
 - [ ] Develop a backend system to manage bookings, appointments, and customer data.
 - [ ] Integrate payment processing for appointment fees.
 - [ ] Provide analytics and reporting features for businesses to track their bookings.
+- [ ] Implement Keycloak for authentication and authorization.
