@@ -3,6 +3,68 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "keycloak-theme": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "swift_booking_theme/keycloak-theme",
+      "sourceRoot": "swift_booking_theme/keycloak-theme/src",
+      "prefix": "kc",
+      "architect": {
+        "build": {
+          "builder": "@analogjs/platform:vite",
+          "options": {
+            "configFile": "swift_booking_theme/keycloak-theme/vite.config.ts",
+            "outputPath": "dist",
+            "main": "swift_booking_theme/keycloak-theme/src/main.ts",
+            "index": "swift_booking_theme/keycloak-theme/index.html",
+            "tsConfig": "swift_booking_theme/keycloak-theme/tsconfig.app.json"
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@analogjs/platform:vite-dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "keycloak-theme:build:production",
+              "port": 5173
+            },
+            "development": {
+              "buildTarget": "keycloak-theme:build:development",
+              "hmr": true
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
+        }
+      }
+    },
     "Swift-Booking": {
       "projectType": "application",
       "schematics": {
