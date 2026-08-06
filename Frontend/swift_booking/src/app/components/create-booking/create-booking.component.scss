@@ -8,3 +8,23 @@
   gap: 0.8rem;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
+
+@media (max-width: 960px) {
+  .panel {
+    padding: 1rem;
+  }
+
+  .field-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    padding: 0.9rem;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,18 @@
 .panel {
   padding: 1.25rem;
   display: grid;
+
+@media (max-width: 960px) {
+  .panel {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    padding: 0.9rem;
+  }
+}
   gap: 0.8rem;
 }
 

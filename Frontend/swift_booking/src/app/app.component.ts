@@ -14,14 +14,17 @@ import { NavLinks } from './common/classes/nav-links';
   templateUrl: './app.component.html',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrl: './app.component.scss',
+  styleUrls: ['./app.component.scss', 'app.component.animations.scss'],
 })
 export class AppComponent implements OnInit {
+  
   title = 'Swift-Booking';
 
   public navLinks = NavLinks.links;
 
   protected isLoggedIn = false;
+  protected specialLinks = ['Login', 'Logout'];
+  protected showHamburgerMenu = false;
 
   constructor(
     readonly authService: AuthService,
@@ -33,16 +36,24 @@ export class AppComponent implements OnInit {
       this.isLoggedIn = value ?? false;
     });
     if (isPlatformBrowser(this.platformId)) {
-      this.toggleNavbButtons();
+      this.toggleNavbLoginButtons();
     }
   }
 
-  toggleNavbButtons() {
+  toggleNavbLoginButtons() {
     this.navLinks.forEach((link) => {
       if (NavLinks.authenticatedNavLinkLabels.includes(link.label)) {
         link.enabled = this.isLoggedIn;
       }
     });
+  }
+
+  toggleNavMenu() {
+    let navMenu = document.querySelector('.primary-navigation') as HTMLElement;
+    if (navMenu) {
+      this.showHamburgerMenu = !this.showHamburgerMenu;
+      navMenu.style.display = this.showHamburgerMenu ? 'flex' : 'none';
+    }
   }
 
   login(): void {

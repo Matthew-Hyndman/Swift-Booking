@@ -8,7 +8,11 @@
 	--lilac: #d291ff;
 	--ink-strong: #1e2330;
 	--ink-muted: #4f5666;
-	--danger: #c23a53;
+	--light-custard: #dee670;
+    --dirty-gold: #96883d;
+    --danger: #c23a53;
+    --cherry: #d33b57;
+    --dry-chilli: #680a0a;
 }
 
 * {
@@ -30,6 +34,14 @@ body {
 		radial-gradient(circle at 72% 84%, rgba(163, 74, 255, 0.22), transparent 32%),
 		linear-gradient(125deg, #fafafa 0%, #f3f3f3 45%, #ece8fb 100%);
 	background-attachment: fixed;
+}
+
+img,
+svg,
+video,
+canvas {
+	max-width: 100%;
+	height: auto;
 }
 
 .glass-panel {
@@ -89,6 +101,25 @@ textarea {
 	color: var(--ink-strong);
 }
 
+input,
+select,
+textarea,
+button,
+.button-link {
+	min-height: 2.75rem;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th,
+td {
+	text-align: left;
+	vertical-align: top;
+}
+
 textarea {
 	min-height: 84px;
 	resize: vertical;
@@ -142,11 +173,39 @@ button:hover,
 	font-size: 0.75rem;
 	font-weight: 700;
 	background: rgba(167, 253, 255, 0.55);
-	color: #135163;
+	color: #135163 !important;
 }
 
 @media (max-width: 640px) {
+	body {
+		background-attachment: scroll;
+	}
+
 	.glass-page {
 		padding: 0.65rem;
+	}
+
+	.glass-grid {
+		grid-template-columns: 1fr;
+	}
+
+	input,
+	select,
+	textarea,
+	button,
+	.button-link {
+		width: 100%;
+	}
+
+	table {
+		display: block;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	th,
+	td {
+		padding: 0.45rem 0.4rem;
+		font-size: 0.88rem;
 	}
 }
