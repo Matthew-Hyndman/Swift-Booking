@@ -1,0 +1,1 @@
+import{ɵ as n,a,b as c,c as s}from"./index-Qt6nCKHh.js";class e{static{this.ɵfac=function(t){return new(t||e)}}static{this.ɵcmp=n({type:e,selectors:[["kc-root"]],decls:2,vars:0,template:function(t,m){t&1&&(a(0,"h1"),c(1,"No Keycloak Context"),s())},encapsulation:2})}}export{e as NoContextComponent};
