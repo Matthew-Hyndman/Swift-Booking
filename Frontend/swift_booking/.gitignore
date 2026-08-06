@@ -11,6 +11,7 @@
 
 # Node
 /node_modules
+/swift_booking_theme/keycloak-theme/node_modules
 npm-debug.log
 yarn-error.log
 package-lock.json
