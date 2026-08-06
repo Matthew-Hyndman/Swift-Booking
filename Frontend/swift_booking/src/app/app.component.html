@@ -7,16 +7,25 @@
         src="assets/images/swift_book_logo_And_Title_Transparent.png"
         alt="swift booking Logo"
     /></a>    
-    <i class="hamburger fa-solid fa-bars" style="color: rgb(255, 255, 255);" (click)="toggleNavMenu()"></i>
+    <i
+      class="hamburger fa-solid fa-bars"
+      style="color: rgb(255, 255, 255);"
+      [attr.aria-expanded]="showHamburgerMenu"
+      (click)="toggleNavMenu()"
+    ></i>
     </div>
-    <nav class="primary-navigation" aria-label="Primary navigation">
+    <nav 
+    class="primary-navigation" 
+    aria-label="Primary navigation"
+    [class.is-open]="showHamburgerMenu"
+    >
       @for (link of navLinks; track $index; let i = $index) {
         @if (link.enabled === true && specialLinks.indexOf(link.label) === -1) {
           <a 
           [routerLink]="link.path" 
           routerLinkActive="is-active"
-          style="animation: fade-in-from-top 0.4s ease;"
-          [style.animationDelay]="(i * 0.1) + 's'"
+          [class.nav-link-animate]="showHamburgerMenu"
+          [style.--nav-link-delay]="(i * 0.25) + 's'"
           >{{
             link.label
           }}</a>

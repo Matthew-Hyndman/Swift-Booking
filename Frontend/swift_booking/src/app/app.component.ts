@@ -4,6 +4,7 @@ import {
   OnInit,
   PLATFORM_ID,
   ChangeDetectionStrategy,
+  HostListener,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from './services/auth';
@@ -14,17 +15,17 @@ import { NavLinks } from './common/classes/nav-links';
   templateUrl: './app.component.html',
   standalone: false,
   changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrls: ['./app.component.scss', 'app.component.animations.scss'],
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  
   title = 'Swift-Booking';
 
   public navLinks = NavLinks.links;
 
   protected isLoggedIn = false;
   protected specialLinks = ['Login', 'Logout'];
-  protected showHamburgerMenu = false;
+  protected showHamburgerMenu = true;
+  protected isMobile = false;
 
   constructor(
     readonly authService: AuthService,
@@ -36,7 +37,29 @@ export class AppComponent implements OnInit {
       this.isLoggedIn = value ?? false;
     });
     if (isPlatformBrowser(this.platformId)) {
+      this.isMobile = window.innerWidth <= 640;
+      this.showHamburgerMenu = !this.isMobile;
       this.toggleNavbLoginButtons();
+    }
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const isMobile = window.innerWidth <= 640;
+    if (isMobile !== this.isMobile) {
+      this.isMobile = isMobile;
+      this.showHamburgerMenu = !isMobile;
+    }
+  }
+
+  @HostListener('document:mousewheel')
+  onDocumentMousewheelEvent(): void {
+    if (this.showHamburgerMenu && this.isMobile) {
+      this.toggleNavMenu();
     }
   }
 
@@ -49,10 +72,8 @@ export class AppComponent implements OnInit {
   }
 
   toggleNavMenu() {
-    let navMenu = document.querySelector('.primary-navigation') as HTMLElement;
-    if (navMenu) {
+    if (this.isMobile) {
       this.showHamburgerMenu = !this.showHamburgerMenu;
-      navMenu.style.display = this.showHamburgerMenu ? 'flex' : 'none';
     }
   }
 
