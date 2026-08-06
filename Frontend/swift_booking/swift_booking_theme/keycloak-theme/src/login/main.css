@@ -1,40 +1,41 @@
 :root {
-	--base-light: #f3f3f3;
-	--neutral: #898989;
-	--aqua: #a7fdff;
-	--violet: #a34aff;
-	--lilac: #d291ff;
-	--ink-strong: #1e2330;
-	--ink-muted: #4f5666;
+    --base-light: #f3f3f3;
+    --neutral: #898989;
+    --aqua: #a7fdff;
+    --violet: #a34aff;
+    --lilac: #d291ff;
+    --ink-strong: #1e2330;
+    --ink-muted: #4f5666;
     --light-custard: #dee670;
     --dirty-gold: #96883d;
-	--danger: #c23a53;
+    --danger: #c23a53;
     --cherry: #d33b57;
     --dry-chilli: #680a0a;
 }
 
 * {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html,
 body {
-	min-height: 100%;
+    min-height: 100%;
 }
 
 .login-pf body {
-	margin: 0;
-	font-family: 'Manrope', 'Segoe UI', sans-serif;
-	color: var(--ink-strong);
-	background:
-		radial-gradient(circle at 9% 14%, rgba(167, 253, 255, 0.56), transparent 36%),
-		radial-gradient(circle at 89% 5%, rgba(210, 145, 255, 0.52), transparent 35%),
-		radial-gradient(circle at 72% 84%, rgba(163, 74, 255, 0.22), transparent 32%),
-		linear-gradient(125deg, #fafafa 0%, #f3f3f3 45%, #ece8fb 100%);
-	background-attachment: fixed;
+    margin: 0;
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    color: var(--ink-strong);
+    background:
+        radial-gradient(circle at 9% 14%, rgba(167, 253, 255, 0.56), transparent 36%),
+        radial-gradient(circle at 89% 5%, rgba(210, 145, 255, 0.52), transparent 35%),
+        radial-gradient(circle at 72% 84%, rgba(163, 74, 255, 0.22), transparent 32%),
+        linear-gradient(125deg, #fafafa 0%, #f3f3f3 45%, #ece8fb 100%);
+    background-attachment: fixed;
+    animation: fade-in 0.7s ease-in-out;
 }
 
-.card-pf  {
+.card-pf {
     border: 0;
     border-radius: 10px;
 }
@@ -48,7 +49,10 @@ body {
     border-radius: 1rem;
 }
 
-button, a, .pf-c-button.pf-m-primary {
+button,
+a,
+.pf-c-button.pf-m-primary,
+#cancelTOTPBtn {
     border: 0;
     border-radius: 999px;
     padding: 0.55rem 0.92rem;
@@ -65,13 +69,16 @@ button, a, .pf-c-button.pf-m-primary {
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-a {
+a,
+.kcSelectAuthListItemClass,
+#cancelTOTPBtn {
     color: var(--ink-strong);
     background: rgba(243, 243, 243, 0.48);
     box-shadow: inset 0 0 0 1px rgba(137, 137, 137, 0.32);
 }
 
-p, label {
+p,
+label {
     margin: 0;
     color: var(--ink-muted);
     display: block;
@@ -83,7 +90,7 @@ p, label {
 }
 
 .kcFormPasswordVisibilityButtonClass {
-    border: 0;    
+    border: 0;
     border-top-right-radius: 999px;
     border-bottom-right-radius: 999px;
     box-shadow: inset 0 0 0 1px rgba(137, 137, 137, 0.32);
@@ -95,8 +102,8 @@ p, label {
     padding: 0.92rem;
     font: inherit;
     font-weight: 700;
-    text-align: center;  
-      
+    text-align: center;
+
     background: linear-gradient(145deg, var(--cherry), var(--dry-chilli));
     box-shadow: 0 8px 20px rgba(195, 58, 83, 0.28);
     text-decoration: none;
@@ -118,7 +125,7 @@ p, label {
     padding: 0.92rem;
     font: inherit;
     font-weight: 700;
-    text-align: center;    
+    text-align: center;
     background: linear-gradient(145deg, var(--aqua), var(--violet));
     box-shadow: 0 8px 20px rgba(163, 74, 255, 0.28);
     text-decoration: none;
@@ -140,7 +147,7 @@ p, label {
     padding: 0.92rem;
     font: inherit;
     font-weight: 700;
-    text-align: center;    
+    text-align: center;
     background: linear-gradient(145deg, var(--light-custard), var(--dirty-gold));
     box-shadow: 0 8px 20px rgba(237, 255, 74, 0.28);
     text-decoration: none;
@@ -149,7 +156,8 @@ p, label {
     align-items: center;
     justify-content: center;
 
-    h4, p {
+    h4,
+    p {
         padding-left: 1.2rem;
         padding-right: 1.2rem;
     }
@@ -173,17 +181,30 @@ p, label {
 
 .pf-c-button.pf-m-control {
 
-    border-color: transparent;    
+    border-color: transparent;
 }
 
-#username, #email, #firstName, #lastName, #recoveryCodeInput {
+.kcSelectAuthListItemHeadingClass {
+    color: var(--ink-strong);
+    font-weight: 700;
+}
+
+#username,
+#email,
+#firstName,
+#lastName,
+#recoveryCodeInput,
+#totp,
+#userLabel,
+#kc-totp-secret-key {
     border: 0;
     border-radius: 999px;
     box-shadow: inset 0 0 0 1px rgba(137, 137, 137, 0.32);
 }
 
-#password, #password-confirm {
-    border: 0;    
+#password,
+#password-confirm {
+    border: 0;
     border-top-left-radius: 999px;
     border-bottom-left-radius: 999px;
     box-shadow: inset 0 0 0 1px rgba(137, 137, 137, 0.32);
@@ -198,13 +219,29 @@ p, label {
     border-radius: 10px;
 }
 
-#kc-recovery-codes-list {
+#kc-totp-secret-key {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+#kc-recovery-codes-list,
+#kc-totp-secret-qr-code {
     border: 0;
     border-radius: 10px;
     box-shadow: inset 0 0 0 1px rgba(137, 137, 137, 0.32);
 }
 
-#printRecoveryCodes, #downloadRecoveryCodes, #copyRecoveryCodes {
+#mode-manual,
+#kc-totp-secret-qr-code {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+
+}
+
+#printRecoveryCodes,
+#downloadRecoveryCodes,
+#copyRecoveryCodes {
     border: 0;
     border-radius: 999px;
     padding: 0.55rem 0.92rem;
@@ -218,5 +255,51 @@ p, label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    
+
+}
+
+/* Responsive styles */
+
+@media (max-width: 834px) {
+
+    p,
+    a,
+    span,
+    label,
+    button {
+        font-size: 0.9rem !important;
+    }
+
+    .select-auth-box-arrow {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+
+    p,
+    a,
+    span,
+    label,
+    button {
+        font-size: 1rem !important;
+    }
+
+    .select-auth-box-arrow {
+        display: none;
+    }
+}
+
+/* Animation */
+
+@keyframes fade-in {
+    0% {
+        transform: translateY(10%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
