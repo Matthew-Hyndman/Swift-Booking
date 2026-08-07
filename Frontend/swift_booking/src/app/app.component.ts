@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
   protected isLoggedIn = false;
   protected specialLinks = ['Login', 'Logout'];
   protected showHamburgerMenu = true;
-  protected isMobile = false;
+  protected isMobileOrTablet = false;
 
   constructor(
     readonly authService: AuthService,
@@ -37,8 +37,8 @@ export class AppComponent implements OnInit {
       this.isLoggedIn = value ?? false;
     });
     if (isPlatformBrowser(this.platformId)) {
-      this.isMobile = window.innerWidth <= 960;
-      this.showHamburgerMenu = !this.isMobile;
+      this.isMobileOrTablet = window.innerWidth <= 960;
+      this.showHamburgerMenu = !this.isMobileOrTablet;
       this.toggleNavbLoginButtons();
     }
   }
@@ -49,16 +49,16 @@ export class AppComponent implements OnInit {
       return;
     }
 
-    const isMobile = window.innerWidth <= 640;
-    if (isMobile !== this.isMobile) {
-      this.isMobile = isMobile;
-      this.showHamburgerMenu = !isMobile;
+    const isMobileOrTablet = window.innerWidth <= 960;
+    if (isMobileOrTablet !== this.isMobileOrTablet) {
+      this.isMobileOrTablet = isMobileOrTablet;
+      this.showHamburgerMenu = !isMobileOrTablet;
     }
   }
 
   @HostListener('document:mousewheel')
   onDocumentMousewheelEvent(): void {
-    if (this.showHamburgerMenu && this.isMobile) {
+    if (this.showHamburgerMenu && this.isMobileOrTablet) {
       this.toggleNavMenu();
     }
   }
@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
   }
 
   toggleNavMenu() {
-    if (this.isMobile) {
+    if (this.isMobileOrTablet) {
       this.showHamburgerMenu = !this.showHamburgerMenu;
     }
   }
