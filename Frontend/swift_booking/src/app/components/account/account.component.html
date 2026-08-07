@@ -1,27 +1,116 @@
 <section class="glass-page">
   <article class="glass-panel panel stack">
     <h1>Account</h1>
-    <p>View, edit, or remove account holder details used for profile and billing communication.</p>
+    <p>
+      View, edit, or remove account holder details used for profile and billing
+      communication.
+    </p>
+
+    <div class="analytics-section">
+      <div class="analytics-header">
+        <h2>Statistics &amp; Analytics</h2>
+        <p>
+          Sample insights to preview how your booking activity could be
+          presented.
+        </p>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="analytics-card">
+          <span class="analytics-card__label">Bookings this month</span>
+          <strong class="analytics-card__value">184</strong>
+          <span class="analytics-card__trend positive"
+            >↑ 18% vs last month</span
+          >
+        </div>
+
+        <div class="analytics-card">
+          <span class="analytics-card__label">Revenue</span>
+          <strong class="analytics-card__value">$12.4k</strong>
+          <span class="analytics-card__trend positive">↑ 9% this week</span>
+        </div>
+
+        <div class="analytics-card">
+          <span class="analytics-card__label">Occupancy</span>
+          <strong class="analytics-card__value">76%</strong>
+          <span class="analytics-card__trend neutral">Steady demand</span>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-card__header">
+            <h3>Weekly activity</h3>
+            <span>Last 7 days</span>
+          </div>
+          <div class="bar-chart" aria-label="Weekly activity chart">
+            <div class="bar" style="height: 42%"></div>
+            <div class="bar" style="height: 68%"></div>
+            <div class="bar" style="height: 54%"></div>
+            <div class="bar" style="height: 82%"></div>
+            <div class="bar" style="height: 61%"></div>
+            <div class="bar" style="height: 89%"></div>
+            <div class="bar" style="height: 73%"></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card__header">
+            <h3>Channel mix</h3>
+            <span>Bookings by source</span>
+          </div>
+          <div class="pie-chart-container">
+            <div class="donut-chart" aria-label="Channel mix chart">
+              <div class="donut-chart__center">
+                <strong>64%</strong>
+                <span>Direct</span>
+              </div>
+            </div>
+            <ul class="legend">
+              <li><span class="legend-dot direct"></span>Direct 64%</li>
+              <li><span class="legend-dot referral"></span>Referral 24%</li>
+              <li><span class="legend-dot social"></span>Social 12%</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <form class="stack" (ngSubmit)="save()" #accountForm="ngForm">
       <label>
         Full Name
-        <input name="fullName" [(ngModel)]="form.fullName" [readonly]="!isEditing" required>
+        <input
+          name="fullName"
+          [(ngModel)]="form.fullName"
+          [readonly]="!isEditing"
+          required
+        />
       </label>
 
       <label>
         Email
-        <input name="email" type="email" [(ngModel)]="form.email" [readonly]="!isEditing" required>
+        <input
+          name="email"
+          type="email"
+          [(ngModel)]="form.email"
+          [readonly]="!isEditing"
+          required
+        />
       </label>
 
       <label>
         Phone
-        <input name="phone" [(ngModel)]="form.phone" [readonly]="!isEditing">
+        <input name="phone" [(ngModel)]="form.phone" [readonly]="!isEditing" />
       </label>
 
       <label>
         Business Name
-        <input name="businessName" [(ngModel)]="form.businessName" [readonly]="!isEditing" required>
+        <input
+          name="businessName"
+          [(ngModel)]="form.businessName"
+          [readonly]="!isEditing"
+          required
+        />
       </label>
 
       <div class="action-row">
@@ -29,10 +118,18 @@
           <button type="button" (click)="startEdit()">Edit</button>
         } @else {
           <button type="submit" [disabled]="accountForm.invalid">Save</button>
-          <button type="button" class="ghost-button" (click)="cancelEdit()">Cancel</button>
+          <button type="button" class="ghost-button" (click)="cancelEdit()">
+            Cancel
+          </button>
         }
 
-        <button type="button" class="ghost-button danger" (click)="deleteAccount()">Delete Account</button>
+        <button
+          type="button"
+          class="ghost-button danger"
+          (click)="deleteAccount()"
+        >
+          Delete Account
+        </button>
       </div>
 
       @if (error) {
