@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
       this.isLoggedIn = value ?? false;
     });
     if (isPlatformBrowser(this.platformId)) {
-      this.isMobile = window.innerWidth <= 640;
+      this.isMobile = window.innerWidth <= 960;
       this.showHamburgerMenu = !this.isMobile;
       this.toggleNavbLoginButtons();
     }
