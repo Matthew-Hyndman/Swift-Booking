@@ -22,10 +22,12 @@
       @for (link of navLinks; track $index; let i = $index) {
         @if (link.enabled === true && specialLinks.indexOf(link.label) === -1) {
           <a 
+          name="nav-link"
           [routerLink]="link.path" 
           routerLinkActive="is-active"
           [class.nav-link-animate]="showHamburgerMenu"
           [style.--nav-link-delay]="(i * 0.25) + 's'"
+          (click)="setNavLinkFunctionality(link)"
           >{{
             link.label
           }}</a>
@@ -33,6 +35,7 @@
           <!-- Special links like Login and Logout are handled separately -->
           @if (isLoggedIn) {
             <button
+              name="nav-link"
               type="button"
               class="ghost-button special-nav-link"
               (click)="logout()"
@@ -41,6 +44,7 @@
             </button>
           } @else {
             <button
+              name="nav-link"
               type="button"
               class="ghost-button special-nav-link"
               (click)="login()"
