@@ -5,6 +5,7 @@ export class NavLinks {
     new LinkObj('Home', '/'),
     new LinkObj('About', '/about'),
     new LinkObj('Subscriptions', '/subscriptions'),
+    
 
     // hidden links
 
@@ -12,6 +13,11 @@ export class NavLinks {
     new LinkObj('View Bookings', '/bookings', false),
     new LinkObj('Create Booking', '/bookings/new', false),
     new LinkObj('Account', '/account', false),
+    
+    // login should be hidden in desktop and table
+
+    new LinkObj('Login', ''),
+    new LinkObj('Logout', '', false)
   ];
 
   public static readonly authenticatedNavLinkLabels: string[] = [

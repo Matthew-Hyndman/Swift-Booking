@@ -1,17 +1,57 @@
 <div class="app-shell">
   <header class="topbar glass-panel">
+    <div class="brand-container">
     <a routerLink="/"
       ><img
         class="brand-img"
         src="assets/images/swift_book_logo_And_Title_Transparent.png"
         alt="swift booking Logo"
-    /></a>
-    <nav aria-label="Primary navigation">
-      @for (link of navLinks; track link) {
-        @if (link.enabled === true) {
-          <a [routerLink]="link.path" routerLinkActive="is-active">{{
+    /></a>    
+    <i
+      class="hamburger fa-solid fa-bars"
+      style="color: rgb(255, 255, 255);"
+      [attr.aria-expanded]="showHamburgerMenu"
+      (click)="toggleNavMenu()"
+    ></i>
+    </div>
+    <nav 
+    class="primary-navigation" 
+    aria-label="Primary navigation"
+    [class.is-open]="showHamburgerMenu"
+    >
+      @for (link of navLinks; track $index; let i = $index) {
+        @if (link.enabled === true && specialLinks.indexOf(link.label) === -1) {
+          <a 
+          name="nav-link"
+          [routerLink]="link.path" 
+          routerLinkActive="is-active"
+          [class.nav-link-animate]="showHamburgerMenu"
+          [style.--nav-link-delay]="(i * 0.25) + 's'"
+          (click)="setNavLinkFunctionality(link)"
+          >{{
             link.label
           }}</a>
+        } @else if (link.enabled === true) {
+          <!-- Special links like Login and Logout are handled separately -->
+          @if (isLoggedIn) {
+            <button
+              name="nav-link"
+              type="button"
+              class="ghost-button special-nav-link"
+              (click)="logout()"
+            >
+              Logout
+            </button>
+          } @else {
+            <button
+              name="nav-link"
+              type="button"
+              class="ghost-button special-nav-link"
+              (click)="login()"
+            >
+              Login
+            </button>
+          }
         }
       }
     </nav>

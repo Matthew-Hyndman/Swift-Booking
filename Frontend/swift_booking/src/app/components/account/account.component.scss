@@ -3,6 +3,215 @@
   padding: 1.2rem;
 }
 
+button {
+  border-radius: 999px;
+}
+
+.analytics-section {
+  margin: 0.6rem 0 1.25rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.analytics-header {
+  margin-bottom: 0.9rem;
+}
+
+.analytics-header h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.05rem;
+}
+
+.analytics-header p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.analytics-card,
+.chart-card {
+  padding: 0.9rem;
+  border-radius: 0.95rem;
+  background: linear-gradient(180deg,rgba(207, 207, 207, 1) 0%, rgba(146, 146, 146, 1) 20%, rgba(74, 74, 74, 1) 100%);
+}
+
+.analytics-card {
+  padding: 0.5rem;  
+}
+
+.analytics-card__screen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: inset -3px 2px 7px 0px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.analytics-card__label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #2c2c2c;
+}
+
+.analytics-card__value {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.analytics-card__trend {
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.48);
+  border-radius: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.analytics-card__trend.positive {
+  color: #62f2b0;
+}
+
+.analytics-card__trend.neutral {
+  color: var(--light-custard);
+}
+
+.analytics-card__trend.negative {
+  color: var(--cherry);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 0.95fr;
+  gap: 0.75rem;
+}
+
+.chart-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.chart-card__header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.chart-card__header span {
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 0.8rem;
+}
+
+.pie-chart-container {
+    padding: 0.5rem 0.5rem 0rem 0.5rem;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 0.75rem;
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+  height: 35vh;
+  padding: 0.5rem 0.5rem 0rem 0.5rem;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 0.75rem;
+  overflow: hidden;
+
+}
+
+.bar {
+  flex: 1;
+  border-radius: 999px 999px 0 0;
+  min-height: 20%;
+  background: linear-gradient(180deg, var(--lilac) 0%, var(--violet) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.donut-chart {
+  display: grid;
+  place-items: center;
+  width: 170px;
+  aspect-ratio: 1;
+  margin: 0.3rem auto 0.7rem;
+  border-radius: 50%;
+  background: conic-gradient(#6c9cff 0 64%, #9c79ff 64% 84%, #36c6a2 84% 100%);
+  position: relative;
+}
+
+.donut-chart::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: rgba(7, 13, 26, 0.92);
+}
+
+.donut-chart__center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  color: rgb(255, 255, 255);
+}
+
+.donut-chart__center strong {
+  font-size: 1.2rem;
+}
+
+.donut-chart__center span {
+  
+  font-size: 0.8rem;
+}
+
+.legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.legend-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.direct {
+  background: #6c9cff;
+}
+
+.legend-dot.referral {
+  background: #9c79ff;
+}
+
+.legend-dot.social {
+  background: #36c6a2;
+}
+
 .action-row {
   display: flex;
   gap: 0.65rem;
@@ -12,4 +221,34 @@
 .danger {
   color: #7f2034;
   box-shadow: inset 0 0 0 1px rgba(194, 58, 83, 0.35);
+}
+
+@media (max-width: 960px) {
+  .panel {
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .analytics-grid,
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row {
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .action-row {
+    flex-direction: column;
+  }
+
+  .action-row > * {
+    width: 100%;
+  }
+
+  .analytics-section {
+    padding: 0.85rem;
+  }
 }

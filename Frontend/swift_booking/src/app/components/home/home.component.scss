@@ -26,3 +26,27 @@
   font-size: 1.02rem;
   line-height: 1.4;
 }
+
+@media (max-width: 960px) {
+  .hero {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions > * {
+    width: 100%;
+  }
+
+  .info-card {
+    min-height: auto;
+  }
+}

@@ -1,11 +1,13 @@
 <section class="glass-page">
   <article class="glass-panel panel stack">
-    <h1>View Bookings</h1>
-    <p>Browse all business bookings with search and filtering controls.</p>
+    <div class="page-header">
+      <h1>View Bookings</h1>
+      <p>Browse all business bookings with search and filtering controls.</p>
+    </div>
 
     <div class="filters">
-      <label>
-        Business
+      <label class="field">
+        <span>Business</span>
         <select name="selectedBusiness" [(ngModel)]="selectedBusinessId" (ngModelChange)="reloadBookings()">
           @for (business of businesses; track business.businessId) {
             <option [ngValue]="business.businessId">{{ business.businessName }}</option>
@@ -13,13 +15,13 @@
         </select>
       </label>
 
-      <label>
-        Search
+      <label class="field">
+        <span>Search</span>
         <input name="searchTerm" [(ngModel)]="searchTerm" placeholder="Customer, service, notes...">
       </label>
 
-      <label>
-        Status
+      <label class="field">
+        <span>Status</span>
         <select name="statusFilter" [(ngModel)]="statusFilter">
           @for (status of statuses; track status) {
             <option [ngValue]="status">{{ status }}</option>
@@ -27,8 +29,8 @@
         </select>
       </label>
 
-      <label>
-        Employee
+      <label class="field">
+        <span>Employee</span>
         <select name="employeeFilter" [(ngModel)]="employeeFilter">
           <option [ngValue]="0">All</option>
           @for (employee of employees; track employee.employeeId) {
@@ -45,9 +47,9 @@
 
   <article class="glass-panel panel">
     @if (isLoading) {
-      <p>Loading bookings...</p>
+      <p class="loading-state">Loading bookings...</p>
     } @else {
-      <div class="table-wrap">
+      <div class="table-wrap desktop-table">
         <table>
           <thead>
             <tr>
@@ -82,6 +84,39 @@
             }
           </tbody>
         </table>
+      </div>
+
+      <div class="mobile-card-list">
+        @for (booking of filteredBookings(); track booking.bookingId) {
+          <div class="booking-card">
+            <div class="booking-card__row">
+              <span class="booking-card__label">Customer</span>
+              <span>{{ booking.customerName }}</span>
+            </div>
+            <div class="booking-card__row">
+              <span class="booking-card__label">Employee</span>
+              <span>{{ booking.employeeName }}</span>
+            </div>
+            <div class="booking-card__row">
+              <span class="booking-card__label">Date</span>
+              <span>{{ booking.bookingDate }}</span>
+            </div>
+            <div class="booking-card__row">
+              <span class="booking-card__label">Time</span>
+              <span>{{ booking.startTime }} - {{ booking.endTime }}</span>
+            </div>
+            <div class="booking-card__row">
+              <span class="booking-card__label">Service</span>
+              <span>{{ booking.serviceDescription || 'N/A' }}</span>
+            </div>
+            <div class="booking-card__actions">
+              <span class="badge">{{ booking.status }}</span>
+              <button type="button" class="ghost-button" (click)="openBooking(booking.bookingId)">Open</button>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-state">No bookings match your current filters.</p>
+        }
       </div>
     }
   </article>

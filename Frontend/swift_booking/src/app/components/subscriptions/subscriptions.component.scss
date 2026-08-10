@@ -29,3 +29,25 @@ ul {
   display: grid;
   gap: 0.35rem;
 }
+
+@media (max-width: 960px) {
+  .intro,
+  .plan-card {
+    padding: 1rem;
+  }
+
+  .plans-grid {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intro,
+  .plan-card {
+    padding: 0.9rem;
+  }
+}
