@@ -1,13 +1,14 @@
 package com.web.app.swift_booking.controller;
 
 import jakarta.validation.Valid;
-import com.web.app.swift_booking.dto.AnalyticsResponse;
-import com.web.app.swift_booking.dto.BookingResponse;
-import com.web.app.swift_booking.dto.BusinessResponse;
-import com.web.app.swift_booking.dto.CreateBookingRequest;
-import com.web.app.swift_booking.dto.CustomerResponse;
-import com.web.app.swift_booking.dto.EmployeeResponse;
-import com.web.app.swift_booking.dto.UpdateBookingRequest;
+
+import com.web.app.swift_booking.DTO.AnalyticsResponse;
+import com.web.app.swift_booking.DTO.BookingResponse;
+import com.web.app.swift_booking.DTO.BusinessResponse;
+import com.web.app.swift_booking.DTO.CreateBookingRequest;
+import com.web.app.swift_booking.DTO.CustomerResponse;
+import com.web.app.swift_booking.DTO.EmployeeResponse;
+import com.web.app.swift_booking.DTO.UpdateBookingRequest;
 import com.web.app.swift_booking.service.BookingService;
 
 import org.springframework.http.HttpStatus;

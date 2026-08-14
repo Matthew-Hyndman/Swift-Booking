@@ -1,4 +1,4 @@
-package com.web.app.swift_booking.dto;
+package com.web.app.swift_booking.DTO;
 
 public record BusinessResponse(
         Integer businessId,

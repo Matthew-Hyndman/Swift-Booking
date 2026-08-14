@@ -1,4 +1,4 @@
-package com.web.app.swift_booking.dto.Keycloak;
+package com.web.app.swift_booking.DTO.Keycloak;
 
 public record MemberRepresentation_DTO(
     String id,

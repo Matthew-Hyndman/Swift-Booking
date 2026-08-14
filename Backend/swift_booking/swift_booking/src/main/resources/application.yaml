@@ -21,8 +21,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${BOOKWISE_ISSUER_URI:http://localhost:8080}
-          jwk-set-uri: ${BOOKWISE_JWK_SET_URI:http://localhost:8080/.well-known/jwks.json}
+          issuer-uri: http://localhost:8080/realms/Swift-Booking
+          jwk-set-uri: http://localhost:8080/realms/Swift-Booking/protocol/openid-connect/certs
 
   data:
     rest:
@@ -38,6 +38,14 @@ spring:
 server:
   port: 8443
 
+keycloak-details:
+  realm-url: http://localhost:8080/realms/Swift-Booking
+  origin: http://localhost:8080
+  realm: Swift-Booking
+  
+  
+
 allowed-origins:
+  - http://localhost:8080
   - http://localhost:5432
   - http://localhost:4200

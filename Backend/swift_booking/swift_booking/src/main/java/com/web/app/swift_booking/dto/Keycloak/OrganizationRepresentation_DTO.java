@@ -1,4 +1,5 @@
-package com.web.app.swift_booking.dto.Keycloak;
+package com.web.app.swift_booking.DTO.Keycloak;
+
 import java.util.List;
 
 public record OrganizationRepresentation_DTO(

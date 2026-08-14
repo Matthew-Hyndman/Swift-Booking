@@ -3,9 +3,8 @@ package com.web.app.swift_booking.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
-import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
-
+import com.web.app.swift_booking.DTO.Keycloak.MemberRepresentation_DTO;
+import com.web.app.swift_booking.DTO.Keycloak.OrganizationRepresentation_DTO;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
