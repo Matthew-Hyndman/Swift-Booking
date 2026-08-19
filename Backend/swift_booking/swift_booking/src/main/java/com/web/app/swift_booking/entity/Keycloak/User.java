@@ -52,6 +52,6 @@ public class User {
     private String serviceAccountClientLink;
 
     @Column(name = "not_before")
-    private Long notBefore;
+    private Integer notBefore;
 
 }

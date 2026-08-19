@@ -1,12 +1,13 @@
 package com.web.app.swift_booking.service.Keycloak;
 import java.util.Optional;
-import com.web.app.swift_booking.DTO.Keycloak.MemberRepresentation_DTO;
+import org.springframework.http.ResponseEntity;
 import com.web.app.swift_booking.DTO.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.DTO.Keycloak.UserRepresentation_DTO;
 import com.web.app.swift_booking.entity.Keycloak.Organization;
 
 public interface OrganizationService {
     
-    String createOrganization(String userId, OrganizationRepresentation_DTO organizationData);    
+    ResponseEntity<String> createOrganization(String userId, OrganizationRepresentation_DTO organizationData);    
 
     Optional<Organization> getOrganizationById(String organizationId);
 
@@ -14,7 +15,7 @@ public interface OrganizationService {
 
     String deleteOrganization(String organizationId);
 
-    String addEmployeeToOrganization(String organizationId, String groupId, String userId);
+    ResponseEntity<String> addEmployeeToOrganization(String organizationId, String groupId, UserRepresentation_DTO userData);
 
-    String removeEmployeeFromOrganization(String organizationId, String groupId, String userId);
+    ResponseEntity<String> removeEmployeeFromOrganization(String organizationId, String groupId, String userId);
 }

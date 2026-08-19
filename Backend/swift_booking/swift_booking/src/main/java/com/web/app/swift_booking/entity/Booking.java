@@ -19,6 +19,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
+import com.web.app.swift_booking.entity.Keycloak.Organization;
+import com.web.app.swift_booking.entity.Keycloak.User;
 
 @Entity
 @Table(name = "bookings")
@@ -30,18 +33,18 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
-    private Integer bookingId;
+    private UUID bookingId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "business_id", nullable = false)
-    private Business business;
+    @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
+    private Organization organization;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    @JoinColumn(name = "staff_user_id", referencedColumnName = "id", nullable = false)
+    private User employee;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", referencedColumnName = "customer_id", nullable = false)
     private Customer customer;
 
     @Column(name = "booking_date", nullable = false)
@@ -49,6 +52,9 @@ public class Booking {
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "end_time", nullable = false)
     private LocalTime endTime;

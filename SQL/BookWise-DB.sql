@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     customer_id INTEGER NOT NULL,
     booking_date DATE NOT NULL,
     start_time TIME NOT NULL,
+    end_date DATE NULL,
     end_time TIME NOT NULL,
     service_description TEXT,
     status VARCHAR(50) DEFAULT 'pending', -- pending, confirmed, completed, cancelled
