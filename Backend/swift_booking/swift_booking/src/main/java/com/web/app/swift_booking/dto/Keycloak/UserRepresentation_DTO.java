@@ -15,5 +15,5 @@ public record UserRepresentation_DTO(
     List<String> realmRoles
 
 ) {
-    
+
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.List;
 
 import org.springframework.http.HttpStatusCode;
@@ -49,7 +50,7 @@ public class OrganizationService_Impl implements OrganizationService {
         private final WebClient keycloakHttpClient = WebClient.builder()
                         .defaultHeader("Content-Type", "application/json")
                         .build();
-        
+
         OrganizationService_Impl(UserRepo userRepo) {
                 this.userRepo = userRepo;
         }
@@ -69,7 +70,8 @@ public class OrganizationService_Impl implements OrganizationService {
                         User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
                         // Keycloak organization create does not reliably persist nested members/groups.
-                        // Create the organization first, then add groups/member through dedicated endpoints.
+                        // Create the organization first, then add groups/member through dedicated
+                        // endpoints.
                         OrganizationRepresentation_DTO createRequest = new OrganizationRepresentation_DTO();
                         createRequest.setId(organizationData.getId());
                         createRequest.setName(organizationData.getName());
@@ -164,17 +166,25 @@ public class OrganizationService_Impl implements OrganizationService {
                         UserRepresentation_DTO userData) {
                 try {
                         String accessToken = getAdminAccessToken();
-                        userData.requiredActions().add("VERIFY_EMAIL");
-                        userData.requiredActions().add("CONFIGURE_TOTP");
-
+                        //userData.requiredActions().add("VERIFY_EMAIL");
+                        //userData.requiredActions().add("CONFIGURE_TOTP");
+        
                         // Create a new user
-                        String userId = this.keycloakHttpClient.post()
+                        ResponseEntity<String> userCreationResponse = this.keycloakHttpClient.post()
                                         .uri(this.origin + "/admin/realms/{realm}/users", realm)
                                         .headers(headers -> headers.setBearerAuth(accessToken))
                                         .bodyValue(userData)
                                         .retrieve()
-                                        .bodyToMono(String.class)
+                                        .toEntity(String.class)
                                         .block();
+
+                        if(userCreationResponse == null || userCreationResponse.getStatusCode().isError()) {
+                                throw new RuntimeException("Failed to create user in Keycloak");
+                        }
+                        
+                        String userId = extractResourceId(userCreationResponse);
+
+                        addUserAsMemberToOrganization(accessToken, organizationId, userId);
 
                         // Add the user to the specified group in the organization
                         this.keycloakHttpClient.put()
@@ -202,13 +212,15 @@ public class OrganizationService_Impl implements OrganizationService {
                                                 .bodyToMono(String.class)
                                                 .flatMap(body -> Mono.error(
                                                                 new RuntimeException(
-                                                                                "Client Error creating group '" + groupName
+                                                                                "Client Error creating group '"
+                                                                                                + groupName
                                                                                                 + "': " + body))))
                                 .onStatus(HttpStatusCode::is5xxServerError, response -> response
                                                 .bodyToMono(String.class)
                                                 .flatMap(body -> Mono.error(
                                                                 new RuntimeException(
-                                                                                "Server Error creating group '" + groupName
+                                                                                "Server Error creating group '"
+                                                                                                + groupName
                                                                                                 + "': " + body))))
                                 .toEntity(String.class)
                                 .block();
@@ -216,50 +228,14 @@ public class OrganizationService_Impl implements OrganizationService {
                 return extractResourceId(groupResponse);
         }
 
-        private void addMemberToOrganizationGroup(String accessToken, String organizationId, String groupId,
-                        String userId) {
-                this.keycloakHttpClient.put()
-                                .uri(this.origin
-                                                + "/admin/realms/{realm}/organizations/{organizationId}/groups/{groupId}/members/{userId}",
-                                                realm, organizationId, groupId, userId)
-                                .headers(headers -> headers.setBearerAuth(accessToken))
-                                .retrieve()
-                                .onStatus(HttpStatusCode::is4xxClientError, response -> response
-                                                .bodyToMono(String.class)
-                                                .flatMap(body -> Mono.error(
-                                                                new RuntimeException(
-                                                                                "Client Error adding member to group: " + body))))
-                                .onStatus(HttpStatusCode::is5xxServerError, response -> response
-                                                .bodyToMono(String.class)
-                                                .flatMap(body -> Mono.error(
-                                                                new RuntimeException(
-                                                                                "Server Error adding member to group: " + body))))
-                                .toBodilessEntity()
-                                .block();
-        }
-
-        private void addMemberToOrganization(String accessToken, String organizationId, String userId) {
-                this.keycloakHttpClient.put()
-                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/members/{userId}",
-                                                realm, organizationId, userId)
-                                .headers(headers -> headers.setBearerAuth(accessToken))
-                                .retrieve()
-                                .onStatus(HttpStatusCode::is4xxClientError, response -> response
-                                                .bodyToMono(String.class)
-                                                .flatMap(body -> Mono.error(
-                                                                new RuntimeException(
-                                                                                "Client Error adding member to organization: "
-                                                                                                + body))))
-                                .onStatus(HttpStatusCode::is5xxServerError, response -> response
-                                                .bodyToMono(String.class)
-                                                .flatMap(body -> Mono.error(
-                                                                new RuntimeException(
-                                                                                "Server Error adding member to organization: "
-                                                                                                + body))))
-                                .toBodilessEntity()
-                                .block();
-        }
-
+        /**
+         * Extracts the resource ID from the Keycloak response. It first checks
+         * the "Location" header for the ID. If not found, it attempts to 
+         * parse the response body as JSON and extract the "id" field.
+         * 
+         * @param response The response entity from which to extract the resource ID.
+         * @return The extracted resource ID, or null if not found.
+         */
         private String extractResourceId(ResponseEntity<String> response) {
                 if (response == null) {
                         return null;
@@ -290,6 +266,72 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 return null;
         }
+
+        private void addUserAsMemberToOrganization(String accessToken, String organizationId, String userId) {
+                ResponseEntity<String> response = this.keycloakHttpClient.post()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/members",
+                                                realm, organizationId)
+                                .headers(headers -> headers.setBearerAuth(accessToken))
+                                .bodyValue(userId)
+                                .retrieve()                                
+                                .toEntity(String.class)
+                                .block();
+
+                if (response == null || response.getStatusCode().isError()) {
+                        throw new RuntimeException("Failed to add user as member to organization");
+                }
+        }
+
+        private void addMemberToOrganizationGroup(String accessToken, String organizationId, String groupId,
+                        String userId) {
+                
+                                addUserAsMemberToOrganization(accessToken, organizationId, userId);
+
+                this.keycloakHttpClient.put()
+                                .uri(this.origin
+                                                + "/admin/realms/{realm}/organizations/{organizationId}/groups/{groupId}/members/{userId}",
+                                                realm, organizationId, groupId, userId)
+                                .headers(headers -> headers.setBearerAuth(accessToken))
+                                .retrieve()
+                                .onStatus(HttpStatusCode::is4xxClientError, response -> response
+                                                .bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(
+                                                                new RuntimeException(
+                                                                                "Client Error adding member to group: "
+                                                                                                + body))))
+                                .onStatus(HttpStatusCode::is5xxServerError, response -> response
+                                                .bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(
+                                                                new RuntimeException(
+                                                                                "Server Error adding member to group: "
+                                                                                                + body))))
+                                .toBodilessEntity()
+                                .block();
+        }
+
+        private void addMemberToOrganization(String accessToken, String organizationId, String userId) {
+                this.keycloakHttpClient.put()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/members/{userId}",
+                                                realm, organizationId, userId)
+                                .headers(headers -> headers.setBearerAuth(accessToken))
+                                .retrieve()
+                                .onStatus(HttpStatusCode::is4xxClientError, response -> response
+                                                .bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(
+                                                                new RuntimeException(
+                                                                                "Client Error adding member to organization: "
+                                                                                                + body))))
+                                .onStatus(HttpStatusCode::is5xxServerError, response -> response
+                                                .bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(
+                                                                new RuntimeException(
+                                                                                "Server Error adding member to organization: "
+                                                                                                + body))))
+                                .toBodilessEntity()
+                                .block();
+        }
+
+        
 
         @Override
         public ResponseEntity<String> removeEmployeeFromOrganization(String organizationId, String groupId,

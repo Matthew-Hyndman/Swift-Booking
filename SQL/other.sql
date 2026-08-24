@@ -1,2 +1,4 @@
 -- this is just a file to run small queries to test make adjustments 
 -- to the database, it is not part of the main project.
+
+select * from keycloak_group;

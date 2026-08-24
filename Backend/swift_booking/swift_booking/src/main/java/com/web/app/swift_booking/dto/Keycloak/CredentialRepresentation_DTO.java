@@ -1,15 +1,16 @@
 package com.web.app.swift_booking.DTO.Keycloak;
+import java.util.Optional;
 
 public record CredentialRepresentation_DTO(
-    String id,
+    Optional<String> id,
     String type,
-    String userlabel,
-    Long createdDate,
-    String credentialData,
-    int priority,
+    Optional<String> userLabel,
+    Optional<Long> createdDate,
+    Optional<String> credentialData,
+    Optional<Integer> priority,
     String value,
     boolean temporary,
-    int period
+    Optional<Integer> period
 
 ) {
     
