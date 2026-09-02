@@ -43,7 +43,7 @@ keycloak-details:
   origin: http://localhost:8080
   realm: Swift-Booking
   client-id: swift-booking-local-client
-  secret: Mbtf8aJLjtK5jv4rw8qIpEfLlslbUsgb 
+  secret: kmBAHEPmjjzWZfu2fWltPP1nY7bEOsrmUejUyU5ojPSwc8xAqEX3ovYJb6REAdaaRcyVTNbiuN10UYMQKa9aQ5
   # this is the secret for the client swift-booking-backend in Keycloak. 
   # It is ONLY for the local environment.
   # when deploying I will use web hooks to set the secret in the 
