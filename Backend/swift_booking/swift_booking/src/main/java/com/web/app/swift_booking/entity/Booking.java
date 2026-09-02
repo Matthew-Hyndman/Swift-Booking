@@ -31,7 +31,7 @@ import com.web.app.swift_booking.entity.Keycloak.User;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "booking_id")
     private UUID bookingId;
 

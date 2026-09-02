@@ -1,4 +1,4 @@
-package com.web.app.swift_booking.DTO;
+package com.web.app.swift_booking.dto;
 
 import jakarta.validation.constraints.NotNull;
 

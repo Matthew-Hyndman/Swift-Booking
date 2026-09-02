@@ -1,8 +1,8 @@
 package com.web.app.swift_booking.service.Keycloak;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
-import com.web.app.swift_booking.DTO.Keycloak.OrganizationRepresentation_DTO;
-import com.web.app.swift_booking.DTO.Keycloak.UserRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
 import com.web.app.swift_booking.entity.Keycloak.Organization;
 
 public interface OrganizationService {

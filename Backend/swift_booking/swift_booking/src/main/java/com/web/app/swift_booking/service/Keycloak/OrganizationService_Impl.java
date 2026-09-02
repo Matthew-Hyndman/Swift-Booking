@@ -15,15 +15,16 @@ import java.util.List;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.web.app.swift_booking.DTO.Keycloak.GroupRepresentation_DTO;
-import com.web.app.swift_booking.DTO.Keycloak.OrganizationRepresentation_DTO;
-import com.web.app.swift_booking.DTO.Keycloak.UserRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
 
 @Service
 public class OrganizationService_Impl implements OrganizationService {
@@ -33,7 +34,7 @@ public class OrganizationService_Impl implements OrganizationService {
 
         private final UserRepo userRepo;
 
-        private OrganizationRepo organizationRepo;
+        private OrganizationRepo orgRepo;
 
         @Value("${keycloak-details.origin}")
         private String origin;
@@ -50,9 +51,9 @@ public class OrganizationService_Impl implements OrganizationService {
         private final WebClient keycloakHttpClient = WebClient.builder()
                         .defaultHeader("Content-Type", "application/json")
                         .build();
-
-        OrganizationService_Impl(UserRepo userRepo) {
+        OrganizationService_Impl(UserRepo userRepo, OrganizationRepo orgRepo) {
                 this.userRepo = userRepo;
+                this.orgRepo = orgRepo;
         }
 
         /**
@@ -134,7 +135,7 @@ public class OrganizationService_Impl implements OrganizationService {
          */
         @Override
         public Optional<Organization> getOrganizationById(String organizationId) {
-                return Optional.ofNullable(organizationRepo.findById(organizationId)
+                return Optional.ofNullable(orgRepo.findById(organizationId)
                                 .orElseThrow(() -> new RuntimeException("Organization not found")));
         }
 

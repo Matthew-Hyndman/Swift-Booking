@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-import com.web.app.swift_booking.DTO.Keycloak.UserRepresentation_DTO;
-import com.web.app.swift_booking.DTO.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
 
 
 @RestController

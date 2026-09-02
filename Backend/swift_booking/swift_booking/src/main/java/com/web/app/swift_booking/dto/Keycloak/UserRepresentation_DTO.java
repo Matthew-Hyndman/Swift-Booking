@@ -1,4 +1,4 @@
-package com.web.app.swift_booking.DTO.Keycloak;
+package com.web.app.swift_booking.dto.Keycloak;
 
 import java.util.List;
 

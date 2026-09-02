@@ -15,7 +15,7 @@ import lombok.Setter;
 public class Organization {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", length = 36)
     private String id;
 
