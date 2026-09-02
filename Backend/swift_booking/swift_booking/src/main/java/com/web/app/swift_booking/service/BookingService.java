@@ -12,41 +12,43 @@ import com.web.app.swift_booking.dto.EmployeeResponse;
 import com.web.app.swift_booking.dto.UpdateBookingRequest;
 import com.web.app.swift_booking.entity.Booking;
 import com.web.app.swift_booking.entity.BookingStatus;
-import com.web.app.swift_booking.entity.Business;
 import com.web.app.swift_booking.entity.Customer;
-import com.web.app.swift_booking.entity.Employee;
 import com.web.app.swift_booking.repository.BookingRepository;
-import com.web.app.swift_booking.repository.BusinessRepository;
 import com.web.app.swift_booking.repository.CustomerRepository;
-import com.web.app.swift_booking.repository.EmployeeRepository;
+
+import com.web.app.swift_booking.DAO.OrganizationRepo;
+import com.web.app.swift_booking.DAO.UserRepo;
+
+import com.web.app.swift_booking.entity.Keycloak.Organization;
+import com.web.app.swift_booking.entity.Keycloak.User;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-@Service
-@Transactional(readOnly = true)
+//@Service
+//@Transactional(readOnly = true)
 public class BookingService {
-
-    private final BusinessRepository businessRepository;
-    private final EmployeeRepository employeeRepository;
+/*
+    private final OrganizationRepo organizationRepository;
+    private final UserRepo userRepository;
     private final CustomerRepository customerRepository;
     private final BookingRepository bookingRepository;
 
     public BookingService(
-            BusinessRepository businessRepository,
-            EmployeeRepository employeeRepository,
+            OrganizationRepo organizationRepository,
+            UserRepo userRepository,
             CustomerRepository customerRepository,
             BookingRepository bookingRepository
     ) {
-        this.businessRepository = businessRepository;
-        this.employeeRepository = employeeRepository;
+        this.organizationRepository = organizationRepository;
+        this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.bookingRepository = bookingRepository;
     }
 
-    public List<BusinessResponse> getBusinesses() {
+    /*public List<BusinessResponse> getBusinesses() {
         return businessRepository.findAll().stream()
                 .map(this::toBusinessResponse)
                 .toList();
@@ -57,8 +59,8 @@ public class BookingService {
         return employeeRepository.findByBusinessBusinessIdAndIsActiveTrueOrderByFirstNameAscLastNameAsc(businessId).stream()
                 .map(this::toEmployeeResponse)
                 .toList();
-    }
-
+    }*/
+/*
     public List<CustomerResponse> getCustomers(String search) {
         List<Customer> customers;
         if (search == null || search.isBlank()) {
@@ -108,7 +110,7 @@ public class BookingService {
         }
 
         Booking booking = new Booking();
-        booking.setBusiness(business);
+        booking.setOrganization(business);
         booking.setEmployee(employee);
         booking.setCustomer(customer);
         booking.setBookingDate(request.bookingDate());
@@ -130,7 +132,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("Booking not found: " + bookingId));
 
-        if (!booking.getBusiness().getBusinessId().equals(businessId)) {
+        if (!booking.getOrganization().getBusinessId().equals(businessId)) {
             throw new NoSuchElementException("Booking not found in business: " + bookingId);
         }
 
@@ -158,7 +160,7 @@ public class BookingService {
             throw new IllegalArgumentException("Employee already has a booking in this time window");
         }
 
-        booking.setBusiness(business);
+        booking.setOrganization(business);
         booking.setEmployee(employee);
         booking.setCustomer(customer);
         booking.setBookingDate(request.bookingDate());
@@ -188,14 +190,14 @@ public class BookingService {
                 bookingRepository.countByBusinessBusinessIdAndStatus(businessId, BookingStatus.CANCELLED),
                 byEmployee
         );
-    }
-
+    }*/
+/*
     private void assertBusinessExists(Integer businessId) {
-        if (!businessRepository.existsById(businessId)) {
+        if (!organizationRepository.existsById(businessId)) {
             throw new NoSuchElementException("Business not found: " + businessId);
         }
     }
-
+ 
     private BusinessResponse toBusinessResponse(Business business) {
         return new BusinessResponse(
                 business.getBusinessId(),
@@ -218,9 +220,9 @@ public class BookingService {
                 employee.getPhone(),
                 employee.getIsActive()
         );
-    }
+    }*/
 
-    private CustomerResponse toCustomerResponse(Customer customer) {
+/*    private CustomerResponse toCustomerResponse(Customer customer) {
         return new CustomerResponse(
                 customer.getCustomerId(),
                 customer.getFirstName(),
@@ -234,7 +236,7 @@ public class BookingService {
     private BookingResponse toBookingResponse(Booking booking) {
         return new BookingResponse(
                 booking.getBookingId(),
-                booking.getBusiness().getBusinessId(),
+                booking.getOrganization().getBusinessId(),
                 booking.getEmployee().getEmployeeId(),
                 booking.getEmployee().fullName(),
                 booking.getCustomer().getCustomerId(),
@@ -246,5 +248,5 @@ public class BookingService {
                 booking.getStatus(),
                 booking.getNotes()
         );
-    }
+    }*/
 }

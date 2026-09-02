@@ -1,6 +1,6 @@
 ### This is Swift Booking
 
-this is repo for Bookwise Project. The ambition of this project is to create a SaaS platform where small businesses can manage their bookings and appointments. The platform will provide features such as online booking, appointment scheduling, customer management, and payment processing.
+this is repo for Swift Booking Project. The ambition of this project is to create a SaaS platform where small businesses can manage their bookings and appointments. The platform will provide features such as online booking, appointment scheduling, customer management, and payment processing.
 
 - [ ] create a user-friendly interface for customers to book appointments online.
 - [ ] Implement a secure authentication system for businesses and customers.

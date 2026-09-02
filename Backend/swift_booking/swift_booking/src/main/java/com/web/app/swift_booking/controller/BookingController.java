@@ -1,6 +1,7 @@
 package com.web.app.swift_booking.controller;
 
 import jakarta.validation.Valid;
+
 import com.web.app.swift_booking.dto.AnalyticsResponse;
 import com.web.app.swift_booking.dto.BookingResponse;
 import com.web.app.swift_booking.dto.BusinessResponse;
@@ -27,13 +28,20 @@ import java.util.List;
 @RequestMapping("/api")
 public class BookingController {
 
-    private final BookingService bookingService;
+    /*private final BookingService bookingService;
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
-    }
+    }*/
 
-    @GetMapping("/businesses")
+    /*@GetMapping("/booking")
+    public String getBooking() {
+        // placeholder for testing the API endpoint
+        return "Booking API is working!";
+    }*/
+    
+
+    /*@GetMapping("/businesses")
     public List<BusinessResponse> getBusinesses() {
         return bookingService.getBusinesses();
     }
@@ -41,9 +49,9 @@ public class BookingController {
     @GetMapping("/businesses/{businessId}/employees")
     public List<EmployeeResponse> getEmployees(@PathVariable Integer businessId) {
         return bookingService.getEmployees(businessId);
-    }
+    }*/
 
-    @GetMapping("/customers")
+    /*@GetMapping("/customers")
     public List<CustomerResponse> getCustomers(@RequestParam(required = false) String search) {
         return bookingService.getCustomers(search);
     }
@@ -74,5 +82,5 @@ public class BookingController {
     @GetMapping("/businesses/{businessId}/analytics")
     public AnalyticsResponse getAnalytics(@PathVariable Integer businessId) {
         return bookingService.getAnalytics(businessId);
-    }
+    }*/
 }

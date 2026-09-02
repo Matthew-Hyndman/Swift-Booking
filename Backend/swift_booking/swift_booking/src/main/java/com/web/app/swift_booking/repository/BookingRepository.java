@@ -10,36 +10,38 @@ import com.web.app.swift_booking.entity.BookingStatus;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
-public interface BookingRepository extends JpaRepository<Booking, Integer> {
+public interface BookingRepository extends JpaRepository<Booking, UUID> {
+/* 
+    List<Booking> findByBusinessBusinessIdOrderByBookingDateDescStartTimeDesc(UUID organizationId);
 
-    List<Booking> findByBusinessBusinessIdOrderByBookingDateDescStartTimeDesc(Integer businessId);
+    long countByBusinessBusinessId(UUID organizationId);
 
-    long countByBusinessBusinessId(Integer businessId);
-
-    long countByBusinessBusinessIdAndStatus(Integer businessId, BookingStatus status);
+    long countByBusinessBusinessIdAndStatus(UUID organizationId, BookingStatus status);
 
     boolean existsByEmployeeEmployeeIdAndBookingDateAndStartTimeLessThanAndEndTimeGreaterThan(
-            Integer employeeId,
+            UUID UserId,
             LocalDate bookingDate,
             LocalTime endTime,
             LocalTime startTime
     );
 
         boolean existsByEmployeeEmployeeIdAndBookingDateAndStartTimeLessThanAndEndTimeGreaterThanAndBookingIdNot(
-            Integer employeeId,
+            UUID UserId,
             LocalDate bookingDate,
             LocalTime endTime,
             LocalTime startTime,
-            Integer bookingId
+            UUID bookingId
         );
 
     @Query("""
-        select concat(e.firstName, ' ', e.lastName), count(b)
+        select concat(ue.firstName, ' ', ue.lastName), count(b)
         from Booking b
-        join b.employee e
-        where b.business.businessId = :businessId
-        group by e.firstName, e.lastName
+        join b.user_entity ue
+        where b.business.businessId = :organizationId
+        group by ue.firstName, ue.lastName
     """)
-    List<Object[]> countBookingsByEmployee(@Param("businessId") Integer businessId);
+    List<Object[]> countBookingsByEmployee(@Param("organizationId") UUID organizationId);
+    */ 
 }
