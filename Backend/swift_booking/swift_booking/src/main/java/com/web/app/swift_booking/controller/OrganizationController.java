@@ -1,5 +1,6 @@
 package com.web.app.swift_booking.controller;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,10 +25,10 @@ public class OrganizationController {
     }
 
     @GetMapping("id/{organizationId}")
-    public ResponseEntity<OrganizationRepresentation_DTO> getOrganizationById(
+    public Mono<OrganizationRepresentation_DTO> getOrganizationById(
         @PathVariable String organizationId
     ) {
-        ResponseEntity<OrganizationRepresentation_DTO> response = this.organizationService.getOrganizationById(organizationId);
+        Mono<OrganizationRepresentation_DTO> response = this.organizationService.getOrganizationById(organizationId);
         return response;
     }
 

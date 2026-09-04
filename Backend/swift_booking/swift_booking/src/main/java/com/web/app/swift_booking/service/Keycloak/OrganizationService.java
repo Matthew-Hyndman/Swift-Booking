@@ -3,6 +3,8 @@ package com.web.app.swift_booking.service.Keycloak;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 
+import reactor.core.publisher.Mono;
+
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
@@ -13,11 +15,11 @@ public interface OrganizationService {
     
     ResponseEntity<String> createOrganization(String userId, OrganizationRepresentation_DTO organizationData);    
 
-    ResponseEntity<OrganizationRepresentation_DTO> getOrganizationById(String organizationId);
+    Mono<OrganizationRepresentation_DTO> getOrganizationById(String organizationId);
 
-    ResponseEntity<List<MemberRepresentation_DTO>> getOrganizationMembersById(String organizationId);
+    Mono<List<MemberRepresentation_DTO>> getOrganizationMembersById(String organizationId);
 
-    ResponseEntity<List<GroupRepresentation_DTO>> getOrganizationGroupsById(String organizationId);
+    Mono<List<GroupRepresentation_DTO>> getOrganizationGroupsById(String organizationId);
 
     ResponseEntity<OrganizationRepresentation_DTO> getOrganizationByUserId(String ownerId);
 

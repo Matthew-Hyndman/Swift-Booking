@@ -134,63 +134,66 @@ public class OrganizationService_Impl implements OrganizationService {
          *         found
          */
         @Override
-        public ResponseEntity<OrganizationRepresentation_DTO> getOrganizationById(String organizationId) {
-                        ResponseEntity<OrganizationRepresentation_DTO> responseOrgInfo = this.keycloakHttpClient
-                                        .get()
-                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}",
-                                                        realm, organizationId)
-                                        .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
-                                        .retrieve()
-                                        .toEntity(OrganizationRepresentation_DTO.class)
-                                        .block();
+        public Mono<OrganizationRepresentation_DTO> getOrganizationById(String organizationId) {
+                Mono<OrganizationRepresentation_DTO> orgMono = this.keycloakHttpClient
+                                .get()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}",
+                                                realm, organizationId)
+                                .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+                                .retrieve()
+                                .onStatus(HttpStatusCode::isError, resp -> resp.bodyToMono(String.class)
+                                                .defaultIfEmpty("")
+                                                .flatMap(body -> Mono.error(new InvalidServerResponse(
+                                                                "getOrganizationById(\"" + organizationId + "\")",
+                                                                "Upstream error: " + resp.statusCode() + " " + body))))
+                                .bodyToMono(OrganizationRepresentation_DTO.class)
+                                .switchIfEmpty(Mono.error(new InvalidServerResponse(
+                                                "getOrganizationById(\"" + organizationId + "\")",
+                                                "Organization not found")));
 
-                        responseOrgInfo.getBody().setMembers(getOrganizationMembersById(organizationId).getBody());
-                        responseOrgInfo.getBody().setGroups(getOrganizationGroupsById(organizationId).getBody());
+                Mono<List<MemberRepresentation_DTO>> membersMono = getOrganizationMembersById(organizationId);
+                Mono<List<GroupRepresentation_DTO>> groupsMono = getOrganizationGroupsById(organizationId);
 
-                        if (responseOrgInfo == null || responseOrgInfo.getBody() == null) {
-                                throw new InvalidServerResponse("getOrganizationById(\"" + organizationId + "\")",
-                                                "Organization not found");
-                        }
-
-                        return ResponseEntity.ok(responseOrgInfo.getBody());
+                return Mono.zip(orgMono, membersMono, groupsMono)
+                                .map(tuple -> {
+                                        OrganizationRepresentation_DTO org = tuple.getT1();
+                                        org.setMembers(tuple.getT2());
+                                        org.setGroups(tuple.getT3());
+                                        return org;
+                                });
         }
 
         @Override
-        public ResponseEntity<List<MemberRepresentation_DTO>> getOrganizationMembersById(String organizationId) {
-                ResponseEntity<List<MemberRepresentation_DTO>> responseMembers = this.keycloakHttpClient
-                                .get()
+        public Mono<List<MemberRepresentation_DTO>> getOrganizationMembersById(String organizationId) {
+                return keycloakHttpClient.get()
                                 .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/members",
                                                 realm, organizationId)
-                                .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+                                .headers(h -> h.setBearerAuth(getAdminAccessToken()))
                                 .retrieve()
-                                .toEntityList(MemberRepresentation_DTO.class)
-                                .block();
-
-                if (responseMembers == null || responseMembers.getBody() == null) {
-                        throw new InvalidServerResponse("getOrganizationMembersById(\"" + organizationId + "\")",
-                                        "Organization members not found");
-                }
-
-                return ResponseEntity.ok(responseMembers.getBody());
+                                .onStatus(HttpStatusCode::isError, resp -> resp.bodyToMono(String.class)
+                                                .defaultIfEmpty("")
+                                                .flatMap(body -> Mono.error(new InvalidServerResponse(
+                                                                "getOrganizationMembersById(\"" + organizationId
+                                                                                + "\")",
+                                                                "Upstream error: " + resp.statusCode() + " " + body))))
+                                .bodyToFlux(MemberRepresentation_DTO.class)
+                                .collectList();
         }
 
         @Override
-        public ResponseEntity<List<GroupRepresentation_DTO>> getOrganizationGroupsById(String organizationId) {
-                ResponseEntity<List<GroupRepresentation_DTO>> responseGroups = this.keycloakHttpClient
-                                .get()
-                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/groups",
-                                                realm, organizationId)
-                                .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+        public Mono<List<GroupRepresentation_DTO>> getOrganizationGroupsById(String organizationId) {
+                return keycloakHttpClient.get()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/groups", realm,
+                                                organizationId)
+                                .headers(h -> h.setBearerAuth(getAdminAccessToken()))
                                 .retrieve()
-                                .toEntityList(GroupRepresentation_DTO.class)
-                                .block();
-
-                if (responseGroups == null || responseGroups.getBody() == null) {
-                        throw new InvalidServerResponse("getOrganizationGroupsById(\"" + organizationId + "\")",
-                                        "Organization groups not found");
-                }
-
-                return ResponseEntity.ok(responseGroups.getBody());
+                                .onStatus(HttpStatusCode::isError, resp -> resp.bodyToMono(String.class)
+                                                .defaultIfEmpty("")
+                                                .flatMap(body -> Mono.error(new InvalidServerResponse(
+                                                                "getOrganizationGroupsById(\"" + organizationId + "\")",
+                                                                "Upstream error: " + resp.statusCode() + " " + body))))
+                                .bodyToFlux(GroupRepresentation_DTO.class)
+                                .collectList();
         }
 
         @Override
@@ -210,14 +213,16 @@ public class OrganizationService_Impl implements OrganizationService {
                                                 "Organization response from server was empty");
                         }
 
-                       if (responseOrgInfo.getBody().size() == 1) {
+                        if (responseOrgInfo.getBody().size() == 1) {
                                 OrganizationRepresentation_DTO orgRep = responseOrgInfo.getBody().get(0);
                                 return ResponseEntity.ok(orgRep);
-                        } else if(responseOrgInfo.getBody().size() > 1){
-                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")", "user is a member of more than one organization");
+                        } else if (responseOrgInfo.getBody().size() > 1) {
+                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")",
+                                                "user is a member of more than one organization");
 
                         } else {
-                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")", "user is not a member of any organization");
+                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")",
+                                                "user is not a member of any organization");
                         }
                 } catch (RuntimeException e) {
                         System.out.println(e.toString());
