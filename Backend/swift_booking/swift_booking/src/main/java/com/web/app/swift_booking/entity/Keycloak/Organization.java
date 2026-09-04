@@ -33,5 +33,4 @@ public class Organization {
 
     @Column(name = "redirect_url")
     private String redirectUrl;
-
 }

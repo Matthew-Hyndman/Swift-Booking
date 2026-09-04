@@ -2,6 +2,8 @@ package com.web.app.swift_booking.dto.Keycloak;
 
 import java.util.List;
 
+import com.web.app.swift_booking.entity.Keycloak.Organization;
+
 import lombok.Data;
 
 @Data

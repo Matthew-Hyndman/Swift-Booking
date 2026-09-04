@@ -24,6 +24,7 @@ import { AccountComponent } from './components/account/account.component';
 import { ViewBookingsComponent } from './components/view-bookings/view-bookings.component';
 import { CreateBookingComponent } from './components/create-booking/create-booking.component';
 import { BookingComponent } from './components/booking/booking.component';
+import { OrganizationComponent } from './components/organization/organization.component';
 import { NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -50,6 +51,7 @@ import {
     ViewBookingsComponent,
     CreateBookingComponent,
     BookingComponent,
+    OrganizationComponent,
   ],
   imports: [
     CommonModule,

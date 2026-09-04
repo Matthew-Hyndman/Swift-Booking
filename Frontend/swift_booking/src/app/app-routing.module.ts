@@ -4,6 +4,7 @@ import { HomeComponent } from './components/home/home.component';
 import { AboutComponent } from './components/about/about.component';
 import { SubscriptionsComponent } from './components/subscriptions/subscriptions.component';
 import { PaymentComponent } from './components/payment/payment.component';
+import { OrganizationComponent } from './components/organization/organization.component';
 import { AccountComponent } from './components/account/account.component';
 import { ViewBookingsComponent } from './components/view-bookings/view-bookings.component';
 import { CreateBookingComponent } from './components/create-booking/create-booking.component';
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'about', component: AboutComponent },
   { path: 'subscriptions', component: SubscriptionsComponent },
   { path: 'payment', component: PaymentComponent },
+  { path: 'organization', component: OrganizationComponent/*, canActivate: [AuthGuard]*/ },
   { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
   { path: 'bookings', component: ViewBookingsComponent, canActivate: [AuthGuard] },
   { path: 'bookings/new', component: CreateBookingComponent, canActivate: [AuthGuard] },

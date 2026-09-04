@@ -1,0 +1,21 @@
+{
+    "id": "64c6e190-5e91-4a79-baf0-2fea0fd44ad7",
+    "username": "alen-tester",
+    "email": "rex_345@hotmail.co.uk",
+    "firstName": "Alen",
+    "lastName": "Tester",
+    "enabled": true,
+    "emailVerified": false,
+    "credentials": 
+    [{
+        "type": "password",
+        "value": "newUser123456789!",
+        "temporary": true
+    }],
+    "requiredActions": [
+        "UPDATE_PASSWORD",
+        "TERMS_AND_CONDITIONS",
+        "VERIFY_EMAIL",
+        "CONFIGURE_TOTP"
+    ]
+}

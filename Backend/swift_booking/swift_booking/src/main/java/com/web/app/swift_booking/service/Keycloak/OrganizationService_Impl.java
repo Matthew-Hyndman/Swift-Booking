@@ -1,30 +1,29 @@
 package com.web.app.swift_booking.service.Keycloak;
 
-import com.web.app.swift_booking.DAO.OrganizationRepo;
-import com.web.app.swift_booking.DAO.UserRepo;
-import com.web.app.swift_booking.entity.Keycloak.Organization;
-import com.web.app.swift_booking.entity.Keycloak.User;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import reactor.core.publisher.Mono;
-
-import java.util.Optional;
-import java.util.UUID;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.app.swift_booking.DAO.OrganizationRepo;
+import com.web.app.swift_booking.DAO.UserRepo;
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
+import com.web.app.swift_booking.entity.Keycloak.User;
+
+import com.web.app.swift_booking.common.InvalidServerResponse;
+
+import reactor.core.publisher.Mono;
 
 @Service
 public class OrganizationService_Impl implements OrganizationService {
@@ -51,6 +50,7 @@ public class OrganizationService_Impl implements OrganizationService {
         private final WebClient keycloakHttpClient = WebClient.builder()
                         .defaultHeader("Content-Type", "application/json")
                         .build();
+
         OrganizationService_Impl(UserRepo userRepo, OrganizationRepo orgRepo) {
                 this.userRepo = userRepo;
                 this.orgRepo = orgRepo;
@@ -134,9 +134,96 @@ public class OrganizationService_Impl implements OrganizationService {
          *         found
          */
         @Override
-        public Optional<Organization> getOrganizationById(String organizationId) {
-                return Optional.ofNullable(orgRepo.findById(organizationId)
-                                .orElseThrow(() -> new RuntimeException("Organization not found")));
+        public ResponseEntity<OrganizationRepresentation_DTO> getOrganizationById(String organizationId) {
+                        ResponseEntity<OrganizationRepresentation_DTO> responseOrgInfo = this.keycloakHttpClient
+                                        .get()
+                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}",
+                                                        realm, organizationId)
+                                        .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+                                        .retrieve()
+                                        .toEntity(OrganizationRepresentation_DTO.class)
+                                        .block();
+
+                        responseOrgInfo.getBody().setMembers(getOrganizationMembersById(organizationId).getBody());
+                        responseOrgInfo.getBody().setGroups(getOrganizationGroupsById(organizationId).getBody());
+
+                        if (responseOrgInfo == null || responseOrgInfo.getBody() == null) {
+                                throw new InvalidServerResponse("getOrganizationById(\"" + organizationId + "\")",
+                                                "Organization not found");
+                        }
+
+                        return ResponseEntity.ok(responseOrgInfo.getBody());
+        }
+
+        @Override
+        public ResponseEntity<List<MemberRepresentation_DTO>> getOrganizationMembersById(String organizationId) {
+                ResponseEntity<List<MemberRepresentation_DTO>> responseMembers = this.keycloakHttpClient
+                                .get()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/members",
+                                                realm, organizationId)
+                                .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+                                .retrieve()
+                                .toEntityList(MemberRepresentation_DTO.class)
+                                .block();
+
+                if (responseMembers == null || responseMembers.getBody() == null) {
+                        throw new InvalidServerResponse("getOrganizationMembersById(\"" + organizationId + "\")",
+                                        "Organization members not found");
+                }
+
+                return ResponseEntity.ok(responseMembers.getBody());
+        }
+
+        @Override
+        public ResponseEntity<List<GroupRepresentation_DTO>> getOrganizationGroupsById(String organizationId) {
+                ResponseEntity<List<GroupRepresentation_DTO>> responseGroups = this.keycloakHttpClient
+                                .get()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/groups",
+                                                realm, organizationId)
+                                .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+                                .retrieve()
+                                .toEntityList(GroupRepresentation_DTO.class)
+                                .block();
+
+                if (responseGroups == null || responseGroups.getBody() == null) {
+                        throw new InvalidServerResponse("getOrganizationGroupsById(\"" + organizationId + "\")",
+                                        "Organization groups not found");
+                }
+
+                return ResponseEntity.ok(responseGroups.getBody());
+        }
+
+        @Override
+        public ResponseEntity<OrganizationRepresentation_DTO> getOrganizationByUserId(String ownerId) {
+                try {
+                        ResponseEntity<List<OrganizationRepresentation_DTO>> responseOrgInfo = this.keycloakHttpClient
+                                        .get()
+                                        .uri(this.origin + "/admin/realms/{realm}/organizations/members/{memberId}/organizations",
+                                                        realm, ownerId)
+                                        .headers(headers -> headers.setBearerAuth(getAdminAccessToken()))
+                                        .retrieve()
+                                        .toEntityList(OrganizationRepresentation_DTO.class)
+                                        .block();
+
+                        if (responseOrgInfo == null || responseOrgInfo.getBody() == null) {
+                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")",
+                                                "Organization response from server was empty");
+                        }
+
+                       if (responseOrgInfo.getBody().size() == 1) {
+                                OrganizationRepresentation_DTO orgRep = responseOrgInfo.getBody().get(0);
+                                return ResponseEntity.ok(orgRep);
+                        } else if(responseOrgInfo.getBody().size() > 1){
+                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")", "user is a member of more than one organization");
+
+                        } else {
+                                throw new InvalidServerResponse("getOrganizationByUserId(\"" + ownerId + "\")", "user is not a member of any organization");
+                        }
+                } catch (RuntimeException e) {
+                        System.out.println(e.toString());
+                        return ResponseEntity.status(500).body(null);
+                }
+
         }
 
         // not implemented yet
@@ -167,9 +254,9 @@ public class OrganizationService_Impl implements OrganizationService {
                         UserRepresentation_DTO userData) {
                 try {
                         String accessToken = getAdminAccessToken();
-                        //userData.requiredActions().add("VERIFY_EMAIL");
-                        //userData.requiredActions().add("CONFIGURE_TOTP");
-        
+                        // userData.requiredActions().add("VERIFY_EMAIL");
+                        // userData.requiredActions().add("CONFIGURE_TOTP");
+
                         // Create a new user
                         ResponseEntity<String> userCreationResponse = this.keycloakHttpClient.post()
                                         .uri(this.origin + "/admin/realms/{realm}/users", realm)
@@ -179,10 +266,10 @@ public class OrganizationService_Impl implements OrganizationService {
                                         .toEntity(String.class)
                                         .block();
 
-                        if(userCreationResponse == null || userCreationResponse.getStatusCode().isError()) {
+                        if (userCreationResponse == null || userCreationResponse.getStatusCode().isError()) {
                                 throw new RuntimeException("Failed to create user in Keycloak");
                         }
-                        
+
                         String userId = extractResourceId(userCreationResponse);
 
                         addUserAsMemberToOrganization(accessToken, organizationId, userId);
@@ -231,7 +318,7 @@ public class OrganizationService_Impl implements OrganizationService {
 
         /**
          * Extracts the resource ID from the Keycloak response. It first checks
-         * the "Location" header for the ID. If not found, it attempts to 
+         * the "Location" header for the ID. If not found, it attempts to
          * parse the response body as JSON and extract the "id" field.
          * 
          * @param response The response entity from which to extract the resource ID.
@@ -274,7 +361,7 @@ public class OrganizationService_Impl implements OrganizationService {
                                                 realm, organizationId)
                                 .headers(headers -> headers.setBearerAuth(accessToken))
                                 .bodyValue(userId)
-                                .retrieve()                                
+                                .retrieve()
                                 .toEntity(String.class)
                                 .block();
 
@@ -285,8 +372,8 @@ public class OrganizationService_Impl implements OrganizationService {
 
         private void addMemberToOrganizationGroup(String accessToken, String organizationId, String groupId,
                         String userId) {
-                
-                                addUserAsMemberToOrganization(accessToken, organizationId, userId);
+
+                addUserAsMemberToOrganization(accessToken, organizationId, userId);
 
                 this.keycloakHttpClient.put()
                                 .uri(this.origin
@@ -331,8 +418,6 @@ public class OrganizationService_Impl implements OrganizationService {
                                 .toBodilessEntity()
                                 .block();
         }
-
-        
 
         @Override
         public ResponseEntity<String> removeEmployeeFromOrganization(String organizationId, String groupId,
