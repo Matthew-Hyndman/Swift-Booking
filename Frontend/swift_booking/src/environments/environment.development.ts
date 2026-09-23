@@ -4,6 +4,7 @@ export const environment = {
   keycloak: {    
     url: 'http://localhost:8080',
     realm: 'Swift-Booking',
-    clientId: 'swift-booking-local-client'
+    userClientId: 'swift-booking-local-client',
+    memberClientId: 'swift-booking-local-client-for-members'
   }
 };

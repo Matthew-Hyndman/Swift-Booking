@@ -11,6 +11,7 @@ import { AuthService } from './services/auth';
 import { NavLinks } from './common/classes/nav-links';
 import { LinkObj } from './common/classes/link-obj';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,9 @@ export class AppComponent implements OnInit {
   protected specialLinks = ['Login', 'Logout'];
   protected showHamburgerMenu = true;
   protected isMobileOrTablet = false;
+
+  private readonly userClientId = environment.keycloak.userClientId;
+  private readonly memberClientId = environment.keycloak.memberClientId;
 
   constructor(
     private router: Router,
@@ -80,8 +84,24 @@ export class AppComponent implements OnInit {
     }
   }
 
-  login(): void {
-    this.authService.login();
+  registerAsUser(): void {
+    this.authService.setRedirectUri(window.location.origin + '/home');
+    this.authService.register(this.userClientId);
+  }
+
+  registerAsMember(): void {
+    this.authService.setRedirectUri(window.location.origin + '/create-organization');
+    this.authService.register(this.memberClientId);
+  }
+
+  loginAsUser(): void {
+    this.authService.setRedirectUri(window.location.origin + '/home');
+    this.authService.login(this.userClientId);
+  }
+
+  loginAsMember(): void {
+    this.authService.setRedirectUri(window.location.origin + '/manage-organization');
+    this.authService.login(this.memberClientId);
   }
 
   logout(): void {

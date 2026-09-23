@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Business, Customer, Employee } from '../../booking.models';
-import { BookingApiService } from '../../services/booking-api.service';
+import { Organization, Customer, Employee } from '../../../booking.models';
+import { BookingApiService } from '../../../services/booking-api.service';
 
 @Component({
   selector: 'app-create-booking',
@@ -11,7 +11,7 @@ import { BookingApiService } from '../../services/booking-api.service';
   styleUrl: './create-booking.component.scss'
 })
 export class CreateBookingComponent implements OnInit {
-  businesses: Business[] = [];
+  businesses: Organization[] = [];
   customers: Customer[] = [];
   employees: Employee[] = [];
 
@@ -40,7 +40,7 @@ export class CreateBookingComponent implements OnInit {
     this.bookingApiService.getBusinesses().subscribe({
       next: (businesses) => {
         this.businesses = businesses;
-        this.selectedBusinessId = businesses.length > 0 ? businesses[0].businessId : null;
+        this.selectedBusinessId = businesses.length > 0 ? businesses[0].organizationId : null;
 
         if (this.selectedBusinessId !== null) {
           this.loadPeopleData(this.selectedBusinessId);

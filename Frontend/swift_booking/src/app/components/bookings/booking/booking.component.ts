@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BookingStatus, Business, Customer, Employee, UpdateBookingRequest } from '../../booking.models';
-import { BookingApiService } from '../../services/booking-api.service';
+import { BookingStatus, Organization, Customer, Employee, UpdateBookingRequest } from '../../../booking.models';
+import { BookingApiService } from '../../../services/booking-api.service';
 
 @Component({
   selector: 'app-booking',
@@ -16,7 +16,7 @@ export class BookingComponent implements OnInit {
   bookingId = 0;
   selectedBusinessId: number | null = null;
 
-  businesses: Business[] = [];
+  businesses: Organization[] = [];
   customers: Customer[] = [];
   employees: Employee[] = [];
 
@@ -50,7 +50,7 @@ export class BookingComponent implements OnInit {
       next: (businesses) => {
         this.businesses = businesses;
         if (this.selectedBusinessId === null) {
-          this.selectedBusinessId = businesses.length > 0 ? businesses[0].businessId : null;
+          this.selectedBusinessId = businesses.length > 0 ? businesses[0].organizationId : null;
         }
 
         if (this.selectedBusinessId !== null) {

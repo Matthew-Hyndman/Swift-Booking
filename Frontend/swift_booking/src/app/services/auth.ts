@@ -68,9 +68,24 @@ export class AuthService {
     }
   }
 
-  public async login(): Promise<void> {
+  public async register(clientId: string): Promise<void> {
+    this.setClientId(clientId);
     try {
-      await this.keycloak.login(); //login method does not seem to be reconised
+      await this.keycloak.register();
+      await this._isLoggedInCheck();
+      if (this._isLoggedIn$.value) {
+        await this.refreshUserProfile();
+      }
+    } catch (err) {
+      console.error('User registration failed', err);
+      await this._isLoggedInCheck();
+    }
+  }
+
+  public async login(clientId: string): Promise<void> {
+    this.setClientId(clientId);
+    try {
+      await this.keycloak.login();     
       await this._isLoggedInCheck();
       if (this._isLoggedIn$.value) {
         await this.refreshUserProfile();
@@ -379,6 +394,15 @@ export class AuthService {
         });
       });
   }
+
+  setRedirectUri(uri: string): void {
+    this.keycloak.redirectUri = uri;
+  }
+
+  setClientId(clientId: string): void {
+    (this.keycloak as any).clientId = clientId;
+  }
+
 }
 
 interface UserRepresentation {
@@ -387,4 +411,9 @@ interface UserRepresentation {
   firstName?: string;
   lastName?: string;
   emailVerified?: boolean | undefined;
+}
+
+interface OrganizationRepresentation {
+  id?: string;
+  name?: string;
 }

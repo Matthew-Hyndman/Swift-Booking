@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { environment } from '../../../environments/environment';
 
@@ -8,7 +8,10 @@ import { environment } from '../../../environments/environment';
 })
 export class AuthGuard implements CanActivate {
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router
+  ) {}
 
   canActivate(): boolean {
     let isLoggedIn = false;
@@ -20,7 +23,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.authService.login();
+    this.router.navigate(['/login-choice-user-only']);
     return false;
   }
 }

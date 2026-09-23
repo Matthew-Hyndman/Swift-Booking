@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -24,7 +25,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.SimpleOrgDetail_DTO;
 import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
+import java.util.NoSuchElementException;
 
 @Service
 public class OrganizationService_Impl implements OrganizationService {
@@ -137,6 +140,41 @@ public class OrganizationService_Impl implements OrganizationService {
         public Optional<Organization> getOrganizationById(String organizationId) {
                 return Optional.ofNullable(orgRepo.findById(organizationId)
                                 .orElseThrow(() -> new RuntimeException("Organization not found")));
+        }
+
+
+        @Override
+        public List<SimpleOrgDetail_DTO> getSmallOrgInfo(String userId) {
+                String accessToken = getAdminAccessToken();
+
+                ResponseEntity<List<Organization>> organizationsResponse = this.keycloakHttpClient.get()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/members/{userId}/organizations", realm, userId)
+                                .headers(headers -> headers.setBearerAuth(accessToken))
+                                .retrieve()
+                                .onStatus(HttpStatusCode::is4xxClientError, response -> {
+                                        if (response.statusCode().isSameCodeAs(HttpStatusCode.valueOf(404))) {
+                                                return Mono.error(new NoSuchElementException(
+                                                                "Organization not found for user: " + userId));
+                                        }
+                                        return response.bodyToMono(String.class)
+                                                        .flatMap(body -> Mono.error(new RuntimeException(
+                                                                        "Client error retrieving organization: " + body)));
+                                })
+                                .onStatus(HttpStatusCode::is5xxServerError, response -> response.bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(new RuntimeException(
+                                                                "Server error retrieving organization: " + body))))
+                                .toEntityList(Organization.class)
+                                .block();
+
+                List<Organization> organizations = organizationsResponse != null ? organizationsResponse.getBody() : null;
+
+                if (organizations == null || organizations.isEmpty()) {
+                        throw new NoSuchElementException("Organization not found for user: " + userId);
+                }
+
+                return organizations.stream()
+                                .map(organization -> new SimpleOrgDetail_DTO(organization.getId(), organization.getName()))
+                                .collect(Collectors.toList());
         }
 
         // not implemented yet
@@ -331,8 +369,6 @@ public class OrganizationService_Impl implements OrganizationService {
                                 .toBodilessEntity()
                                 .block();
         }
-
-        
 
         @Override
         public ResponseEntity<String> removeEmployeeFromOrganization(String organizationId, String groupId,

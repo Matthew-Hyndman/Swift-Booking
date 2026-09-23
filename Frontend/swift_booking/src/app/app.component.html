@@ -23,7 +23,7 @@
         @if (link.enabled === true && specialLinks.indexOf(link.label) === -1) {
           <a 
           name="nav-link"
-          [routerLink]="link.path" 
+          href="{{link.path}}" 
           routerLinkActive="is-active"
           [class.nav-link-animate]="showHamburgerMenu"
           [style.--nav-link-delay]="(i * 0.25) + 's'"
@@ -46,10 +46,18 @@
             <button
               name="nav-link"
               type="button"
-              class="ghost-button special-nav-link"
-              (click)="login()"
+              class="ghost-button"
+              (click)="loginAsUser()"
             >
-              Login
+              Login as User
+            </button>
+            <button
+              name="nav-link"
+              type="button"
+              class="ghost-button"
+              (click)="loginAsMember()"
+            >
+              Login as Member
             </button>
           }
         }
@@ -57,12 +65,15 @@
     </nav>
     <div class="auth-actions">
       @if (isLoggedIn) {
-        <button type="button" class="ghost-button" (click)="logout()">
+        <button type="button" class="ghost-button special-nav-link" (click)="logout()">
           Logout
         </button>
       } @else {
-        <button type="button" class="ghost-button" (click)="login()">
-          Login
+        <button type="button" class="ghost-button special-nav-link" (click)="loginAsUser()">
+          Login as User
+        </button>
+        <button type="button" class="ghost-button special-nav-link" (click)="loginAsMember()">
+          Login as Member
         </button>
       }
     </div>
