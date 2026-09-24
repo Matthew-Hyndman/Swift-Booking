@@ -12,9 +12,10 @@ import { AccountComponent } from './components/account/account.component';
 import { ViewBookingsComponent } from './components/bookings/view-bookings/view-bookings.component';
 import { CreateBookingComponent } from './components/bookings/create-booking/create-booking.component';
 import { BookingComponent } from './components/bookings/booking/booking.component';
-import { AuthGuard } from './common/guards/auth.guard';
+import { LoginAsCustomerOnlyGuard } from './common/guards/login-as-customer-only.guard';
 import { CreateOrganization } from './components/organization/create-organization/create-organization';
 import { LoginChoice } from './components/login-choices/login-choice/login-choice';
+import { LoginAsMemberOnlyGuard } from './common/guards/login-as-member-only-guard';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -24,13 +25,14 @@ export const routes: Routes = [
   { path: 'login-choice', component: LoginChoice },
   { path: 'login-choice-user-only', component: LoginChoiceUserOnly },
   { path: 'login-choice-member-only', component: LoginChoiceMemberOnly },
-  { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
-  { path: 'bookings', component: ViewBookingsComponent, canActivate: [AuthGuard] },
-  { path: 'create-organization', component: CreateOrganization, canActivate: [AuthGuard] },
-  { path: 'manage-organization', component: ManageOrganization, canActivate: [AuthGuard, OrganizationGuard] },
-  { path: 'bookings/new', component: CreateBookingComponent, canActivate: [AuthGuard] },
-  { path: 'bookings/:id', component: BookingComponent, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'home' }
+  { path: 'account', component: AccountComponent, canActivate: [LoginAsCustomerOnlyGuard] },
+  { path: 'bookings', component: ViewBookingsComponent, canActivate: [LoginAsCustomerOnlyGuard] },
+  { path: 'create-organization', component: CreateOrganization, canActivate: [LoginAsMemberOnlyGuard] },
+  { path: 'manage-organization', component: ManageOrganization, canActivate: [LoginAsMemberOnlyGuard, OrganizationGuard] },
+  { path: 'bookings/new', component: CreateBookingComponent, canActivate: [LoginAsCustomerOnlyGuard] },
+  { path: 'bookings/:id', component: BookingComponent, canActivate: [LoginAsCustomerOnlyGuard] },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' }
 ];
 
 @NgModule({

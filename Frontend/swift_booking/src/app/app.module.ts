@@ -30,7 +30,7 @@ import { RouterModule } from '@angular/router';
 
 import { routes } from './app-routing.module';
 
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.local';
 
 import {  
   customBearerTokenInterceptor,

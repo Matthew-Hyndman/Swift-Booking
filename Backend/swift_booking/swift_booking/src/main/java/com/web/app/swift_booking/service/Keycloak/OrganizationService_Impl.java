@@ -149,7 +149,9 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 ResponseEntity<List<Organization>> organizationsResponse = this.keycloakHttpClient.get()
                                 .uri(this.origin + "/admin/realms/{realm}/organizations/members/{userId}/organizations", realm, userId)
-                                .headers(headers -> headers.setBearerAuth(accessToken))
+                                .headers(headers -> {
+                                        headers.setBearerAuth(accessToken);                                        
+                                })
                                 .retrieve()
                                 .onStatus(HttpStatusCode::is4xxClientError, response -> {
                                         if (response.statusCode().isSameCodeAs(HttpStatusCode.valueOf(404))) {
@@ -168,7 +170,7 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 List<Organization> organizations = organizationsResponse != null ? organizationsResponse.getBody() : null;
 
-                if (organizations == null || organizations.isEmpty()) {
+                if (organizations.size() == 0) {
                         throw new NoSuchElementException("Organization not found for user: " + userId);
                 }
 

@@ -1,13 +1,12 @@
-import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
+import { Injectable } from '@angular/core';
 import { AuthService } from '../../services/auth';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
 
+export class LoginAsCustomerOrMemberGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router
@@ -23,7 +22,7 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    this.router.navigate(['/login-choice-user-only']);
+    this.router.navigate(['/login-choice']);
     return false;
   }
 }

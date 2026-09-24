@@ -1,39 +1,54 @@
-import { CanActivate } from '@angular/router';
-import { AuthService } from '../../services/auth';
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { AuthService } from '../../services/auth';
 import { environment } from '../../../environments/environment';
-import { Router } from '@angular/router';
 
+@Injectable({
+  providedIn: 'root',
+})
 export class OrganizationGuard implements CanActivate {
-  
-   org: SimpleOrgDetail = { id: '', name: '' };
-
-
   constructor(
-    private authService: AuthService,
-    private httpClient: HttpClient,
-    private router: Router
+    private readonly authService: AuthService,
+    private readonly httpClient: HttpClient,
+    private readonly router: Router,
   ) {}
 
-  canActivate(): boolean {
+  async canActivate(): Promise<boolean> {
+    await this.authService.refreshUserProfile();
+    const profile = await firstValueFrom(this.authService.userProfile$);
+    const userId = profile?.id || '';
 
-     let userId = '';
+   
 
-     this.authService.userProfile$.subscribe(profile => {
-       userId = profile?.id || '';
-     });
+    /*if (!userId) {
+      await this.router.navigate(['/login-choice-member-only']);
+      return false;
+    }*/
 
-    this.httpClient.get<SimpleOrgDetail>(`${environment.apiBaseUrl}/api/organizations/small-info/${userId}`).subscribe(org => {
-      this.org = org;
-    });
+    try {
+      let org: SimpleOrgDetail = { id: '', name: '' };
+      const call = await 
+        this.httpClient.get<SimpleOrgDetail>(
+          `${environment.apiBaseUrl}/api/organizations/small-info/${userId}`,
+        ).subscribe({
+          next: (data) => { org = data; },
+          error: (err) => { throw err; }
+        })
+      ;
 
-    if (this.org.id === '' || this.org.name === '') {
-      this.router.navigate(['/create-organization']);
-    } else {
+      if (!org?.id || !org?.name) {
+        await this.router.navigate(['/create-organization']);
+        return false;
+      }
+
       return true;
+    } catch (error) {
+      console.error('OrganizationGuard: failed to load organization', error);
+      await this.router.navigate(['/create-organization']);
+      return false;
     }
-
-  return false;
   }
 }
 

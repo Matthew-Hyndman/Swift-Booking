@@ -12,10 +12,12 @@ export class LoginChoiceUserOnly {
  constructor(private authService: AuthService) {}
 
   loginAsUser(): void {
+    this.authService.setRedirectUri(`${window.location.origin}/home`);
     this.authService.login(environment.keycloak.userClientId);
   }
   
   registerAsUser(): void {
+    this.authService.setRedirectUri(`${window.location.origin}/home`);
     this.authService.register(environment.keycloak.userClientId);
   }
 }

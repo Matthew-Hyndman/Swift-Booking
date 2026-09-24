@@ -11,7 +11,7 @@ import { AuthService } from './services/auth';
 import { NavLinks } from './common/classes/nav-links';
 import { LinkObj } from './common/classes/link-obj';
 import { Router } from '@angular/router';
-import { environment } from '../environments/environment';
+import { environment } from '../environments/environment.local';
 
 @Component({
   selector: 'app-root',
@@ -85,23 +85,19 @@ export class AppComponent implements OnInit {
   }
 
   registerAsUser(): void {
-    this.authService.setRedirectUri(window.location.origin + '/home');
-    this.authService.register(this.userClientId);
+    this.authService.register(environment.baseFrontendUrl + '/home');
   }
 
   registerAsMember(): void {
-    this.authService.setRedirectUri(window.location.origin + '/create-organization');
-    this.authService.register(this.memberClientId);
+    this.authService.register(environment.baseFrontendUrl + '/create-organization');
   }
 
   loginAsUser(): void {
-    this.authService.setRedirectUri(window.location.origin + '/home');
-    this.authService.login(this.userClientId);
+    this.authService.login(environment.baseFrontendUrl + '/home');
   }
 
   loginAsMember(): void {
-    this.authService.setRedirectUri(window.location.origin + '/manage-organization');
-    this.authService.login(this.memberClientId);
+    this.authService.login(environment.baseFrontendUrl + '/manage-organization');
   }
 
   logout(): void {

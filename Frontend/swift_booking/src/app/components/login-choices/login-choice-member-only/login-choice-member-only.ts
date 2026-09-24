@@ -14,11 +14,13 @@ export class LoginChoiceMemberOnly {
 
 
   loginAsMember(): void {
+    this.authService.setRedirectUri(`${window.location.origin}/manage-organization`);
     this.authService.login(environment.keycloak.memberClientId);
   }
 
 
   registerAsMember(): void {
+    this.authService.setRedirectUri(`${window.location.origin}/create-organization`);
     this.authService.register(environment.keycloak.memberClientId);
   }
 
