@@ -6,7 +6,7 @@ import { BehaviorSubject, fromEvent, merge, Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { KeycloakProfile } from 'keycloak-js';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.local';
 
 
 
@@ -105,7 +105,7 @@ export class AuthService {
 
   public async logout(): Promise<void> {
     try {
-      await this.keycloak.logout();
+      await this.keycloak.logout({ redirectUri: environment.baseFrontendUrl + '/home'});
     } catch (err) {
       console.error('Logout failed', err);
     } finally {

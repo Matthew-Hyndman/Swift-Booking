@@ -3,7 +3,7 @@ import { CanActivate, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../services/auth';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.local';
 
 @Injectable({
   providedIn: 'root',
@@ -29,16 +29,15 @@ export class OrganizationGuard implements CanActivate {
 
     try {
       let org: SimpleOrgDetail = { id: '', name: '' };
-      const call = await 
-        this.httpClient.get<SimpleOrgDetail>(
+      await firstValueFrom(
+        this.httpClient.get<SimpleOrgDetail[]>(
           `${environment.apiBaseUrl}/api/organizations/small-info/${userId}`,
-        ).subscribe({
-          next: (data) => { org = data; },
-          error: (err) => { throw err; }
-        })
-      ;
+        )
+      ).then((data) => {
+        org = data[0];
+      });
 
-      if (!org?.id || !org?.name) {
+      if (org.id === '' || org.name === '') {
         await this.router.navigate(['/create-organization']);
         return false;
       }

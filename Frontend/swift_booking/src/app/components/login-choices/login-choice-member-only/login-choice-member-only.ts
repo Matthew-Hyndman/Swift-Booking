@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../../services/auth';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../environments/environment.local';
 
 @Component({
   selector: 'app-login-choice-member-only',
@@ -13,15 +13,12 @@ export class LoginChoiceMemberOnly {
    constructor(private authService: AuthService) {}
 
 
-  loginAsMember(): void {
-    this.authService.setRedirectUri(`${window.location.origin}/manage-organization`);
-    this.authService.login(environment.keycloak.memberClientId);
-  }
-
-
-  registerAsMember(): void {
-    this.authService.setRedirectUri(`${window.location.origin}/create-organization`);
-    this.authService.register(environment.keycloak.memberClientId);
-  }
-
+    loginAsMember(): void {
+      this.authService.login(`${environment.baseFrontendUrl}/manage-organization`);
+    }
+  
+   
+    registerAsMember(): void {
+      this.authService.register(`${environment.baseFrontendUrl}/create-organization`);
+    }
 }

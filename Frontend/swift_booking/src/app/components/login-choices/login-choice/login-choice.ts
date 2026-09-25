@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../../services/auth';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../environments/environment.local';
 
 @Component({
   selector: 'app-login-choice',
@@ -13,23 +13,20 @@ export class LoginChoice {
   constructor(private authService: AuthService) {}
 
   loginAsUser(): void {
-    this.authService.setRedirectUri(`${window.location.origin}/home`);
-    this.authService.login(environment.keycloak.userClientId);
-  }
-
-  loginAsMember(): void {
-    this.authService.setRedirectUri(`${window.location.origin}/manage-organization`);
-    this.authService.login(environment.keycloak.memberClientId);
+    this.authService.login(`${environment.baseFrontendUrl}/home`);
   }
 
   registerAsUser(): void {
-    this.authService.setRedirectUri(`${window.location.origin}/home`);
-    this.authService.register(environment.keycloak.userClientId);
+    this.authService.register(`${environment.baseFrontendUrl}/home`);
   }
 
+  loginAsMember(): void {
+    this.authService.login(`${environment.baseFrontendUrl}/manage-organization`);
+  }
+
+ 
   registerAsMember(): void {
-    this.authService.setRedirectUri(`${window.location.origin}/create-organization`);
-    this.authService.register(environment.keycloak.memberClientId);
+    this.authService.register(`${environment.baseFrontendUrl}/create-organization`);
   }
 
 }
