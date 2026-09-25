@@ -30,9 +30,6 @@ export class AppComponent implements OnInit {
   protected showHamburgerMenu = true;
   protected isMobileOrTablet = false;
 
-  private readonly userClientId = environment.keycloak.userClientId;
-  private readonly memberClientId = environment.keycloak.memberClientId;
-
   constructor(
     private router: Router,
     readonly authService: AuthService,
