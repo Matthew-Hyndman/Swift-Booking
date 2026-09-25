@@ -39,7 +39,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
         select concat(ue.firstName, ' ', ue.lastName), count(b)
         from Booking b
         join b.user_entity ue
-        where b.business.businessId = :organizationId
+        where b.business.organizationId = :organizationId
         group by ue.firstName, ue.lastName
     """)
     List<Object[]> countBookingsByEmployee(@Param("organizationId") UUID organizationId);

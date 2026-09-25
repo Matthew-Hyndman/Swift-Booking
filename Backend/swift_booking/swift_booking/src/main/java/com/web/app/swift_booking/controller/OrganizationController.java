@@ -11,7 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
+import com.web.app.swift_booking.entity.Keycloak.Organization;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.SimpleOrgDetail_DTO;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.NoSuchElementException;
+import java.util.List;
+
 
 
 @RestController
@@ -22,6 +29,16 @@ public class OrganizationController {
     
     public OrganizationController(OrganizationService_Impl organizationService) {
         this.organizationService = organizationService;
+    }
+
+    @GetMapping("small-info/{userId}")
+    public ResponseEntity<List<SimpleOrgDetail_DTO>> getSmallOrgInfo(@PathVariable String userId) {
+        try {
+            List<SimpleOrgDetail_DTO> smallOrgInfo = this.organizationService.getSmallOrgInfo(userId);
+            return ResponseEntity.ok(smallOrgInfo);
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("create/{userId}")

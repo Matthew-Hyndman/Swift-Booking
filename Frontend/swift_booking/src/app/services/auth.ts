@@ -1,11 +1,12 @@
 import { Injectable, Inject, PLATFORM_ID, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import Keycloak from 'keycloak-js';
 import { BehaviorSubject, fromEvent, merge, Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { KeycloakProfile } from 'keycloak-js';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.local';
 
 
 
@@ -20,10 +21,10 @@ export class AuthService {
   //private static readonly IDLE_WARNING_AFTER_MS = 10000;
   //private static readonly IDLE_LOGOUT_AFTER_MS = 20000;
 
-  private readonly keycloak = inject(Keycloak);
+  private keycloak = inject(Keycloak);
 
   // Keycloak instance (provided by `provideKeycloak` in AppModule)
-  constructor(private httpClient: HttpClient) {
+  constructor() {
     this.isLoggedIn$.subscribe((isLoggedIn) => {
       if (isLoggedIn) {
         this.startIdleMonitor();
@@ -68,9 +69,22 @@ export class AuthService {
     }
   }
 
-  public async login(): Promise<void> {
+  public async register(theRedirectUri: string): Promise<void> {
     try {
-      await this.keycloak.login(); //login method does not seem to be reconised
+      await this.keycloak.register({ redirectUri: theRedirectUri });
+      await this._isLoggedInCheck();
+      if (this._isLoggedIn$.value) {
+        await this.refreshUserProfile();
+      }
+    } catch (err) {
+      console.error('User registration failed', err);
+      await this._isLoggedInCheck();
+    }
+  }
+
+  public async login(theRedirectUri: string): Promise<void> {
+    try {
+      await this.keycloak.login({ redirectUri: theRedirectUri });
       await this._isLoggedInCheck();
       if (this._isLoggedIn$.value) {
         await this.refreshUserProfile();
@@ -84,7 +98,7 @@ export class AuthService {
 
   public async logout(): Promise<void> {
     try {
-      await this.keycloak.logout();
+      await this.keycloak.logout({ redirectUri: environment.baseFrontendUrl + '/home'});
     } catch (err) {
       console.error('Logout failed', err);
     } finally {
@@ -379,6 +393,15 @@ export class AuthService {
         });
       });
   }
+
+  setRedirectUri(uri: string): void {
+    this.keycloak.redirectUri = uri;
+  }
+
+  setClientId(clientId: string): void {
+    this.keycloak.clientId = clientId;
+  }
+
 }
 
 interface UserRepresentation {
