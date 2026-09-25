@@ -37,7 +37,7 @@ export class OrganizationGuard implements CanActivate {
         org = data[0];
       });
 
-      if (org.id === '' || org.name === '') {
+      if (org.name === '') {
         await this.router.navigate(['/create-organization']);
         return false;
       }

@@ -23,8 +23,8 @@
         @if (link.enabled === true && specialLinks.indexOf(link.label) === -1) {
           <a 
           name="nav-link"
-          href="{{link.path}}" 
           routerLinkActive="is-active"
+          [routerLink]="link.path" 
           [class.nav-link-animate]="showHamburgerMenu"
           [style.--nav-link-delay]="(i * 0.25) + 's'"
           (click)="setNavLinkFunctionality(link)"

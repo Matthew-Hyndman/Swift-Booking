@@ -24,10 +24,7 @@ export class AuthService {
   private keycloak = inject(Keycloak);
 
   // Keycloak instance (provided by `provideKeycloak` in AppModule)
-  constructor(
-    private httpClient: HttpClient,
-    private router: Router,
-  ) {
+  constructor() {
     this.isLoggedIn$.subscribe((isLoggedIn) => {
       if (isLoggedIn) {
         this.startIdleMonitor();
@@ -73,14 +70,12 @@ export class AuthService {
   }
 
   public async register(theRedirectUri: string): Promise<void> {
-    //this.setClientId(clientId);
     try {
       await this.keycloak.register({ redirectUri: theRedirectUri });
       await this._isLoggedInCheck();
       if (this._isLoggedIn$.value) {
         await this.refreshUserProfile();
       }
-      //this.router.navigateByUrl(theRedirectUri);
     } catch (err) {
       console.error('User registration failed', err);
       await this._isLoggedInCheck();
@@ -88,14 +83,12 @@ export class AuthService {
   }
 
   public async login(theRedirectUri: string): Promise<void> {
-    //this.setClientId(clientId);
     try {
       await this.keycloak.login({ redirectUri: theRedirectUri });
       await this._isLoggedInCheck();
       if (this._isLoggedIn$.value) {
         await this.refreshUserProfile();
       }
-      //this.router.navigateByUrl(theRedirectUri);
     } catch (err) {
       console.error('Login failed', err);
       // leave state consistent or set to false
@@ -417,9 +410,4 @@ interface UserRepresentation {
   firstName?: string;
   lastName?: string;
   emailVerified?: boolean | undefined;
-}
-
-interface OrganizationRepresentation {
-  id?: string;
-  name?: string;
 }

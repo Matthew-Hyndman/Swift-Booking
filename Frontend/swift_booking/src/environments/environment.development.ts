@@ -1,10 +1,10 @@
 export const environment = {
   production: false,
-  apiBaseUrl: '/api',
+  apiBaseUrl: '{DEV_API_BASE_URL}',
+  baseFrontendUrl: '{DEV_BASE_FRONTEND_URL}',
   keycloak: {    
-    url: 'http://localhost:8080',
-    realm: 'Swift-Booking',
-    userClientId: 'swift-booking-local-client',
-    memberClientId: 'swift-booking-local-client-for-members'
+    url: '{DEV_KEYCLOAK_URL}',
+    realm: '{DEV_KEYCLOAK_REALM}',
+    userClientId: '{DEV_KEYCLOAK_USER_CLIENT_ID}',
   }
 };

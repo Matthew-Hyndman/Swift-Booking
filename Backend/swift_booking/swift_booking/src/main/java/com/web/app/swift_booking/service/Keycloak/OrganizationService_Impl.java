@@ -170,7 +170,7 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 List<Organization> organizations = organizationsResponse != null ? organizationsResponse.getBody() : null;
 
-                if (organizations.size() == 0) {
+                if (organizations == null || organizations.isEmpty()) {
                         throw new NoSuchElementException("Organization not found for user: " + userId);
                 }
 
