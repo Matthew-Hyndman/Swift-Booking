@@ -1,8 +1,8 @@
 export type BookingStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 
-export interface Business {
-  businessId: number;
-  businessName: string;
+export interface Organization {
+  organizationId: number;
+  organizationName: string;
   description: string;
   phone: string;
   email: string;
@@ -10,7 +10,7 @@ export interface Business {
 
 export interface Employee {
   employeeId: number;
-  businessId: number;
+  organizationId: number;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -31,7 +31,7 @@ export interface Customer {
 
 export interface Booking {
   bookingId: number;
-  businessId: number;
+  organizationId: number;
   employeeId: number;
   employeeName: string;
   customerId: number;

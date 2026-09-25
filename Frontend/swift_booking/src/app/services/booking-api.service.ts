@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { Analytics, Booking, Business, CreateBookingRequest, Customer, Employee, UpdateBookingRequest } from '../booking.models';
-import { environment } from '../../environments/environment';
+import { Analytics, Booking, Organization, CreateBookingRequest, Customer, Employee, UpdateBookingRequest } from '../booking.models';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +10,8 @@ import { environment } from '../../environments/environment';
 export class BookingApiService {
   constructor(private readonly http: HttpClient) {}
 
-  getBusinesses(): Observable<Business[]> {
-    return this.http.get<Business[]>(`${environment.apiBaseUrl}/businesses`);
+  getBusinesses(): Observable<Organization[]> {
+    return this.http.get<Organization[]>(`${environment.apiBaseUrl}/businesses`);
   }
 
   getEmployees(businessId: number): Observable<Employee[]> {

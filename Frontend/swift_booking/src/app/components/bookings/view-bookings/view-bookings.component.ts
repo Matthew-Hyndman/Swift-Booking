@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { Booking, BookingStatus, Business, Employee } from '../../booking.models';
-import { BookingApiService } from '../../services/booking-api.service';
+import { Booking, BookingStatus, Organization, Employee } from '../../../booking.models';
+import { BookingApiService } from '../../../services/booking-api.service';
 
 @Component({
   selector: 'app-view-bookings',
@@ -13,7 +13,7 @@ import { BookingApiService } from '../../services/booking-api.service';
 export class ViewBookingsComponent implements OnInit {
   readonly statuses: Array<BookingStatus | 'ALL'> = ['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'];
 
-  businesses: Business[] = [];
+  businesses: Organization[] = [];
   employees: Employee[] = [];
   bookings: Booking[] = [];
 
@@ -39,7 +39,7 @@ export class ViewBookingsComponent implements OnInit {
     this.bookingApiService.getBusinesses().subscribe({
       next: (businesses) => {
         this.businesses = businesses;
-        this.selectedBusinessId = businesses.length > 0 ? businesses[0].businessId : null;
+        this.selectedBusinessId = businesses.length > 0 ? businesses[0].organizationId : null;
         if (this.selectedBusinessId !== null) {
           this.reloadBookings();
           return;
