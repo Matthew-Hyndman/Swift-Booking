@@ -14,8 +14,8 @@ import { environment } from '../../environments/environment.local';
     providedIn: 'root',
 })
 export class AuthService {
-  private static readonly IDLE_WARNING_AFTER_MS = 3 * 60 * 1000;
-  private static readonly IDLE_LOGOUT_AFTER_MS = 5 * 60 * 1000;
+  private static readonly IDLE_WARNING_AFTER_MS = 30 * 60 * 1000;
+  private static readonly IDLE_LOGOUT_AFTER_MS = 35 * 60 * 1000;
 
   // For testing purposes, set the idle warning and logout times to 10 seconds and 20 seconds respectively
   //private static readonly IDLE_WARNING_AFTER_MS = 10000;
