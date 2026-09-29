@@ -2,6 +2,8 @@ package com.web.app.swift_booking.dto.Keycloak;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Data;
 
 @Data
@@ -12,6 +14,8 @@ public class OrganizationRepresentation_DTO {
     private boolean enabled;
     private String description;
     private String redirectUrl;
+    private JsonNode billingAddress;
+    private List<JsonNode> branches;
     private List<MemberRepresentation_DTO> members;
     private List<GroupRepresentation_DTO> groups;
 
@@ -62,6 +66,22 @@ public class OrganizationRepresentation_DTO {
 
     public void setRedirectUrl(String redirectUrl) {
         this.redirectUrl = redirectUrl;
+    }
+
+    public JsonNode getBillingAddress() {
+        return billingAddress;
+    }
+
+    public void setBillingAddress(JsonNode billingAddress) {
+        this.billingAddress = billingAddress;
+    }
+
+    public List<JsonNode> getBranches() {
+        return branches;
+    }
+
+    public void setBranches(List<JsonNode> branches) {
+        this.branches = branches;
     }
 
     public List<MemberRepresentation_DTO> getMembers() {

@@ -1,336 +1,593 @@
 <section class="org-create-page glass-panel glass-page">
-	<h1>Create Your Business</h1>
-	<p class="intro">
-		Set up your organization, billing address, branch locations, and team members.
-	</p>
+  <h1>Create Your Business</h1>
+  <p class="intro">
+    Set up your organization, billing address, branch locations, and team
+    members.
+  </p>
 
-    <!-- Business Details Form -->
-	<form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" novalidate>
-		<fieldset>
-			<legend>Business Details</legend>
+  <!-- Business Details Form -->
+  <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" novalidate>
+    <fieldset>
+      <legend>Business Details</legend>
 
-            <!-- Business Name Input -->
-			<label for="businessName">Business Name</label>
-			<input id="businessName" type="text" formControlName="businessName" />
-			@if (hasError(organizationForm.get('businessName'), 'required')) {
-			<p class="error">
-				Business name is required.
-			</p>
-			}
-			@if (hasError(organizationForm.get('businessName'), 'minlength')) {
-			<p class="error">
-				Business name must be at least 2 characters.
-			</p>
-			}
-		</fieldset>
+      <!-- Business Name Input -->
+      <label for="businessName">Business Name</label>
+      <input id="businessName" type="text" formControlName="businessName" />
+      @if (hasError(organizationForm.get('businessName'), 'required')) {
+      <p class="error">Business name is required.</p>
+      } @if (hasError(organizationForm.get('businessName'), 'minlength')) {
+      <p class="error">Business name must be at least 2 characters.</p>
+      }
+    </fieldset>
 
-        <!-- Billing Address -->
-		<fieldset formGroupName="billingAddress">
-			<legend>Billing Address</legend>
-			<div class="grid two-col">
-				<div>
-					<label for="billingStreet1">Street 1</label>
-					<input id="billingStreet1" type="text" formControlName="street1" />
-					@if (hasError(organizationForm.get('billingAddress.street1'), 'required')) {
-					<p class="error">
-						Street 1 is required.
-					</p>
-					}
-				</div>
+    <!-- Billing Address -->
+    <fieldset formGroupName="billingAddress">
+      <legend>Billing Address</legend>
 
-				<div>
-					<label for="billingStreet2">Street 2</label>
-					<input id="billingStreet2" type="text" formControlName="street2" />
-				</div>
 
-				<div>
-					<label for="billingCity">City</label>
-					<input id="billingCity" type="text" formControlName="city" />
-					@if (hasError(organizationForm.get('billingAddress.city'), 'required')) {
-					<p class="error">
-						City is required.
-					</p>
-					}
-				</div>
+      <div>
+        <label for="billingAddressName">Address Name</label>
+        <input id="billingAddressName" type="text" formControlName="addressName" />
+        @if (hasError(organizationForm.get('billingAddress.addressName'), 'required')) {
+        <p class="error">Address name is required.</p>
+        } @if (hasError(organizationForm.get('billingAddress.addressName'), 'maxLength')) {
+        <p class="error">Address name must be at most 120 characters.</p>
+        }
+      </div>
+      <div class="grid two-col">
+        <div>
+          <label for="billingStreet1">Street 1</label>
+          <input id="billingStreet1" type="text" formControlName="street1" />
+          @if (hasError(organizationForm.get('billingAddress.street1'),
+          'required')) {
+          <p class="error">Street 1 is required.</p>
+          }
+        </div>
 
-				<div>
-					<label for="billingState">State</label>
-					<input id="billingState" type="text" formControlName="state" />
-					@if (hasError(organizationForm.get('billingAddress.state'), 'required')) {
-					<p class="error">
-						State is required.
-					</p>
-					}
-				</div>
+        <div>
+          <label for="billingStreet2">Street 2</label>
+          <input id="billingStreet2" type="text" formControlName="street2" />
+        </div>
 
-				<div>
-					<label for="billingPostalCode">Postal Code</label>
-					<input id="billingPostalCode" type="text" formControlName="postalCode" />
-					@if (hasError(organizationForm.get('billingAddress.postalCode'), 'required')) {
-					<p class="error">
-						Postal code is required.
-					</p>
-					}
-					@if (hasError(organizationForm.get('billingAddress.postalCode'), 'pattern')) {
-					<p class="error">
-						Postal code is invalid.
-					</p>
-					}
-				</div>
+        <div>
+          <label for="billingCity">City</label>
+          <input id="billingCity" type="text" formControlName="city" />
+          @if (hasError(organizationForm.get('billingAddress.city'),
+          'required')) {
+          <p class="error">City is required.</p>
+          }
+        </div>
 
-				<div>
-					<label for="billingCountry">Country</label>
-					<input id="billingCountry" type="text" formControlName="country" />
-					@if (hasError(organizationForm.get('billingAddress.country'), 'required')) {
-					<p class="error">
-						Country is required.
-					</p>
-					}
-				</div>
-			</div>
-		</fieldset>
-        <!-- End of Billing Address -->
+        <div>
+          <label for="billingState">State</label>
+          <input id="billingState" type="text" formControlName="state" />
+          @if (hasError(organizationForm.get('billingAddress.state'),
+          'required')) {
+          <p class="error">State is required.</p>
+          }
+        </div>
 
-        <!-- Branches -->
-		<fieldset formArrayName="branches">
-			<legend>Branches</legend>
+        <div>
+          <label for="billingPostalCode">Postal Code</label>
+          <input
+            id="billingPostalCode"
+            type="text"
+            formControlName="postalCode"
+          />
+          @if (hasError(organizationForm.get('billingAddress.postalCode'),
+          'required')) {
+          <p class="error">Postal code is required.</p>
+          } @if (hasError(organizationForm.get('billingAddress.postalCode'),
+          'pattern')) {
+          <p class="error">Postal code is invalid.</p>
+          }
+        </div>
 
-			@for (branch of branches.controls; track branchTrackBy(branchIndex); let branchIndex = $index) {
-                
-			<div class="branch-card glass-panel" [class.is-removing]="isBranchRemoving(branchIndex)" [formGroupName]="branchIndex">
-				<div class="branch-header">
-					<h2>Branch {{ branchIndex + 1 }}</h2>
-					<button
-						type="button"
-						class="secondary"
-						[disabled]="isOnlyBranch()"
-						(click)="removeBranch(branchIndex)"
-					>
-						Remove Branch
-					</button>
-				</div>
-                
-                <!-- Branch Address -->
-				<div class="accordion-section">
-					
-                    <button type="button" class="accordion-toggle" (click)="toggleBranchDetails(branchIndex)">
-						<span>Branch Details</span>
-						<span>{{ isBranchDetailsOpen(branchIndex) ? 'Hide' : 'Show' }}</span>
-					</button>
-                    
-					@if (!isBranchDetailsOpen(branchIndex) && getAddressSummary(branchIndex)) {
-					<p class="summary-text">
-						{{ getAddressSummary(branchIndex) }}
-					</p>
-                    <p class="summary-text">
-                        {{ getStaffCount(branchIndex) }}
-						{{ getStaffCount(branchIndex) === 1 ? 'Staff Member' : 'Staff Members' }}
-                    </p>
-					}
+        <div>
+          <label for="billingCountry">Country</label>
+          <input id="billingCountry" type="text" formControlName="country" />
+          @if (hasError(organizationForm.get('billingAddress.country'),
+          'required')) {
+          <p class="error">Country is required.</p>
+          }
+        </div>
+      </div>
+    </fieldset>
 
-					<div class="accordion-content" [class.is-open]="isBranchDetailsOpen(branchIndex)">
-						<div class="accordion-inner">
-							<label [for]="'branchName-' + branchIndex">Branch Name</label>
-							<input [id]="'branchName-' + branchIndex" type="text" formControlName="branchName" />
-							@if (hasError(branch.get('branchName'), 'required')) {
-							<p class="error">
-								Branch name is required.
-							</p>
-							}
+    <label class="checkbox-row">
+      <input
+        type="checkbox"
+        [formControl]="organizationForm.controls.billingAddressIsWorkingBranch"
+      />
+      <span>This billing address is also a working branch of the business</span>
+    </label>
 
-							<div formGroupName="address" class="grid two-col">
-								<div>
-									<label [for]="'branchStreet1-' + branchIndex">Street 1</label>
-									<input [id]="'branchStreet1-' + branchIndex" type="text" formControlName="street1" />
-									@if (hasError(branch.get('address.street1'), 'required')) {
-									<p class="error">
-										Street 1 is required.
-									</p>
-									}
-								</div>
+    @if (organizationForm.get('billingAddressIsWorkingBranch')?.value) {
+    <div class="accordion-section billing-staff-section">
+      <button
+        type="button"
+        class="accordion-toggle"
+        (click)="billingStaffOpen = !billingStaffOpen"
+      >
+        <span>Staff Members</span>
+        <span>{{ billingStaffOpen ? 'Hide' : 'Show' }}</span>
+      </button>
 
-								<div>
-									<label [for]="'branchStreet2-' + branchIndex">Street 2</label>
-									<input [id]="'branchStreet2-' + branchIndex" type="text" formControlName="street2" />
-								</div>
+      <div class="accordion-content" [class.is-open]="billingStaffOpen">
+        <div class="accordion-inner">
+          <label class="checkbox-row">
+            <input
+              type="checkbox"
+              [formControl]="organizationForm.controls.isUserStaffMemberAtBillingAddress"
+            />
+            <span>I am a staff member at this branch</span>
+          </label>
 
-								<div>
-									<label [for]="'branchCity-' + branchIndex">City</label>
-									<input [id]="'branchCity-' + branchIndex" type="text" formControlName="city" />
-									@if (hasError(branch.get('address.city'), 'required')) {
-									<p class="error">
-										City is required.
-									</p>
-									}
-								</div>
+          <div [formArray]="billingStaffMembers" class="employee-list">
+            @for (billingStaff of billingStaffMembers.controls; track billingStaff; let billingStaffIndex = $index) {
+            <div class="employee-card glass-panel" [formGroupName]="billingStaffIndex">
+              <div class="employee-header">
+                <h3>Staff Member {{ billingStaffIndex + 1 }}</h3>
+                <button
+                  type="button"
+                  class="secondary"
+                  [disabled]="isOnlyBillingStaffMember()"
+                  (click)="removeBillingStaffMember(billingStaffIndex)"
+                >
+                  Remove Staff Member
+                </button>
+              </div>
 
-								<div>
-									<label [for]="'branchState-' + branchIndex">State</label>
-									<input [id]="'branchState-' + branchIndex" type="text" formControlName="state" />
-									@if (hasError(branch.get('address.state'), 'required')) {
-									<p class="error">
-										State is required.
-									</p>
-									}
-								</div>
+              <div class="grid two-col">
+                <div>
+                  <label [for]="'billingStaffUsername-' + billingStaffIndex">Username</label>
+                  <input [id]="'billingStaffUsername-' + billingStaffIndex" type="text" formControlName="username" />
+                  @if (hasError(billingStaff.get('username'), 'required')) {
+                  <p class="error">Username is required.</p>
+                  }
+                </div>
 
-								<div>
-									<label [for]="'branchPostalCode-' + branchIndex">Postal Code</label>
-									<input [id]="'branchPostalCode-' + branchIndex" type="text" formControlName="postalCode" />
-									@if (hasError(branch.get('address.postalCode'), 'required')) {
-									<p class="error">
-										Postal code is required.
-									</p>
-									}
-									@if (hasError(branch.get('address.postalCode'), 'pattern')) {
-									<p class="error">
-										Postal code is invalid.
-									</p>
-									}
-								</div>
+                <div>
+                  <label [for]="'billingStaffPassword-' + billingStaffIndex">Password</label>
+                  <input [id]="'billingStaffPassword-' + billingStaffIndex" type="password" formControlName="password" />
+                  @if (hasError(billingStaff.get('password'), 'required')) {
+                  <p class="error">Password is required.</p>
+                  }
+                  @if (hasError(billingStaff.get('password'), 'minlength')) {
+                  <p class="error">Password must be at least 8 characters.</p>
+                  }
+                  @if (hasError(billingStaff.get('password'), 'pattern')) {
+                  <p class="error">Password must include upper, lower, and a number.</p>
+                  }
+                </div>
 
-								<div>
-									<label [for]="'branchCountry-' + branchIndex">Country</label>
-									<input [id]="'branchCountry-' + branchIndex" type="text" formControlName="country" />
-									@if (hasError(branch.get('address.country'), 'required')) {
-									<p class="error">
-										Country is required.
-									</p>
-									}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-                <!-- End of Branch Address -->
+                <div>
+                  <label [for]="'billingStaffEmail-' + billingStaffIndex">Email</label>
+                  <input [id]="'billingStaffEmail-' + billingStaffIndex" type="email" formControlName="email" />
+                  @if (hasError(billingStaff.get('email'), 'required')) {
+                  <p class="error">Email is required.</p>
+                  }
+                  @if (hasError(billingStaff.get('email'), 'email')) {
+                  <p class="error">Email is invalid.</p>
+                  }
+                </div>
 
-                <!-- Employees -->
-				<div formArrayName="employees" class="employee-list accordion-section">
-					<button type="button" class="accordion-toggle" (click)="toggleBranchStaff(branchIndex)">
-						<span>Staff Members</span>
-						<span>{{ isBranchStaffOpen(branchIndex) ? 'Hide' : 'Show' }}</span>
-					</button>
+                <div>
+                  <label [for]="'billingStaffFirstName-' + billingStaffIndex">First Name</label>
+                  <input [id]="'billingStaffFirstName-' + billingStaffIndex" type="text" formControlName="firstName" />
+                  @if (hasError(billingStaff.get('firstName'), 'required')) {
+                  <p class="error">First name is required.</p>
+                  }
+                </div>
 
-					<div class="accordion-content" [class.is-open]="isBranchStaffOpen(branchIndex)">
-						<div class="accordion-inner">
-							@for (employee of branchEmployees(branchIndex).controls; track employee; let employeeIndex = $index) {
-                                <!-- Employee Details -->
-							<div class="employee-card glass-panel" [class.is-removing]="isStaffRemoving(branchIndex, employeeIndex)" [formGroupName]="employeeIndex">
-								<div class="employee-header">
-									<h3>Staff Member {{ employeeIndex + 1 }}</h3>
-									<button
-										type="button"
-										class="secondary"
-										[disabled]="isOnlyStaffMember(branchIndex)"
-										(click)="removeEmployee(branchIndex, employeeIndex)"
-									>
-										Remove Staff Member
-									</button>
-								</div>
+                <div>
+                  <label [for]="'billingStaffLastName-' + billingStaffIndex">Last Name</label>
+                  <input [id]="'billingStaffLastName-' + billingStaffIndex" type="text" formControlName="lastName" />
+                  @if (hasError(billingStaff.get('lastName'), 'required')) {
+                  <p class="error">Last name is required.</p>
+                  }
+                </div>
 
-								<div class="accordion-section nested-accordion">
-									<button type="button" class="accordion-toggle" (click)="toggleStaffMember(branchIndex, employeeIndex)">
-										<span>Staff Member Details</span>
-										<span>{{ isStaffMemberOpen(branchIndex, employeeIndex) ? 'Hide' : 'Show' }}</span>
-									</button>
+                <div>
+                  <label [for]="'billingStaffRole-' + billingStaffIndex">Role</label>
+                  <select [id]="'billingStaffRole-' + billingStaffIndex" formControlName="role">
+                    @for (role of roleOptions; track role.value) {
+                    <option [value]="role.value">{{ role.label }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+            </div>
+            }
 
-									<div class="accordion-content" [class.is-open]="isStaffMemberOpen(branchIndex, employeeIndex)">
-										<div class="accordion-inner">
-											<div class="grid two-col">
-												<div>
-													<label [for]="'username-' + branchIndex + '-' + employeeIndex">Username</label>
-													<input [id]="'username-' + branchIndex + '-' + employeeIndex" type="text" formControlName="username" />
-													@if (hasError(employee.get('username'), 'required')) {
-													<p class="error">Username is required.</p>
-													}
-												</div>
+            <button type="button" class="secondary" (click)="addBillingStaffMember()">
+              Add Staff Member
+            </button>
 
-												<div>
-													<label [for]="'password-' + branchIndex + '-' + employeeIndex">Password</label>
-													<input [id]="'password-' + branchIndex + '-' + employeeIndex" type="password" formControlName="password" />
-													@if (hasError(employee.get('password'), 'required')) {
-													<p class="error">Password is required.</p>
-													}
-													@if (hasError(employee.get('password'), 'minlength')) {
-													<p class="error">
-														Password must be at least 8 characters.
-													</p>
-													}
-													@if (hasError(employee.get('password'), 'pattern')) {
-													<p class="error">
-														Password must include upper, lower, and a number.
-													</p>
-													}
-												</div>
+            @if (organizationForm.hasError('billingBranchNoStaffMembers') && (organizationForm.touched || submitted)) {
+            <p class="error">
+              Every working billing branch must have at least one staff member, or confirm that you are a staff member in this branch.
+            </p>
+            }
+          </div>
 
-												<div>
-													<label [for]="'email-' + branchIndex + '-' + employeeIndex">Email</label>
-													<input [id]="'email-' + branchIndex + '-' + employeeIndex" type="email" formControlName="email" />
-													@if (hasError(employee.get('email'), 'required')) {
-													<p class="error">Email is required.</p>
-													}
-													@if (hasError(employee.get('email'), 'email')) {
-													<p class="error">Email is invalid.</p>
-													}
-												</div>
+          <label class="checkbox-row">
+            <input
+              type="checkbox"
+              [formControl]="organizationForm.controls.disableAdditionalBranches"
+            />
+            <span>Using only this Address for the business</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    }
+    <!-- End of Billing Address -->
 
-												<div>
-													<label [for]="'firstName-' + branchIndex + '-' + employeeIndex">First Name</label>
-													<input [id]="'firstName-' + branchIndex + '-' + employeeIndex" type="text" formControlName="firstName" />
-													@if (hasError(employee.get('firstName'), 'required')) {
-													<p class="error">First name is required.</p>
-													}
-												</div>
+    <!-- Branches -->
+	 @if(!organizationForm.controls.disableAdditionalBranches.value ||
+      organizationForm.controls.disableAdditionalBranches.value === undefined) { 
+	  
+    <fieldset formArrayName="branches">
+      <legend>Branches</legend>
+      
+	  @for(branch of branches.controls; track branchTrackBy(branchIndex); let
+      branchIndex = $index) {
 
-												<div>
-													<label [for]="'lastName-' + branchIndex + '-' + employeeIndex">Last Name</label>
-													<input [id]="'lastName-' + branchIndex + '-' + employeeIndex" type="text" formControlName="lastName" />
-													@if (hasError(employee.get('lastName'), 'required')) {
-													<p class="error">Last name is required.</p>
-													}
-												</div>
+      <div
+        class="branch-card glass-panel"
+        [class.is-removing]="isBranchRemoving(branchIndex)"
+        [formGroupName]="branchIndex"
+      >
+        <div class="branch-header">
+          <h2>Branch {{ branchIndex + 1 }}</h2>
+          <button
+            type="button"
+            class="secondary"
+            [disabled]="isOnlyBranch()"
+            (click)="removeBranch(branchIndex)"
+          >
+            Remove Branch
+          </button>
+        </div>
 
-												<div>
-													<label [for]="'role-' + branchIndex + '-' + employeeIndex">Role</label>
-													<select [id]="'role-' + branchIndex + '-' + employeeIndex" formControlName="role">
-														@for (role of roleOptions; track role.value) {
-														<option [value]="role.value">{{ role.label }}</option>
-														}
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-                            <!-- End of Employee Details -->
-							}
+        <!-- Branch Address -->
+        <div class="accordion-section">
+          <button
+            type="button"
+            class="accordion-toggle"
+            (click)="toggleBranchDetails(branchIndex)"
+          >
+            <span>Branch Details</span>
+            <span
+              >{{ isBranchDetailsOpen(branchIndex) ? 'Hide' : 'Show' }}</span
+            >
+          </button>
 
-							@if (branch.hasError('noEmployees') && (branch.touched || submitted)) {
-							<p class="error">
-								Every branch must have at least one staff member.
-							</p>
-							}
-							<button type="button" class="secondary" (click)="addEmployee(branchIndex)">
-								Add Staff Member
-							</button>
-						</div>
-					</div>
-				</div>
-                <!-- End of Employees -->
-			</div>
-			}
+          @if (!isBranchDetailsOpen(branchIndex) &&
+          getAddressSummary(branchIndex)) {
+          <p class="summary-text">{{ getAddressSummary(branchIndex) }}</p>
+          <p class="summary-text">
+            {{ getStaffCount(branchIndex) }} {{ getStaffCount(branchIndex) === 1
+            ? 'Staff Member' : 'Staff Members' }}
+          </p>
+          }
 
-			<button type="button" class="secondary" (click)="addBranch()">Add Branch</button>
-		</fieldset>
+          <div
+            class="accordion-content"
+            [class.is-open]="isBranchDetailsOpen(branchIndex)"
+          >
+            <div class="accordion-inner">
+              <label [for]="'branchName-' + branchIndex">Branch Name</label>
+              <input
+                [id]="'branchName-' + branchIndex"
+                type="text"
+                formControlName="branchName"
+              />
+              @if (hasError(branch.get('branchName'), 'required')) {
+              <p class="error">Branch name is required.</p>
+              }
 
-		<button type="submit" class="primary">Create Organization</button>
-	</form>
+              <div formGroupName="address" class="grid two-col">
+                <div>
+                  <label [for]="'branchStreet1-' + branchIndex">Street 1</label>
+                  <input
+                    [id]="'branchStreet1-' + branchIndex"
+                    type="text"
+                    formControlName="street1"
+                  />
+                  @if (hasError(branch.get('address.street1'), 'required')) {
+                  <p class="error">Street 1 is required.</p>
+                  }
+                </div>
 
-	@if (submittedPayload) {
-	<section class="payload glass-panel">
-		<h2>Payload Preview</h2>
-		<pre>{{ submittedPayload | json }}</pre>
-	</section>
-	}
+                <div>
+                  <label [for]="'branchStreet2-' + branchIndex">Street 2</label>
+                  <input
+                    [id]="'branchStreet2-' + branchIndex"
+                    type="text"
+                    formControlName="street2"
+                  />
+                </div>
+
+                <div>
+                  <label [for]="'branchCity-' + branchIndex">City</label>
+                  <input
+                    [id]="'branchCity-' + branchIndex"
+                    type="text"
+                    formControlName="city"
+                  />
+                  @if (hasError(branch.get('address.city'), 'required')) {
+                  <p class="error">City is required.</p>
+                  }
+                </div>
+
+                <div>
+                  <label [for]="'branchState-' + branchIndex">State</label>
+                  <input
+                    [id]="'branchState-' + branchIndex"
+                    type="text"
+                    formControlName="state"
+                  />
+                  @if (hasError(branch.get('address.state'), 'required')) {
+                  <p class="error">State is required.</p>
+                  }
+                </div>
+
+                <div>
+                  <label [for]="'branchPostalCode-' + branchIndex"
+                    >Postal Code</label
+                  >
+                  <input
+                    [id]="'branchPostalCode-' + branchIndex"
+                    type="text"
+                    formControlName="postalCode"
+                  />
+                  @if (hasError(branch.get('address.postalCode'), 'required')) {
+                  <p class="error">Postal code is required.</p>
+                  } @if (hasError(branch.get('address.postalCode'), 'pattern'))
+                  {
+                  <p class="error">Postal code is invalid.</p>
+                  }
+                </div>
+
+                <div>
+                  <label [for]="'branchCountry-' + branchIndex">Country</label>
+                  <input
+                    [id]="'branchCountry-' + branchIndex"
+                    type="text"
+                    formControlName="country"
+                  />
+                  @if (hasError(branch.get('address.country'), 'required')) {
+                  <p class="error">Country is required.</p>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Branch Address -->
+
+        <!-- Employees -->
+        <div class="branch-assignment-toggle">
+          <label class="checkbox-row">
+            <input
+              type="checkbox"
+              formControlName="signedInUserIsStaffMember"
+            />
+            <span>I am a staff member in this branch</span>
+          </label>
+        </div>
+
+        <div formArrayName="employees" class="employee-list accordion-section">
+          <button
+            type="button"
+            class="accordion-toggle"
+            (click)="toggleBranchStaff(branchIndex)"
+          >
+            <span>Staff Members</span>
+            <span>{{ isBranchStaffOpen(branchIndex) ? 'Hide' : 'Show' }}</span>
+          </button>
+
+          <div
+            class="accordion-content"
+            [class.is-open]="isBranchStaffOpen(branchIndex)"
+          >
+            <div class="accordion-inner">
+              @for (employee of branchEmployees(branchIndex).controls; track
+              employee; let employeeIndex = $index) {
+              <!-- Employee Details -->
+              <div
+                class="employee-card glass-panel"
+                [class.is-removing]="isStaffRemoving(branchIndex, employeeIndex)"
+                [formGroupName]="employeeIndex"
+              >
+                <div class="employee-header">
+                  <h3>Staff Member {{ employeeIndex + 1 }}</h3>
+                  <button
+                    type="button"
+                    class="secondary"
+                    [disabled]="isOnlyStaffMember(branchIndex)"
+                    (click)="removeEmployee(branchIndex, employeeIndex)"
+                  >
+                    Remove Staff Member
+                  </button>
+                </div>
+
+                <div class="accordion-section nested-accordion">
+                  <button
+                    type="button"
+                    class="accordion-toggle"
+                    (click)="toggleStaffMember(branchIndex, employeeIndex)"
+                  >
+                    <span>Staff Member Details</span>
+                    <span
+                      >{{ isStaffMemberOpen(branchIndex, employeeIndex) ? 'Hide'
+                      : 'Show' }}</span
+                    >
+                  </button>
+
+                  <div
+                    class="accordion-content"
+                    [class.is-open]="isStaffMemberOpen(branchIndex, employeeIndex)"
+                  >
+                    <div class="accordion-inner">
+                      <div class="grid two-col">
+                        <div>
+                          <label
+                            [for]="'username-' + branchIndex + '-' + employeeIndex"
+                            >Username</label
+                          >
+                          <input
+                            [id]="'username-' + branchIndex + '-' + employeeIndex"
+                            type="text"
+                            formControlName="username"
+                          />
+                          @if (hasError(employee.get('username'), 'required')) {
+                          <p class="error">Username is required.</p>
+                          }
+                        </div>
+
+                        <div>
+                          <label
+                            [for]="'password-' + branchIndex + '-' + employeeIndex"
+                            >Password</label
+                          >
+                          <input
+                            [id]="'password-' + branchIndex + '-' + employeeIndex"
+                            type="password"
+                            formControlName="password"
+                          />
+                          @if (hasError(employee.get('password'), 'required')) {
+                          <p class="error">Password is required.</p>
+                          } @if (hasError(employee.get('password'),
+                          'minlength')) {
+                          <p class="error">
+                            Password must be at least 8 characters.
+                          </p>
+                          } @if (hasError(employee.get('password'), 'pattern'))
+                          {
+                          <p class="error">
+                            Password must include upper, lower, and a number.
+                          </p>
+                          }
+                        </div>
+
+                        <div>
+                          <label
+                            [for]="'email-' + branchIndex + '-' + employeeIndex"
+                            >Email</label
+                          >
+                          <input
+                            [id]="'email-' + branchIndex + '-' + employeeIndex"
+                            type="email"
+                            formControlName="email"
+                          />
+                          @if (hasError(employee.get('email'), 'required')) {
+                          <p class="error">Email is required.</p>
+                          } @if (hasError(employee.get('email'), 'email')) {
+                          <p class="error">Email is invalid.</p>
+                          }
+                        </div>
+
+                        <div>
+                          <label
+                            [for]="'firstName-' + branchIndex + '-' + employeeIndex"
+                            >First Name</label
+                          >
+                          <input
+                            [id]="'firstName-' + branchIndex + '-' + employeeIndex"
+                            type="text"
+                            formControlName="firstName"
+                          />
+                          @if (hasError(employee.get('firstName'), 'required'))
+                          {
+                          <p class="error">First name is required.</p>
+                          }
+                        </div>
+
+                        <div>
+                          <label
+                            [for]="'lastName-' + branchIndex + '-' + employeeIndex"
+                            >Last Name</label
+                          >
+                          <input
+                            [id]="'lastName-' + branchIndex + '-' + employeeIndex"
+                            type="text"
+                            formControlName="lastName"
+                          />
+                          @if (hasError(employee.get('lastName'), 'required')) {
+                          <p class="error">Last name is required.</p>
+                          }
+                        </div>
+
+                        <div>
+                          <label
+                            [for]="'role-' + branchIndex + '-' + employeeIndex"
+                            >Role</label
+                          >
+                          <select
+                            [id]="'role-' + branchIndex + '-' + employeeIndex"
+                            formControlName="role"
+                          >
+                            @for (role of roleOptions; track role.value) {
+                            <option [value]="role.value">
+                              {{ role.label }}
+                            </option>
+                            }
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- End of Employee Details -->
+              } @if (branch.hasError('noEmployees') && (branch.touched ||
+              submitted)) {
+              <p class="error">
+                Every branch must have at least one staff member, or confirm
+                that you are a staff member in this branch.
+              </p>
+              } @if
+              (organizationForm.hasError('signedInUserAssignedToMultipleBranches')
+              && (organizationForm.touched || submitted)) {
+              <p class="error">
+                The signed-in user can only be assigned to one branch.
+              </p>
+              }
+              <button
+                type="button"
+                class="secondary"
+                (click)="addEmployee(branchIndex)"
+              >
+                Add Staff Member
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- End of Employees -->
+      </div>
+      }
+
+      <button
+        type="button"
+        class="secondary"
+        [disabled]="!canAddBranch()"
+        (click)="addBranch()"
+      >
+        Add Branch
+      </button>
+      
+    </fieldset>
+}
+    <button type="submit" class="primary">Create Organization</button>
+  </form>
+
+  @if (submittedPayload) {
+  <section class="payload glass-panel">
+    <h2>Payload Preview</h2>
+    <pre>{{ submittedPayload | json }}</pre>
+  </section>
+  }
 </section>

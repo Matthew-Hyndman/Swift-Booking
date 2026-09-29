@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import {
   AbstractControl,
   FormArray,
@@ -9,6 +10,8 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import Keycloak from 'keycloak-js';
+import { environment } from '../../../../environments/environment.local';
 
 @Component({
   selector: 'app-create-organization',
@@ -18,6 +21,8 @@ import {
 })
 export class CreateOrganization {
   private readonly fb = new FormBuilder();
+  private readonly http = inject(HttpClient);
+  private readonly keycloak = inject(Keycloak);
   private nextBranchId = 1;
   private nextStaffId = 1;
 
@@ -27,13 +32,21 @@ export class CreateOrganization {
     { value: 'owner', label: 'Owner' },
   ];
 
-  readonly organizationForm = this.fb.group({
-    businessName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
-    billingAddress: this.createAddressGroup(),
-    branches: this.fb.array([this.createBranchGroup()]),
-  });
+  readonly organizationForm = this.fb.group(
+    {
+      businessName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
+      billingAddress: this.createAddressGroup(),
+      billingAddressIsWorkingBranch: [false],
+      isUserStaffMemberAtBillingAddress: [false],
+      billingStaffMembers: this.fb.array([]),
+      disableAdditionalBranches: [false],
+      branches: this.fb.array([this.createBranchGroup()]),
+    },
+    { validators: [this.onlyOneSignedInUserBranchValidator(), this.billingBranchMustHaveStaffMemberValidator()] },
+  );
 
   submitted = false;
+  billingStaffOpen = false;
   submittedPayload: unknown = null;
   branchAccordionState: BranchAccordionState[] = [this.createBranchAccordionState(1)];
   private readonly branchLeaving = new Set<number>();
@@ -45,11 +58,38 @@ export class CreateOrganization {
     return this.organizationForm.get('branches') as FormArray<FormGroup>;
   }
 
+  get billingStaffMembers(): FormArray<FormGroup> {
+    return this.organizationForm.get('billingStaffMembers') as FormArray<FormGroup>;
+  }
+
   branchEmployees(index: number): FormArray<FormGroup> {
     return this.branches.at(index).get('employees') as FormArray<FormGroup>;
   }
 
+  addBillingStaffMember(): void {
+    this.billingStaffMembers.push(this.createEmployeeGroup());
+    this.organizationForm.updateValueAndValidity();
+  }
+
+  removeBillingStaffMember(index: number): void {
+    const isUserStaffMemberAtBillingAddress = this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ?? false;
+    if (this.billingStaffMembers.length === 1 && 
+      !isUserStaffMemberAtBillingAddress) {
+      return;
+    }
+
+    this.billingStaffMembers.removeAt(index);
+    this.organizationForm.updateValueAndValidity();
+  }
+
   addBranch(): void {
+    const isBillingBranch = !!this.organizationForm.get('billingAddressIsWorkingBranch')?.value;
+    const disableAdditionalBranches = !!this.organizationForm.get('disableAdditionalBranches')?.value;
+
+    if (isBillingBranch && disableAdditionalBranches) {
+      return;
+    }
+
     this.branches.push(this.createBranchGroup());
     this.branchAccordionState.push(this.createBranchAccordionState(1));
   }
@@ -181,8 +221,21 @@ export class CreateOrganization {
     return this.branches.length === 1;
   }
 
+  canAddBranch(): boolean {
+    return !(
+      !!this.organizationForm.get('billingAddressIsWorkingBranch')?.value &&
+      !!this.organizationForm.get('disableAdditionalBranches')?.value
+    );
+  }
+
   isOnlyStaffMember(branchIndex: number): boolean {
-    return this.branchEmployees(branchIndex).length === 1;
+    const isUserStaffMemberAtBranch = this.organizationForm.get('isUserStaffMemberAtBranch')?.value ?? false;
+    return this.branchEmployees(branchIndex).length === 1 && !isUserStaffMemberAtBranch;
+  }
+
+  isOnlyBillingStaffMember(): boolean {
+    const isUserStaffMemberAtBillingAddress = this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ?? false;
+    return this.billingStaffMembers.length < 0 || !isUserStaffMemberAtBillingAddress;
   }
 
   getAddressSummary(branchIndex: number): string {
@@ -216,8 +269,32 @@ export class CreateOrganization {
       return;
     }
 
-    this.submittedPayload = this.organizationForm.getRawValue();
-    console.log('Organization payload', this.submittedPayload);
+    const userId = this.keycloak.tokenParsed?.sub ?? this.keycloak.subject ?? '';
+    if (!userId) {
+      console.error('No signed-in user ID available for organization creation');
+      return;
+    }
+
+    const payload = this.buildOrganizationPayload();
+    this.submittedPayload = payload;
+
+    this.http.post<string>(`${environment.apiBaseUrl}/api/organizations/create/${userId}`, payload).subscribe({
+      next: (response) => {
+        console.log('Organization created successfully', response);
+        this.submittedPayload = {
+          payload,
+          response,
+        };
+      },
+      error: (error) => {
+        const message = error?.error ?? error?.message ?? 'Unable to create organization.';
+        console.error('Organization creation failed', error);
+        this.submittedPayload = {
+          payload,
+          error: message,
+        };
+      },
+    });
   }
 
   hasError(control: AbstractControl | null, code: string): boolean {
@@ -230,6 +307,7 @@ export class CreateOrganization {
 
   private createAddressGroup(): FormGroup {
     return this.fb.group({
+      addressName: ['', [Validators.required, Validators.maxLength(120)]],
       street1: ['', [Validators.required, Validators.maxLength(120)]],
       street2: [''],
       city: ['', [Validators.required, Validators.maxLength(80)]],
@@ -245,6 +323,7 @@ export class CreateOrganization {
         branchName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
         address: this.createAddressGroup(),
         employees: this.fb.array([this.createEmployeeGroup()]),
+        signedInUserIsStaffMember: [false],
       },
       { validators: this.branchMustHaveEmployeeValidator() },
     );
@@ -271,11 +350,91 @@ export class CreateOrganization {
   private branchMustHaveEmployeeValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const employees = control.get('employees') as FormArray<FormControl> | null;
+      const signedInUserIsStaffMember = !!control.get('signedInUserIsStaffMember')?.value;
+
       if (!employees || employees.length < 1) {
-        return { noEmployees: true };
+        return signedInUserIsStaffMember ? null : { noEmployees: true };
       }
 
       return null;
+    };
+  }
+
+  private onlyOneSignedInUserBranchValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const branches = control.get('branches') as FormArray | null;
+      const billingAddressIsWorkingBranch = !!control.get('billingAddressIsWorkingBranch')?.value;
+      const isUserStaffMemberAtBillingAddress = !!control.get('isUserStaffMemberAtBillingAddress')?.value;
+
+      if (!branches || branches.length === 0) {
+        if (billingAddressIsWorkingBranch && isUserStaffMemberAtBillingAddress) {
+          return null;
+        }
+        return null;
+      }
+
+      let selectedBranchCount = 0;
+
+      if (billingAddressIsWorkingBranch && isUserStaffMemberAtBillingAddress) {
+        selectedBranchCount += 1;
+      }
+
+      for (const branchControl of branches.controls) {
+        const isSelected = !!(branchControl as FormGroup).get('signedInUserIsStaffMember')?.value;
+        if (isSelected) {
+          selectedBranchCount += 1;
+        }
+      }
+
+      return selectedBranchCount > 1 ? { signedInUserAssignedToMultipleBranches: true } : null;
+    };
+  }
+
+  private billingBranchMustHaveStaffMemberValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const billingAddressIsWorkingBranch = !!control.get('billingAddressIsWorkingBranch')?.value;
+      const isUserStaffMemberAtBillingAddress = !!control.get('isUserStaffMemberAtBillingAddress')?.value;
+      const billingStaffMembers = control.get('billingStaffMembers') as FormArray | null;
+
+      if (!billingAddressIsWorkingBranch) {
+        return null;
+      }
+
+      const hasBillingStaff = !!billingStaffMembers && billingStaffMembers.length > 0;
+
+      return hasBillingStaff || isUserStaffMemberAtBillingAddress
+        ? null
+        : { billingBranchNoStaffMembers: true };
+    };
+  }
+
+  private buildOrganizationPayload(): Record<string, unknown> {
+    const formValue = this.organizationForm.getRawValue();
+    const businessName = formValue.businessName ?? '';
+    const tokenClaims = (this.keycloak.tokenParsed ?? {}) as Record<string, unknown>;
+    const preferredUsername = typeof tokenClaims['preferred_username'] === 'string'
+      ? tokenClaims['preferred_username']
+      : 'signed-in user';
+
+    return {
+      id: undefined,
+      name: businessName,
+      alias: businessName
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'organization',
+      enabled: true,
+      description: `Business created by ${preferredUsername}`,
+      redirectUrl: '',
+      billingAddress: formValue.billingAddress,
+      billingAddressIsWorkingBranch: formValue.billingAddressIsWorkingBranch,
+      isUserStaffMemberAtBillingAddress: formValue.isUserStaffMemberAtBillingAddress,
+      billingStaffMembers: formValue.billingStaffMembers,
+      disableAdditionalBranches: formValue.disableAdditionalBranches,
+      branches: formValue.branches,
+      members: [],
+      groups: [],
     };
   }
 
@@ -315,6 +474,7 @@ interface BranchAccordionState {
 }
 
 interface AddressSummary {
+  addressName?: string;
   street1?: string;
   street2?: string;
   city?: string;

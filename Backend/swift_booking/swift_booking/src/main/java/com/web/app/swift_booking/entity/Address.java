@@ -1,13 +1,13 @@
-package com.web.app.swift_booking.entity.Keycloak;
+package com.web.app.swift_booking.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.web.app.swift_booking.entity.Keycloak.Organization;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -25,9 +25,11 @@ import lombok.Setter;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "address_id")
+    @Column(name = "address_id", nullable = false, updatable = false)
     private UUID addressId;
+
+    @Column(name = "address_name", nullable = false)
+    private String addressName;
 
     @Column(name = "street_line1", nullable = false)
     private String streetLine1;
@@ -51,11 +53,14 @@ public class Address {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organization_id", referencedColumnName = "id",nullable = false)
+    @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
     private Organization organization;
 
     @PrePersist
     void prePersist() {
+        if (addressId == null) {
+            addressId = UUID.randomUUID();
+        }
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }

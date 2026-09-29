@@ -1,36 +1,42 @@
 package com.web.app.swift_booking.controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import com.web.app.swift_booking.service.Keycloak.OrganizationService_Impl;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
-import com.web.app.swift_booking.entity.Keycloak.Organization;
+import com.web.app.swift_booking.dto.Address_DTO;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.SimpleOrgDetail_DTO;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import java.util.NoSuchElementException;
-import java.util.List;
-
-
+import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
+import com.web.app.swift_booking.service.AddressService;
+import com.web.app.swift_booking.service.Keycloak.OrganizationService_Impl;
 
 @RestController
 @RequestMapping("/api/organizations")
 public class OrganizationController {
 
     private final OrganizationService_Impl organizationService;
-    
-    public OrganizationController(OrganizationService_Impl organizationService) {
+    private final AddressService addressService;
+
+    public OrganizationController(OrganizationService_Impl organizationService, AddressService addressService) {
         this.organizationService = organizationService;
+        this.addressService = addressService;
     }
 
+    /**
+     * Get a list of simplified organization details for the specified user.
+     * @param userId The ID of the user for whom to retrieve simplified organization details.
+     * @return A ResponseEntity containing a list of SimpleOrgDetail_DTO objects representing the simplified organization details for the specified user.
+     */
     @GetMapping("small-info/{userId}")
     public ResponseEntity<List<SimpleOrgDetail_DTO>> getSmallOrgInfo(@PathVariable String userId) {
         try {
@@ -41,27 +47,66 @@ public class OrganizationController {
         }
     }
 
+    /**
+     * Create an organization and add the specified user as a member of the organization.
+     * @param userId The ID of the user to be added as a member of the newly created organization.
+     * @param organizationData The data for the organization to be created.
+     * @return A ResponseEntity containing a message indicating the result of the create operation.
+     */
     @PostMapping("create/{userId}")
     public ResponseEntity<String> createOrganization(
-        @PathVariable String userId, 
+        @PathVariable String userId,
         @RequestBody OrganizationRepresentation_DTO organizationData
     ) {
+        return this.organizationService.createOrganization(userId, organizationData);
+    }
 
-        ResponseEntity<String> response = this.organizationService.createOrganization(userId, organizationData);
-        // create organization and add userId as member of the organization
-        return response;
+    @GetMapping("{organizationId}/addresses")
+    public ResponseEntity<?> getOrganizationAddresses(@PathVariable String organizationId) {
+        return addressService.getAllBranchAddresses(organizationId);
+    }
+
+    @PostMapping("{organizationId}/addresses")
+    public ResponseEntity<?> addOrganizationAddress(
+        @PathVariable String organizationId,
+        @RequestBody Address_DTO addressData
+    ) {
+        return addressService.addBranchAddress(organizationId, addressData);
+    }
+
+    @PutMapping("addresses/{addressId}")
+    public ResponseEntity<?> updateOrganizationAddress(
+        @PathVariable String addressId,
+        @RequestBody Address_DTO addressData
+    ) {
+        return addressService.updateBranchAddress(addressId, addressData);
     }
 
     @PutMapping("add-employee/{organizationId}/{groupId}")
     public ResponseEntity<String> addEmployeeToOrganization(
-        @PathVariable String organizationId,        
+        @PathVariable String organizationId,
         @PathVariable String groupId,
         @RequestBody UserRepresentation_DTO userData
     ) {
-        ResponseEntity<String> response = this.organizationService.addEmployeeToOrganization(organizationId, groupId, userData);
-        return response;
+        return this.organizationService.addEmployeeToOrganization(organizationId, groupId, userData);
     }
-    
-    
-    
+
+    @PutMapping("{organizationId}/addresses/{addressId}")
+    public ResponseEntity<?> updateOrganizationAddressInOrg(
+        @PathVariable String organizationId,
+        @PathVariable String addressId,
+        @RequestBody Address_DTO addressData
+    ) {
+        return addressService.updateBranchAddress(addressId, addressData);
+    }
+
+    @DeleteMapping("addresses/{addressId}")
+    public ResponseEntity<?> deleteOrganizationAddress(@PathVariable String addressId) {
+        return addressService.deleteBranchAddress(addressId);
+    }
+
+    @DeleteMapping("{organizationId}/addresses")
+    public ResponseEntity<?> deleteAllOrganizationAddresses(@PathVariable String organizationId) {
+        return addressService.deleteAllBranchAddresses(organizationId);
+    }
 }

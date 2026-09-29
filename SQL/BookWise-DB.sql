@@ -65,12 +65,14 @@ DROP FUNCTION IF EXISTS trg_bookings_validate_org_member() CASCADE;
 CREATE TABLE IF NOT EXISTS addresses (
     address_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     organization_id VARCHAR(36) NOT NULL,
+    address_name VARCHAR(255) NOT NULL,
     street_line1 VARCHAR(255) NOT NULL,
     street_line2 VARCHAR(255),
     city VARCHAR(100) NOT NULL,
     county VARCHAR(100),
     postal_code VARCHAR(20),
     country VARCHAR(100) NOT NULL,
+    is_billing_address BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_addresses_organization
         FOREIGN KEY (organization_id) REFERENCES org(id) ON DELETE CASCADE

@@ -1,7 +1,9 @@
 package com.web.app.swift_booking.service.Keycloak;
 
+import com.web.app.swift_booking.DAO.AddressRepo;
 import com.web.app.swift_booking.DAO.OrganizationRepo;
 import com.web.app.swift_booking.DAO.UserRepo;
+import com.web.app.swift_booking.entity.Address;
 import com.web.app.swift_booking.entity.Keycloak.Organization;
 import com.web.app.swift_booking.entity.Keycloak.User;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,13 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,8 @@ public class OrganizationService_Impl implements OrganizationService {
 
         private final UserRepo userRepo;
 
-        private OrganizationRepo orgRepo;
+        private final OrganizationRepo orgRepo;
+        private final AddressRepo addressRepo;
 
         @Value("${keycloak-details.origin}")
         private String origin;
@@ -54,9 +55,10 @@ public class OrganizationService_Impl implements OrganizationService {
         private final WebClient keycloakHttpClient = WebClient.builder()
                         .defaultHeader("Content-Type", "application/json")
                         .build();
-        OrganizationService_Impl(UserRepo userRepo, OrganizationRepo orgRepo) {
+        OrganizationService_Impl(UserRepo userRepo, OrganizationRepo orgRepo, AddressRepo addressRepo) {
                 this.userRepo = userRepo;
                 this.orgRepo = orgRepo;
+                this.addressRepo = addressRepo;
         }
 
         /**
@@ -121,7 +123,10 @@ public class OrganizationService_Impl implements OrganizationService {
                                 addMemberToOrganization(accessToken, organizationId, user.getId());
                         }
 
-                        String responseMessage = "Organization created, default groups added, and owner member assigned";
+                        persistOrganizationMetadata(organizationId, organizationData);
+                        persistOrganizationAddresses(organizationId, organizationData);
+
+                        String responseMessage = "Organization created, default groups added, owner member assigned, and branch addresses saved";
                         return ResponseEntity.ok(responseMessage);
                 } catch (Exception e) {
                         return ResponseEntity.status(500).body("Error creating organization: " + e.getMessage());
@@ -182,15 +187,67 @@ public class OrganizationService_Impl implements OrganizationService {
         // not implemented yet
         @Override
         public String updateOrganization(String organizationId, OrganizationRepresentation_DTO organizationData) {
-                // Implementation here
-                return null;
+                try {
+                        String accessToken = getAdminAccessToken();
+                        OrganizationRepresentation_DTO updateRequest = new OrganizationRepresentation_DTO();
+                        updateRequest.setId(organizationId);
+                        updateRequest.setName(organizationData.getName());
+                        updateRequest.setAlias(organizationData.getAlias());
+                        updateRequest.setEnabled(organizationData.isEnabled());
+                        updateRequest.setDescription(organizationData.getDescription());
+                        updateRequest.setRedirectUrl(organizationData.getRedirectUrl());
+
+                        this.keycloakHttpClient.put()
+                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}", realm,
+                                                        organizationId)
+                                        .headers(headers -> headers.setBearerAuth(accessToken))
+                                        .bodyValue(updateRequest)
+                                        .retrieve()
+                                        .onStatus(HttpStatusCode::is4xxClientError, response -> response
+                                                        .bodyToMono(String.class)
+                                                        .flatMap(body -> Mono.error(
+                                                                        new RuntimeException("Client Error updating organization: " + body))))
+                                        .onStatus(HttpStatusCode::is5xxServerError, response -> response
+                                                        .bodyToMono(String.class)
+                                                        .flatMap(body -> Mono.error(
+                                                                        new RuntimeException("Server Error updating organization: " + body))))
+                                        .toBodilessEntity()
+                                        .block();
+
+                        persistOrganizationMetadata(organizationId, organizationData);
+                        persistOrganizationAddresses(organizationId, organizationData);
+                        return "Organization updated";
+                } catch (Exception e) {
+                        return "Error updating organization: " + e.getMessage();
+                }
         }
 
-        // not implemented yet
         @Override
         public String deleteOrganization(String organizationId) {
-                // Implementation here
-                return null;
+                try {
+                        String accessToken = getAdminAccessToken();
+                        addressRepo.deleteByOrganization_Id(organizationId);
+                        orgRepo.deleteById(organizationId);
+
+                        this.keycloakHttpClient.delete()
+                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}", realm,
+                                                        organizationId)
+                                        .headers(headers -> headers.setBearerAuth(accessToken))
+                                        .retrieve()
+                                        .onStatus(HttpStatusCode::is4xxClientError, response -> response
+                                                        .bodyToMono(String.class)
+                                                        .flatMap(body -> Mono.error(
+                                                                        new RuntimeException("Client Error deleting organization: " + body))))
+                                        .onStatus(HttpStatusCode::is5xxServerError, response -> response
+                                                        .bodyToMono(String.class)
+                                                        .flatMap(body -> Mono.error(
+                                                                        new RuntimeException("Server Error deleting organization: " + body))))
+                                        .toBodilessEntity()
+                                        .block();
+                        return "Organization deleted";
+                } catch (Exception e) {
+                        return "Error deleting organization: " + e.getMessage();
+                }
         }
 
         /**
@@ -240,6 +297,92 @@ public class OrganizationService_Impl implements OrganizationService {
                         return ResponseEntity.status(500)
                                         .body("Error adding employee to organization: " + e.getMessage());
                 }
+        }
+
+        private void persistOrganizationMetadata(String organizationId, OrganizationRepresentation_DTO organizationData) {
+                if (organizationData == null) {
+                        return;
+                }
+
+                Organization organization = orgRepo.findById(organizationId).orElseGet(() -> {
+                        Organization newOrganization = new Organization();
+                        newOrganization.setId(organizationId);
+                        return newOrganization;
+                });
+
+                organization.setName(organizationData.getName());
+                organization.setAlias(organizationData.getAlias());
+                organization.setEnabled(organizationData.isEnabled());
+                organization.setDescription(organizationData.getDescription());
+                organization.setRedirectUrl(organizationData.getRedirectUrl());
+                orgRepo.save(organization);
+        }
+
+        private void persistOrganizationAddresses(String organizationId, OrganizationRepresentation_DTO organizationData) {
+                if (organizationId == null || organizationId.isBlank() || organizationData == null) {
+                        return;
+                }
+
+                Organization organization = orgRepo.findById(organizationId)
+                                .orElseThrow(() -> new RuntimeException("Organization metadata not found for address persistence: "
+                                                + organizationId));
+
+                addressRepo.deleteByOrganization_Id(organizationId);
+
+                if (organizationData.getBillingAddress() != null && !organizationData.getBillingAddress().isNull()) {
+                        saveAddress(organizationId, "Billing Address", organizationData.getBillingAddress(), organization);
+                }
+
+                if (organizationData.getBranches() == null || organizationData.getBranches().isEmpty()) {
+                        return;
+                }
+
+                for (JsonNode branch : organizationData.getBranches()) {
+                        if (branch == null || branch.isNull()) {
+                                continue;
+                        }
+
+                        JsonNode addressNode = branch.get("address");
+                        if (addressNode == null || addressNode.isNull()) {
+                                continue;
+                        }
+
+                        String branchName = branch.has("branchName") && !branch.get("branchName").isNull()
+                                        ? branch.get("branchName").asText()
+                                        : "Branch address";
+                        saveAddress(organizationId, branchName, addressNode, organization);
+                }
+        }
+
+        private void saveAddress(String organizationId, String name, JsonNode addressNode, Organization organization) {
+                if (addressNode == null || addressNode.isNull()) {
+                        return;
+                }
+
+                Address address = new Address();
+                address.setAddressName(name);
+                address.setStreetLine1(getText(addressNode, "street1", "streetLine1"));
+                address.setStreetLine2(getText(addressNode, "street2", "streetLine2"));
+                address.setCity(getText(addressNode, "city"));
+                address.setCounty(getText(addressNode, "state", "county"));
+                address.setPostalCode(getText(addressNode, "postalCode", "postal_code"));
+                address.setCountry(getText(addressNode, "country"));
+                address.setOrganization(organization);
+
+                if (address.getStreetLine1() == null || address.getCity() == null || address.getCountry() == null) {
+                        return;
+                }
+
+                addressRepo.save(address);
+        }
+
+        private String getText(JsonNode node, String... possibleKeys) {
+                for (String key : possibleKeys) {
+                        if (node.has(key) && !node.get(key).isNull()) {
+                                return node.get(key).asText();
+                        }
+                }
+                return null;
         }
 
         private String createOrganizationGroup(String accessToken, String organizationId, String groupName) {
