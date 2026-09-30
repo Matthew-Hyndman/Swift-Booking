@@ -7,8 +7,8 @@
       <label>
         Business
         <select name="selectedBusinessId" [(ngModel)]="selectedBusinessId" (ngModelChange)="onBusinessChange()">
-          @for (business of businesses; track business.businessId) {
-            <option [ngValue]="business.businessId">{{ business.businessName }}</option>
+          @for (business of businesses; track business.organizationId) {
+            <option [ngValue]="business.organizationId">{{ business.organizationName }}</option>
           }
         </select>
       </label>

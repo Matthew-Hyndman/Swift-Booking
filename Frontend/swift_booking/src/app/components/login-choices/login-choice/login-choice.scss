@@ -1,0 +1,54 @@
+.login-choice-layout {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.login-choice-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    height: 250px;
+    width: 300px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-choice-card-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    background-color: #8382823d;
+    padding: 20px;
+    border-radius: 25px;
+    margin: 20px;
+}
+
+.login-choice-card button {
+    margin: 10px 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.login-choice-card button:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 400px) {
+    .login-choice-card {
+        width: 100%;
+        height: auto;
+    }
+}

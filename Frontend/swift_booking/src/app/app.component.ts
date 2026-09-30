@@ -11,6 +11,7 @@ import { AuthService } from './services/auth';
 import { NavLinks } from './common/classes/nav-links';
 import { LinkObj } from './common/classes/link-obj';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment.local';
 
 @Component({
   selector: 'app-root',
@@ -80,8 +81,20 @@ export class AppComponent implements OnInit {
     }
   }
 
-  login(): void {
-    this.authService.login();
+  registerAsUser(): void {
+    this.authService.register(environment.baseFrontendUrl + '/home');
+  }
+
+  registerAsMember(): void {
+    this.authService.register(environment.baseFrontendUrl + '/create-organization');
+  }
+
+  loginAsUser(): void {
+    this.authService.login(environment.baseFrontendUrl + '/home');
+  }
+
+  loginAsMember(): void {
+    this.authService.login(environment.baseFrontendUrl + '/manage-organization');
   }
 
   logout(): void {

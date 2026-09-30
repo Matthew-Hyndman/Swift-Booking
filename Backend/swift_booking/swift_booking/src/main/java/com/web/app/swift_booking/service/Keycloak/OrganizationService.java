@@ -1,11 +1,13 @@
 package com.web.app.swift_booking.service.Keycloak;
-
+import java.util.Optional;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import reactor.core.publisher.Mono;
 
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.SimpleOrgDetail_DTO;
 import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
@@ -22,6 +24,8 @@ public interface OrganizationService {
     Mono<List<GroupRepresentation_DTO>> getOrganizationGroupsById(String organizationId);
 
     ResponseEntity<OrganizationRepresentation_DTO> getOrganizationByUserId(String ownerId);
+
+    List<SimpleOrgDetail_DTO> getSmallOrgInfo(String userId);
 
     String updateOrganization(String organizationId, OrganizationRepresentation_DTO organizationData);
 

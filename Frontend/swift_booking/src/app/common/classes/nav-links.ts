@@ -17,6 +17,8 @@ export class NavLinks {
     // login should be hidden in desktop and table
 
     new LinkObj('Login', ''),
+    //new LinkObj('Login as User', ''),
+    //new LinkObj('Login as Member', ''),
     new LinkObj('Logout', '', false)
   ];
 
