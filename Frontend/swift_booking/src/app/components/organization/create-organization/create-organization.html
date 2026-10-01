@@ -24,7 +24,7 @@
     <fieldset formGroupName="billingAddress">
       <legend>Billing Address</legend>
 
-
+      <!-- Address Name -->
       <div>
         <label for="billingAddressName">Address Name</label>
         <input id="billingAddressName" type="text" formControlName="addressName" />
@@ -34,6 +34,8 @@
         <p class="error">Address name must be at most 120 characters.</p>
         }
       </div>
+
+      <!-- Street 1 and Street 2 -->
       <div class="grid two-col">
         <div>
           <label for="billingStreet1">Street 1</label>
@@ -49,6 +51,7 @@
           <input id="billingStreet2" type="text" formControlName="street2" />
         </div>
 
+        <!-- City, State, Postal Code, and Country -->
         <div>
           <label for="billingCity">City</label>
           <input id="billingCity" type="text" formControlName="city" />
@@ -94,6 +97,7 @@
       </div>
     </fieldset>
 
+    <!-- Billing Address Is Working Branch Checkbox -->
     <label class="checkbox-row">
       <input
         type="checkbox"
@@ -103,6 +107,8 @@
     </label>
 
     @if (organizationForm.get('billingAddressIsWorkingBranch')?.value) {
+    
+    <!-- Billing Staff Section -->
     <div class="accordion-section billing-staff-section">
       <button
         type="button"
@@ -115,10 +121,13 @@
 
       <div class="accordion-content" [class.is-open]="billingStaffOpen">
         <div class="accordion-inner">
+
+          <!-- User is a Staff Member at this Branch -->
           <label class="checkbox-row">
             <input
               type="checkbox"
               [formControl]="organizationForm.controls.isUserStaffMemberAtBillingAddress"
+              (change)="onBillingUserStaffMemberSelected($any($event.target).checked)"
             />
             <span>I am a staff member at this branch</span>
           </label>
@@ -139,6 +148,8 @@
               </div>
 
               <div class="grid two-col">
+
+                <!-- Employee Username -->
                 <div>
                   <label [for]="'billingStaffUsername-' + billingStaffIndex">Username</label>
                   <input [id]="'billingStaffUsername-' + billingStaffIndex" type="text" formControlName="username" />
@@ -147,6 +158,7 @@
                   }
                 </div>
 
+                <!-- Employee Password -->
                 <div>
                   <label [for]="'billingStaffPassword-' + billingStaffIndex">Password</label>
                   <input [id]="'billingStaffPassword-' + billingStaffIndex" type="password" formControlName="password" />
@@ -161,6 +173,7 @@
                   }
                 </div>
 
+                <!-- Employee Email -->
                 <div>
                   <label [for]="'billingStaffEmail-' + billingStaffIndex">Email</label>
                   <input [id]="'billingStaffEmail-' + billingStaffIndex" type="email" formControlName="email" />
@@ -172,6 +185,7 @@
                   }
                 </div>
 
+                <!-- Employee First Name -->
                 <div>
                   <label [for]="'billingStaffFirstName-' + billingStaffIndex">First Name</label>
                   <input [id]="'billingStaffFirstName-' + billingStaffIndex" type="text" formControlName="firstName" />
@@ -180,6 +194,7 @@
                   }
                 </div>
 
+                <!-- Employee Last Name -->
                 <div>
                   <label [for]="'billingStaffLastName-' + billingStaffIndex">Last Name</label>
                   <input [id]="'billingStaffLastName-' + billingStaffIndex" type="text" formControlName="lastName" />
@@ -188,6 +203,7 @@
                   }
                 </div>
 
+                <!-- Employee Role -->
                 <div>
                   <label [for]="'billingStaffRole-' + billingStaffIndex">Role</label>
                   <select [id]="'billingStaffRole-' + billingStaffIndex" formControlName="role">
@@ -206,7 +222,7 @@
 
             @if (organizationForm.hasError('billingBranchNoStaffMembers') && (organizationForm.touched || submitted)) {
             <p class="error">
-              Every working billing branch must have at least one staff member, or confirm that you are a staff member in this branch.
+              Every branch must have at least one staff member.
             </p>
             }
           </div>
@@ -278,6 +294,8 @@
             [class.is-open]="isBranchDetailsOpen(branchIndex)"
           >
             <div class="accordion-inner">
+
+              <!-- Branch Name -->
               <label [for]="'branchName-' + branchIndex">Branch Name</label>
               <input
                 [id]="'branchName-' + branchIndex"
@@ -287,8 +305,11 @@
               @if (hasError(branch.get('branchName'), 'required')) {
               <p class="error">Branch name is required.</p>
               }
-
+            
               <div formGroupName="address" class="grid two-col">
+
+                <!-- Branch Address -->
+                <!-- Branch Address Line 1 -->
                 <div>
                   <label [for]="'branchStreet1-' + branchIndex">Street 1</label>
                   <input
@@ -301,6 +322,7 @@
                   }
                 </div>
 
+                <!-- Branch Address Line 2 -->
                 <div>
                   <label [for]="'branchStreet2-' + branchIndex">Street 2</label>
                   <input
@@ -310,6 +332,7 @@
                   />
                 </div>
 
+                <!-- Branch City -->
                 <div>
                   <label [for]="'branchCity-' + branchIndex">City</label>
                   <input
@@ -322,6 +345,7 @@
                   }
                 </div>
 
+                <!-- Branch State -->
                 <div>
                   <label [for]="'branchState-' + branchIndex">State</label>
                   <input
@@ -334,6 +358,7 @@
                   }
                 </div>
 
+                <!-- Branch Postal Code -->
                 <div>
                   <label [for]="'branchPostalCode-' + branchIndex"
                     >Postal Code</label
@@ -351,6 +376,7 @@
                   }
                 </div>
 
+                <!-- Branch Country -->
                 <div>
                   <label [for]="'branchCountry-' + branchIndex">Country</label>
                   <input
@@ -374,6 +400,7 @@
             <input
               type="checkbox"
               formControlName="signedInUserIsStaffMember"
+              (change)="onSignedInUserBranchSelected(branchIndex, $any($event.target).checked)"
             />
             <span>I am a staff member in this branch</span>
           </label>
@@ -432,6 +459,8 @@
                     [class.is-open]="isStaffMemberOpen(branchIndex, employeeIndex)"
                   >
                     <div class="accordion-inner">
+
+                      <!-- Employee Username -->
                       <div class="grid two-col">
                         <div>
                           <label
@@ -448,6 +477,7 @@
                           }
                         </div>
 
+                      <!-- Employee Password -->
                         <div>
                           <label
                             [for]="'password-' + branchIndex + '-' + employeeIndex"
@@ -473,6 +503,7 @@
                           }
                         </div>
 
+                      <!-- Employee Email -->
                         <div>
                           <label
                             [for]="'email-' + branchIndex + '-' + employeeIndex"
@@ -490,6 +521,7 @@
                           }
                         </div>
 
+                      <!-- Employee First Name -->
                         <div>
                           <label
                             [for]="'firstName-' + branchIndex + '-' + employeeIndex"
@@ -506,6 +538,7 @@
                           }
                         </div>
 
+                      <!-- Employee Last Name -->
                         <div>
                           <label
                             [for]="'lastName-' + branchIndex + '-' + employeeIndex"
@@ -521,6 +554,7 @@
                           }
                         </div>
 
+                      <!-- Employee Role -->
                         <div>
                           <label
                             [for]="'role-' + branchIndex + '-' + employeeIndex"
@@ -546,8 +580,7 @@
               } @if (branch.hasError('noEmployees') && (branch.touched ||
               submitted)) {
               <p class="error">
-                Every branch must have at least one staff member, or confirm
-                that you are a staff member in this branch.
+                Every branch must have at least one staff member.
               </p>
               } @if
               (organizationForm.hasError('signedInUserAssignedToMultipleBranches')

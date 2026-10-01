@@ -46,9 +46,10 @@ export class CreateOrganization {
   );
 
   submitted = false;
-  billingStaffOpen = false;
+  billingStaffOpen = true;
   submittedPayload: unknown = null;
   branchAccordionState: BranchAccordionState[] = [this.createBranchAccordionState(1)];
+
   private readonly branchLeaving = new Set<number>();
   private readonly staffLeaving = new Set<string>();
   private readonly branchExitDurationMs = 260;
@@ -129,7 +130,9 @@ export class CreateOrganization {
 
   removeEmployee(branchIndex: number, employeeIndex: number): void {
     const employees = this.branchEmployees(branchIndex);
-    if (employees.length === 1) {
+    const signedInUserIsStaffMember = !!this.branches.at(branchIndex).get('signedInUserIsStaffMember')?.value;
+
+    if (employees.length === 1 && !signedInUserIsStaffMember) {
       return;
     }
 
@@ -157,7 +160,11 @@ export class CreateOrganization {
       }
 
       const latestEmployees = this.branchEmployees(latestBranchIndex);
-      if (latestEmployees.length <= 1) {
+      const latestSignedInUserIsStaffMember = !!this.branches
+        .at(latestBranchIndex)
+        .get('signedInUserIsStaffMember')?.value;
+
+      if (latestEmployees.length <= 1 && !latestSignedInUserIsStaffMember) {
         this.staffLeaving.delete(staffKey);
         return;
       }
@@ -228,9 +235,36 @@ export class CreateOrganization {
     );
   }
 
+  onSignedInUserBranchSelected(branchIndex: number, isChecked: boolean): void {
+    if (!isChecked) {
+      return;
+    }
+
+    this.branches.controls.forEach((branchControl, index) => {
+      if (index !== branchIndex) {
+        branchControl.get('signedInUserIsStaffMember')?.setValue(false, { emitEvent: false });
+      }
+    });
+
+    const billingStaffControl = this.organizationForm.get('isUserStaffMemberAtBillingAddress');
+    if (billingStaffControl?.value) {
+      billingStaffControl.setValue(false, { emitEvent: false });
+    }
+  }
+
+  onBillingUserStaffMemberSelected(isChecked: boolean): void {
+    if (!isChecked) {
+      return;
+    }
+
+    this.branches.controls.forEach((branchControl) => {
+      branchControl.get('signedInUserIsStaffMember')?.setValue(false, { emitEvent: false });
+    });
+  }
+
   isOnlyStaffMember(branchIndex: number): boolean {
-    const isUserStaffMemberAtBranch = this.organizationForm.get('isUserStaffMemberAtBranch')?.value ?? false;
-    return this.branchEmployees(branchIndex).length === 1 && !isUserStaffMemberAtBranch;
+    const signedInUserIsStaffMember = !!this.branches.at(branchIndex).get('signedInUserIsStaffMember')?.value;
+    return this.branchEmployees(branchIndex).length === 1 && !signedInUserIsStaffMember;
   }
 
   isOnlyBillingStaffMember(): boolean {
