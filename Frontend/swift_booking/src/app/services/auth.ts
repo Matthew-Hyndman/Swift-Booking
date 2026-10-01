@@ -84,7 +84,7 @@ export class AuthService {
 
   public async login(theRedirectUri: string): Promise<void> {
     try {
-      await this.keycloak.login({ redirectUri: theRedirectUri });
+      await this.keycloak.login({redirectUri: theRedirectUri,});
       await this._isLoggedInCheck();
       if (this._isLoggedIn$.value) {
         await this.refreshUserProfile();
@@ -400,6 +400,31 @@ export class AuthService {
 
   setClientId(clientId: string): void {
     this.keycloak.clientId = clientId;
+  }
+
+  public getUserGroups(): string[] {
+    const kc: any = this.keycloak as any;
+    const groups = kc?.tokenParsed?.groups;
+
+    if (!Array.isArray(groups)) {
+      return [];
+    }
+
+    return groups.filter((group): group is string => typeof group === 'string');
+  }
+
+  public isInOrganizationGroup(groupName: string): boolean {
+    const groupNameToCheck = groupName.trim().toLowerCase();
+
+    if (!groupNameToCheck) {
+      return false;
+    }
+
+    return this.getUserGroups().some((groupPath) => {
+      const normalizedPath = groupPath.toLowerCase();
+      const pathSegments = normalizedPath.split('/').filter(Boolean);
+      return pathSegments.includes(groupNameToCheck);
+    });
   }
 
 }

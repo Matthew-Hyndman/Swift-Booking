@@ -103,6 +103,7 @@ import { LoginChoiceMemberOnly } from './components/login-choices/login-choice-m
         url: environment.keycloak.url,
         realm: environment.keycloak.realm,
         clientId: environment.keycloak.userClientId,
+        
       },
       initOptions: {
         onLoad: 'check-sso',
@@ -113,6 +114,7 @@ import { LoginChoiceMemberOnly } from './components/login-choices/login-choice-m
         checkLoginIframe: false,
         responseMode: 'fragment',
         //redirectUri: environment.baseFrontendUrl + '/home',
+        scope: 'openid profile email groups organization',
         useNonce: false,
       },
       loadUserProfileAtStartUp: false,

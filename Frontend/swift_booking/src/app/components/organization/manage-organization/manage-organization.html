@@ -1,1 +1,136 @@
-<p>manage-organization works!</p>
+<section class="glass-page organization-page">
+	<header class="glass-panel hero stack">
+		<div class="hero-head">
+			<div class="stack">
+				<p class="hero-kicker">Organization Console</p>
+				<h1>Manage Organization</h1>
+				<p>
+					View organization details, branch structure, team allocation, and performance insights.
+				</p>
+			</div>
+
+			<button
+				type="button"
+				class="ghost-button"
+				*ngIf="hasRole('Owner')"
+				(click)="onOpenSettings()"
+			>
+				Settings
+			</button>
+		</div>
+
+		<div class="role-chip-row">
+			<span class="badge" *ngFor="let role of currentUserRoles">{{ role }}</span>
+		</div>
+		<p class="helper-text">Edit actions require the Manager role.</p>
+	</header>
+
+	<div class="glass-grid">
+		<article class="glass-panel section-card stack">
+			<div class="section-head">
+				<h2>Organization Name</h2>
+				<div class="actions">
+					<span class="badge role-auth">Role Authorization: {{ sectionAuthorization['organizationName'] }}</span>
+					<button
+						type="button"
+						[disabled]="!canEditSection()"
+						(click)="onEditSection('Organization Name')"
+					>
+						Edit
+					</button>
+				</div>
+			</div>
+			<p class="value-text">{{ organization.organizationName }}</p>
+		</article>
+
+		<article class="glass-panel section-card stack">
+			<div class="section-head">
+				<h2>Billing Address</h2>
+				<div class="actions">
+					<span class="badge role-auth">Role Authorization: {{ sectionAuthorization['billingAddress'] }}</span>
+					<button
+						type="button"
+						[disabled]="!canEditSection()"
+						(click)="onEditSection('Billing Address')"
+					>
+						Edit
+					</button>
+				</div>
+			</div>
+			<address class="value-text billing-address">
+				{{ organization.billingAddress.line1 }}<br />
+				<span *ngIf="organization.billingAddress.line2">{{ organization.billingAddress.line2 }}<br /></span>
+				{{ organization.billingAddress.city }}, {{ organization.billingAddress.region }} {{ organization.billingAddress.postalCode }}<br />
+				{{ organization.billingAddress.country }}
+			</address>
+		</article>
+
+		<article class="glass-panel section-card stack">
+			<div class="section-head">
+				<h2>Branches</h2>
+				<div class="actions">
+					<span class="badge role-auth">Role Authorization: {{ sectionAuthorization['branches'] }}</span>
+					<button
+						type="button"
+						[disabled]="!canEditSection()"
+						(click)="onEditSection('Branches')"
+					>
+						Edit
+					</button>
+				</div>
+			</div>
+			<ul class="data-list">
+				<li *ngFor="let branch of organization.branches">
+					<strong>{{ branch.name }}</strong>
+					<span>{{ branch.city }}</span>
+					<span>{{ branch.staffCount }} Staff</span>
+				</li>
+			</ul>
+		</article>
+
+		<article class="glass-panel section-card stack">
+			<div class="section-head">
+				<h2>Staff</h2>
+				<div class="actions">
+					<span class="badge role-auth">Role Authorization: {{ sectionAuthorization['staff'] }}</span>
+					<button
+						type="button"
+						[disabled]="!canEditSection()"
+						(click)="onEditSection('Staff')"
+					>
+						Edit
+					</button>
+				</div>
+			</div>
+			<ul class="data-list">
+				<li *ngFor="let member of organization.staff">
+					<strong>{{ member.name }}</strong>
+					<span>{{ member.role }}</span>
+					<span>{{ member.branch }}</span>
+				</li>
+			</ul>
+		</article>
+	</div>
+
+	<article class="glass-panel section-card stack analytics-card">
+		<div class="section-head">
+			<h2>Analytics</h2>
+			<span class="badge role-auth">Role Authorization: {{ sectionAuthorization['analytics'] }}</span>
+		</div>
+
+		<div class="analytics-grid">
+			<div class="metric">
+				<span class="metric-label">Active Bookings</span>
+				<strong>{{ organization.analytics.activeBookings }}</strong>
+			</div>
+			<div class="metric">
+				<span class="metric-label">Monthly Revenue</span>
+				<strong>{{ organization.analytics.monthlyRevenue }}</strong>
+			</div>
+			<div class="metric">
+				<span class="metric-label">Cancellation Rate</span>
+				<strong>{{ organization.analytics.cancellationRate }}</strong>
+			</div>
+		</div>
+	</article>
+</section>
