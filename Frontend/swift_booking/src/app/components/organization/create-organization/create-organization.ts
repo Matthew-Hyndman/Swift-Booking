@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import Keycloak from 'keycloak-js';
 import { environment } from '../../../../environments/environment.local';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-create-organization',
@@ -20,6 +21,36 @@ import { environment } from '../../../../environments/environment.local';
   styleUrl: './create-organization.scss',
 })
 export class CreateOrganization {
+
+  constructor(
+    private readonly auth: AuthService
+  ) {}
+
+  testMode = environment.testMode;
+  /**
+   * `FOR TESTING ONLY`
+   * 
+   * Fills the organization form with a billing address as the working 
+   * branch and the user as a single staff member.
+   */
+  populateFormWithBillingAddressAsWorkingBranchAndUserAsSingleStaffMember() {
+    this.organizationForm.patchValue({
+      businessName: 'Test Business 1',
+      billingAddress: {
+        addressName: 'Billing Address',
+        street1: '123 Main St',
+        street2: '',
+        city: 'City',
+        county: 'County',
+        postalCode: '12345',
+        country: 'Country',
+      },
+      billingAddressIsWorkingBranch: true,
+      isUserStaffMemberAtBillingAddress: true,
+      disableAdditionalBranches: true,
+    });
+  }
+
   private readonly fb = new FormBuilder();
   private readonly http = inject(HttpClient);
   private readonly keycloak = inject(Keycloak);
@@ -34,7 +65,14 @@ export class CreateOrganization {
 
   readonly organizationForm = this.fb.group(
     {
-      businessName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
+      businessName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(120),
+        ],
+      ],
       billingAddress: this.createAddressGroup(),
       billingAddressIsWorkingBranch: [false],
       isUserStaffMemberAtBillingAddress: [false],
@@ -42,13 +80,20 @@ export class CreateOrganization {
       disableAdditionalBranches: [false],
       branches: this.fb.array([this.createBranchGroup()]),
     },
-    { validators: [this.onlyOneSignedInUserBranchValidator(), this.billingBranchMustHaveStaffMemberValidator()] },
+    {
+      validators: [
+        this.onlyOneSignedInUserBranchValidator(),
+        this.billingBranchMustHaveStaffMemberValidator(),
+      ],
+    },
   );
 
   submitted = false;
   billingStaffOpen = true;
   submittedPayload: unknown = null;
-  branchAccordionState: BranchAccordionState[] = [this.createBranchAccordionState(1)];
+  branchAccordionState: BranchAccordionState[] = [
+    this.createBranchAccordionState(1),
+  ];
 
   private readonly branchLeaving = new Set<number>();
   private readonly staffLeaving = new Set<string>();
@@ -60,7 +105,9 @@ export class CreateOrganization {
   }
 
   get billingStaffMembers(): FormArray<FormGroup> {
-    return this.organizationForm.get('billingStaffMembers') as FormArray<FormGroup>;
+    return this.organizationForm.get(
+      'billingStaffMembers',
+    ) as FormArray<FormGroup>;
   }
 
   branchEmployees(index: number): FormArray<FormGroup> {
@@ -73,9 +120,13 @@ export class CreateOrganization {
   }
 
   removeBillingStaffMember(index: number): void {
-    const isUserStaffMemberAtBillingAddress = this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ?? false;
-    if (this.billingStaffMembers.length === 1 && 
-      !isUserStaffMemberAtBillingAddress) {
+    const isUserStaffMemberAtBillingAddress =
+      this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ??
+      false;
+    if (
+      this.billingStaffMembers.length === 1 &&
+      !isUserStaffMemberAtBillingAddress
+    ) {
       return;
     }
 
@@ -84,8 +135,12 @@ export class CreateOrganization {
   }
 
   addBranch(): void {
-    const isBillingBranch = !!this.organizationForm.get('billingAddressIsWorkingBranch')?.value;
-    const disableAdditionalBranches = !!this.organizationForm.get('disableAdditionalBranches')?.value;
+    const isBillingBranch = !!this.organizationForm.get(
+      'billingAddressIsWorkingBranch',
+    )?.value;
+    const disableAdditionalBranches = !!this.organizationForm.get(
+      'disableAdditionalBranches',
+    )?.value;
 
     if (isBillingBranch && disableAdditionalBranches) {
       return;
@@ -108,7 +163,9 @@ export class CreateOrganization {
     this.branchLeaving.add(state.id);
 
     window.setTimeout(() => {
-      const targetIndex = this.branchAccordionState.findIndex((branchState) => branchState.id === state.id);
+      const targetIndex = this.branchAccordionState.findIndex(
+        (branchState) => branchState.id === state.id,
+      );
       if (targetIndex === -1 || this.branches.length <= 1) {
         this.branchLeaving.delete(state.id);
         return;
@@ -124,29 +181,35 @@ export class CreateOrganization {
   addEmployee(branchIndex: number): void {
     this.branchEmployees(branchIndex).push(this.createEmployeeGroup());
     this.branchAccordionState[branchIndex].staffMemberPanelsOpen.push(true);
-    this.branchAccordionState[branchIndex].staffMemberIds.push(this.nextStaffId++);
+    this.branchAccordionState[branchIndex].staffMemberIds.push(
+      this.nextStaffId++,
+    );
     this.branches.at(branchIndex).updateValueAndValidity();
   }
 
   removeEmployee(branchIndex: number, employeeIndex: number): void {
     const employees = this.branchEmployees(branchIndex);
-    const signedInUserIsStaffMember = !!this.branches.at(branchIndex).get('signedInUserIsStaffMember')?.value;
+    const signedInUserIsStaffMember = !!this.branches
+      .at(branchIndex)
+      .get('signedInUserIsStaffMember')?.value;
 
     if (employees.length === 1 && !signedInUserIsStaffMember) {
       return;
     }
 
-    const state = this.branchAccordionState[branchIndex];
-    const staffId = state?.staffMemberIds[employeeIndex];
-    if (!state || staffId === undefined) {
+    const county = this.branchAccordionState[branchIndex];
+    const staffId = county?.staffMemberIds[employeeIndex];
+    if (!county || staffId === undefined) {
       return;
     }
 
-    const staffKey = this.staffKey(state.id, staffId);
+    const staffKey = this.staffKey(county.id, staffId);
     this.staffLeaving.add(staffKey);
 
     window.setTimeout(() => {
-      const latestBranchIndex = this.branchAccordionState.findIndex((branchState) => branchState.id === state.id);
+      const latestBranchIndex = this.branchAccordionState.findIndex(
+        (branchState) => branchState.id === county.id,
+      );
       if (latestBranchIndex === -1) {
         this.staffLeaving.delete(staffKey);
         return;
@@ -188,7 +251,8 @@ export class CreateOrganization {
 
   isStaffRemoving(branchIndex: number, employeeIndex: number): boolean {
     const branchId = this.branchAccordionState[branchIndex]?.id;
-    const staffId = this.branchAccordionState[branchIndex]?.staffMemberIds[employeeIndex];
+    const staffId =
+      this.branchAccordionState[branchIndex]?.staffMemberIds[employeeIndex];
 
     if (branchId === undefined || staffId === undefined) {
       return false;
@@ -198,18 +262,19 @@ export class CreateOrganization {
   }
 
   toggleBranchDetails(branchIndex: number): void {
-    const state = this.branchAccordionState[branchIndex];
-    state.detailsOpen = !state.detailsOpen;
+    const county = this.branchAccordionState[branchIndex];
+    county.detailsOpen = !county.detailsOpen;
   }
 
   toggleBranchStaff(branchIndex: number): void {
-    const state = this.branchAccordionState[branchIndex];
-    state.staffOpen = !state.staffOpen;
+    const county = this.branchAccordionState[branchIndex];
+    county.staffOpen = !county.staffOpen;
   }
 
   toggleStaffMember(branchIndex: number, employeeIndex: number): void {
-    const state = this.branchAccordionState[branchIndex];
-    state.staffMemberPanelsOpen[employeeIndex] = !state.staffMemberPanelsOpen[employeeIndex];
+    const county = this.branchAccordionState[branchIndex];
+    county.staffMemberPanelsOpen[employeeIndex] =
+      !county.staffMemberPanelsOpen[employeeIndex];
   }
 
   isBranchDetailsOpen(branchIndex: number): boolean {
@@ -221,7 +286,11 @@ export class CreateOrganization {
   }
 
   isStaffMemberOpen(branchIndex: number, employeeIndex: number): boolean {
-    return this.branchAccordionState[branchIndex]?.staffMemberPanelsOpen[employeeIndex] ?? false;
+    return (
+      this.branchAccordionState[branchIndex]?.staffMemberPanelsOpen[
+        employeeIndex
+      ] ?? false
+    );
   }
 
   isOnlyBranch(): boolean {
@@ -242,11 +311,15 @@ export class CreateOrganization {
 
     this.branches.controls.forEach((branchControl, index) => {
       if (index !== branchIndex) {
-        branchControl.get('signedInUserIsStaffMember')?.setValue(false, { emitEvent: false });
+        branchControl
+          .get('signedInUserIsStaffMember')
+          ?.setValue(false, { emitEvent: false });
       }
     });
 
-    const billingStaffControl = this.organizationForm.get('isUserStaffMemberAtBillingAddress');
+    const billingStaffControl = this.organizationForm.get(
+      'isUserStaffMemberAtBillingAddress',
+    );
     if (billingStaffControl?.value) {
       billingStaffControl.setValue(false, { emitEvent: false });
     }
@@ -258,22 +331,34 @@ export class CreateOrganization {
     }
 
     this.branches.controls.forEach((branchControl) => {
-      branchControl.get('signedInUserIsStaffMember')?.setValue(false, { emitEvent: false });
+      branchControl
+        .get('signedInUserIsStaffMember')
+        ?.setValue(false, { emitEvent: false });
     });
   }
 
   isOnlyStaffMember(branchIndex: number): boolean {
-    const signedInUserIsStaffMember = !!this.branches.at(branchIndex).get('signedInUserIsStaffMember')?.value;
-    return this.branchEmployees(branchIndex).length === 1 && !signedInUserIsStaffMember;
+    const signedInUserIsStaffMember = !!this.branches
+      .at(branchIndex)
+      .get('signedInUserIsStaffMember')?.value;
+    return (
+      this.branchEmployees(branchIndex).length === 1 &&
+      !signedInUserIsStaffMember
+    );
   }
 
   isOnlyBillingStaffMember(): boolean {
-    const isUserStaffMemberAtBillingAddress = this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ?? false;
-    return this.billingStaffMembers.length < 0 || !isUserStaffMemberAtBillingAddress;
+    const isUserStaffMemberAtBillingAddress =
+      this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ??
+      false;
+    return (
+      this.billingStaffMembers.length < 0 || !isUserStaffMemberAtBillingAddress
+    );
   }
 
   getAddressSummary(branchIndex: number): string {
-    const address = this.branches.at(branchIndex).get('address')?.value as AddressSummary | null;
+    const address = this.branches.at(branchIndex).get('address')
+      ?.value as AddressSummary | null;
     if (!address) {
       return '';
     }
@@ -282,7 +367,7 @@ export class CreateOrganization {
       address.street1,
       address.street2,
       address.city,
-      address.state,
+      address.county,
       address.postalCode,
       address.country,
     ]
@@ -299,36 +384,74 @@ export class CreateOrganization {
     this.submitted = true;
     this.organizationForm.markAllAsTouched();
 
-    if (this.organizationForm.invalid) {
-      return;
+    const isAdditionalBranchesDisabled = this.organizationForm.controls.disableAdditionalBranches?.value ?? false;
+    const isUserStaffMemberAtBillingAddress = this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ?? false;
+    const isUserStaffMemberAtBranchAddress = this.organizationForm.get('isUserStaffMemberAtBranchAddress')?.value ?? false;
+
+    if (isAdditionalBranchesDisabled) {
+      if (
+        this.organizationForm.controls.billingAddress.invalid ||
+        this.organizationForm.controls.billingStaffMembers.invalid
+      ) {
+        console.error('Organization form is invalid');
+        return;
+      }
+    } else {
+      if (this.organizationForm.invalid) {
+        console.error('Organization form is invalid');
+        return;
+      }
     }
 
-    const userId = this.keycloak.tokenParsed?.sub ?? this.keycloak.subject ?? '';
+    const userId =
+      this.keycloak.tokenParsed?.sub ?? this.keycloak.subject ?? '';
     if (!userId) {
       console.error('No signed-in user ID available for organization creation');
       return;
     }
 
-    const payload = this.buildOrganizationPayload();
+    let payload = this.buildOrganizationPayload();
+
+    if (isAdditionalBranchesDisabled) {
+      payload['branches'] = [];
+    }
+
+    // how do you know which staff members belong to which address?
+    // database should have a mapping of staff members to addresses
+    if (isUserStaffMemberAtBillingAddress) {
+
+    }
+
+    else if (isUserStaffMemberAtBranchAddress) {
+
+    }
+
+    
     this.submittedPayload = payload;
 
-    this.http.post<string>(`${environment.apiBaseUrl}/api/organizations/create/${userId}`, payload).subscribe({
-      next: (response) => {
-        console.log('Organization created successfully', response);
-        this.submittedPayload = {
-          payload,
-          response,
-        };
-      },
-      error: (error) => {
-        const message = error?.error ?? error?.message ?? 'Unable to create organization.';
-        console.error('Organization creation failed', error);
-        this.submittedPayload = {
-          payload,
-          error: message,
-        };
-      },
-    });
+    this.http
+      .post<string>(
+        `${environment.apiBaseUrl}/api/organizations/create/${userId}`,
+        payload,
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('Organization created successfully', response);
+          this.submittedPayload = {
+            payload,
+            response,
+          };
+        },
+        error: (error) => {
+          const message =
+            error?.error ?? error?.message ?? 'Unable to create organization.';
+          console.error('Organization creation failed', error);
+          this.submittedPayload = {
+            payload,
+            error: message,
+          };
+        },
+      });
   }
 
   hasError(control: AbstractControl | null, code: string): boolean {
@@ -345,8 +468,11 @@ export class CreateOrganization {
       street1: ['', [Validators.required, Validators.maxLength(120)]],
       street2: [''],
       city: ['', [Validators.required, Validators.maxLength(80)]],
-      state: ['', [Validators.required, Validators.maxLength(80)]],
-      postalCode: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9 -]{3,12}$')]],
+      county: ['', [Validators.required, Validators.maxLength(80)]],
+      postalCode: [
+        '',
+        [Validators.required, Validators.pattern('^[A-Za-z0-9 -]{3,12}$')],
+      ],
       country: ['', [Validators.required, Validators.maxLength(80)]],
     });
   }
@@ -354,10 +480,18 @@ export class CreateOrganization {
   private createBranchGroup(): FormGroup {
     return this.fb.group(
       {
-        branchName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(120)]],
+        branchName: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(2),
+            Validators.maxLength(120),
+          ],
+        ],
         address: this.createAddressGroup(),
         employees: this.fb.array([this.createEmployeeGroup()]),
         signedInUserIsStaffMember: [false],
+        isBillingAddress: [false],
       },
       { validators: this.branchMustHaveEmployeeValidator() },
     );
@@ -365,7 +499,14 @@ export class CreateOrganization {
 
   private createEmployeeGroup(): FormGroup {
     return this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+        ],
+      ],
       password: [
         '',
         [
@@ -374,7 +515,10 @@ export class CreateOrganization {
           Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$'),
         ],
       ],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
+      email: [
+        '',
+        [Validators.required, Validators.email, Validators.maxLength(254)],
+      ],
       firstName: ['', [Validators.required, Validators.maxLength(80)]],
       lastName: ['', [Validators.required, Validators.maxLength(80)]],
       role: ['employee', [Validators.required]],
@@ -383,8 +527,12 @@ export class CreateOrganization {
 
   private branchMustHaveEmployeeValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const employees = control.get('employees') as FormArray<FormControl> | null;
-      const signedInUserIsStaffMember = !!control.get('signedInUserIsStaffMember')?.value;
+      const employees = control.get(
+        'employees',
+      ) as FormArray<FormControl> | null;
+      const signedInUserIsStaffMember = !!control.get(
+        'signedInUserIsStaffMember',
+      )?.value;
 
       if (!employees || employees.length < 1) {
         return signedInUserIsStaffMember ? null : { noEmployees: true };
@@ -397,11 +545,18 @@ export class CreateOrganization {
   private onlyOneSignedInUserBranchValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const branches = control.get('branches') as FormArray | null;
-      const billingAddressIsWorkingBranch = !!control.get('billingAddressIsWorkingBranch')?.value;
-      const isUserStaffMemberAtBillingAddress = !!control.get('isUserStaffMemberAtBillingAddress')?.value;
+      const billingAddressIsWorkingBranch = !!control.get(
+        'billingAddressIsWorkingBranch',
+      )?.value;
+      const isUserStaffMemberAtBillingAddress = !!control.get(
+        'isUserStaffMemberAtBillingAddress',
+      )?.value;
 
       if (!branches || branches.length === 0) {
-        if (billingAddressIsWorkingBranch && isUserStaffMemberAtBillingAddress) {
+        if (
+          billingAddressIsWorkingBranch &&
+          isUserStaffMemberAtBillingAddress
+        ) {
           return null;
         }
         return null;
@@ -414,27 +569,38 @@ export class CreateOrganization {
       }
 
       for (const branchControl of branches.controls) {
-        const isSelected = !!(branchControl as FormGroup).get('signedInUserIsStaffMember')?.value;
+        const isSelected = !!(branchControl as FormGroup).get(
+          'signedInUserIsStaffMember',
+        )?.value;
         if (isSelected) {
           selectedBranchCount += 1;
         }
       }
 
-      return selectedBranchCount > 1 ? { signedInUserAssignedToMultipleBranches: true } : null;
+      return selectedBranchCount > 1
+        ? { signedInUserAssignedToMultipleBranches: true }
+        : null;
     };
   }
 
   private billingBranchMustHaveStaffMemberValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
-      const billingAddressIsWorkingBranch = !!control.get('billingAddressIsWorkingBranch')?.value;
-      const isUserStaffMemberAtBillingAddress = !!control.get('isUserStaffMemberAtBillingAddress')?.value;
-      const billingStaffMembers = control.get('billingStaffMembers') as FormArray | null;
+      const billingAddressIsWorkingBranch = !!control.get(
+        'billingAddressIsWorkingBranch',
+      )?.value;
+      const isUserStaffMemberAtBillingAddress = !!control.get(
+        'isUserStaffMemberAtBillingAddress',
+      )?.value;
+      const billingStaffMembers = control.get(
+        'billingStaffMembers',
+      ) as FormArray | null;
 
       if (!billingAddressIsWorkingBranch) {
         return null;
       }
 
-      const hasBillingStaff = !!billingStaffMembers && billingStaffMembers.length > 0;
+      const hasBillingStaff =
+        !!billingStaffMembers && billingStaffMembers.length > 0;
 
       return hasBillingStaff || isUserStaffMemberAtBillingAddress
         ? null
@@ -445,35 +611,53 @@ export class CreateOrganization {
   private buildOrganizationPayload(): Record<string, unknown> {
     const formValue = this.organizationForm.getRawValue();
     const businessName = formValue.businessName ?? '';
-    const tokenClaims = (this.keycloak.tokenParsed ?? {}) as Record<string, unknown>;
-    const preferredUsername = typeof tokenClaims['preferred_username'] === 'string'
-      ? tokenClaims['preferred_username']
-      : 'signed-in user';
+    const tokenClaims = (this.keycloak.tokenParsed ?? {}) as Record<
+      string,
+      unknown
+    >;
+    const preferredUsername =
+      typeof tokenClaims['preferred_username'] === 'string'
+        ? tokenClaims['preferred_username']
+        : 'signed-in user';
 
-    return {
+    let payload = {
       id: undefined,
       name: businessName,
-      alias: businessName
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '') || 'organization',
+      alias:
+        businessName
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') || 'organization',
       enabled: true,
       description: `Business created by ${preferredUsername}`,
       redirectUrl: '',
       billingAddress: formValue.billingAddress,
       billingAddressIsWorkingBranch: formValue.billingAddressIsWorkingBranch,
-      isUserStaffMemberAtBillingAddress: formValue.isUserStaffMemberAtBillingAddress,
+      isUserStaffMemberAtBillingAddress:
+        formValue.isUserStaffMemberAtBillingAddress,
       billingStaffMembers: formValue.billingStaffMembers,
       disableAdditionalBranches: formValue.disableAdditionalBranches,
       branches: formValue.branches,
       members: [],
       groups: [],
     };
+
+    payload.billingAddress = {
+      ...payload.billingAddress,
+      isBillingAddress: true,
+    };
+
+    return payload;
   }
 
-  private createBranchAccordionState(employeeCount: number): BranchAccordionState {
-    const staffMemberIds = Array.from({ length: employeeCount }, () => this.nextStaffId++);
+  private createBranchAccordionState(
+    employeeCount: number,
+  ): BranchAccordionState {
+    const staffMemberIds = Array.from(
+      { length: employeeCount },
+      () => this.nextStaffId++,
+    );
 
     return {
       id: this.nextBranchId++,
@@ -496,7 +680,6 @@ export class CreateOrganization {
       }
     }
   }
-
 }
 
 interface BranchAccordionState {
@@ -512,7 +695,8 @@ interface AddressSummary {
   street1?: string;
   street2?: string;
   city?: string;
-  state?: string;
+  county?: string;
   postalCode?: string;
   country?: string;
+  isBillingAddress?: boolean;
 }

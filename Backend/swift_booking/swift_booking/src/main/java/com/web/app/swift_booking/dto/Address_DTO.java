@@ -13,5 +13,6 @@ public record Address_DTO(
     String postalCode,
     String country,
     LocalDateTime createdAt,
-    String organizationId
+    String organizationId,
+    boolean isBillingAddress
 ) { }

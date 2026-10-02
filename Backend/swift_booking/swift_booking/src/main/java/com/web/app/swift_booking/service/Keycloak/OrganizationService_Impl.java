@@ -85,6 +85,7 @@ public class OrganizationService_Impl implements OrganizationService {
                         createRequest.setEnabled(organizationData.isEnabled());
                         createRequest.setDescription(organizationData.getDescription());
                         createRequest.setRedirectUrl(organizationData.getRedirectUrl());
+                        //createRequest.setMembers(organizationData.getMembers());
 
                         ResponseEntity<String> createResponse = this.keycloakHttpClient.post()
                                         .uri(this.origin + "/admin/realms/{realm}/organizations", realm)

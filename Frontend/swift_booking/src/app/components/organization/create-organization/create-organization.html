@@ -5,6 +5,18 @@
     members.
   </p>
 
+  <!-- Testing Buttons-->
+  @if(testMode) {
+    <h2>Testing Buttons</h2>
+    <button
+      type="button"
+      (click)="populateFormWithBillingAddressAsWorkingBranchAndUserAsSingleStaffMember()"
+    >
+      Test billing address as working branch with user as single staff member
+    </button>
+  }
+  <!-- End of Testing Buttons -->
+
   <!-- Business Details Form -->
   <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" novalidate>
     <fieldset>
@@ -27,10 +39,16 @@
       <!-- Address Name -->
       <div>
         <label for="billingAddressName">Address Name</label>
-        <input id="billingAddressName" type="text" formControlName="addressName" />
-        @if (hasError(organizationForm.get('billingAddress.addressName'), 'required')) {
+        <input
+          id="billingAddressName"
+          type="text"
+          formControlName="addressName"
+        />
+        @if (hasError(organizationForm.get('billingAddress.addressName'),
+        'required')) {
         <p class="error">Address name is required.</p>
-        } @if (hasError(organizationForm.get('billingAddress.addressName'), 'maxLength')) {
+        } @if (hasError(organizationForm.get('billingAddress.addressName'),
+        'maxLength')) {
         <p class="error">Address name must be at most 120 characters.</p>
         }
       </div>
@@ -51,7 +69,7 @@
           <input id="billingStreet2" type="text" formControlName="street2" />
         </div>
 
-        <!-- City, State, Postal Code, and Country -->
+        <!-- City, County, Postal Code, and Country -->
         <div>
           <label for="billingCity">City</label>
           <input id="billingCity" type="text" formControlName="city" />
@@ -62,11 +80,11 @@
         </div>
 
         <div>
-          <label for="billingState">State</label>
-          <input id="billingState" type="text" formControlName="state" />
-          @if (hasError(organizationForm.get('billingAddress.state'),
+          <label for="billingCounty">County</label>
+          <input id="billingCounty" type="text" formControlName="county" />
+          @if (hasError(organizationForm.get('billingAddress.county'),
           'required')) {
-          <p class="error">State is required.</p>
+          <p class="error">County is required.</p>
           }
         </div>
 
@@ -107,7 +125,7 @@
     </label>
 
     @if (organizationForm.get('billingAddressIsWorkingBranch')?.value) {
-    
+
     <!-- Billing Staff Section -->
     <div class="accordion-section billing-staff-section">
       <button
@@ -121,7 +139,6 @@
 
       <div class="accordion-content" [class.is-open]="billingStaffOpen">
         <div class="accordion-inner">
-
           <!-- User is a Staff Member at this Branch -->
           <label class="checkbox-row">
             <input
@@ -133,8 +150,12 @@
           </label>
 
           <div [formArray]="billingStaffMembers" class="employee-list">
-            @for (billingStaff of billingStaffMembers.controls; track billingStaff; let billingStaffIndex = $index) {
-            <div class="employee-card glass-panel" [formGroupName]="billingStaffIndex">
+            @for (billingStaff of billingStaffMembers.controls; track
+            billingStaff; let billingStaffIndex = $index) {
+            <div
+              class="employee-card glass-panel"
+              [formGroupName]="billingStaffIndex"
+            >
               <div class="employee-header">
                 <h3>Staff Member {{ billingStaffIndex + 1 }}</h3>
                 <button
@@ -148,11 +169,16 @@
               </div>
 
               <div class="grid two-col">
-
                 <!-- Employee Username -->
                 <div>
-                  <label [for]="'billingStaffUsername-' + billingStaffIndex">Username</label>
-                  <input [id]="'billingStaffUsername-' + billingStaffIndex" type="text" formControlName="username" />
+                  <label [for]="'billingStaffUsername-' + billingStaffIndex"
+                    >Username</label
+                  >
+                  <input
+                    [id]="'billingStaffUsername-' + billingStaffIndex"
+                    type="text"
+                    formControlName="username"
+                  />
                   @if (hasError(billingStaff.get('username'), 'required')) {
                   <p class="error">Username is required.</p>
                   }
@@ -160,35 +186,52 @@
 
                 <!-- Employee Password -->
                 <div>
-                  <label [for]="'billingStaffPassword-' + billingStaffIndex">Password</label>
-                  <input [id]="'billingStaffPassword-' + billingStaffIndex" type="password" formControlName="password" />
+                  <label [for]="'billingStaffPassword-' + billingStaffIndex"
+                    >Password</label
+                  >
+                  <input
+                    [id]="'billingStaffPassword-' + billingStaffIndex"
+                    type="password"
+                    formControlName="password"
+                  />
                   @if (hasError(billingStaff.get('password'), 'required')) {
                   <p class="error">Password is required.</p>
-                  }
-                  @if (hasError(billingStaff.get('password'), 'minlength')) {
+                  } @if (hasError(billingStaff.get('password'), 'minlength')) {
                   <p class="error">Password must be at least 8 characters.</p>
-                  }
-                  @if (hasError(billingStaff.get('password'), 'pattern')) {
-                  <p class="error">Password must include upper, lower, and a number.</p>
+                  } @if (hasError(billingStaff.get('password'), 'pattern')) {
+                  <p class="error">
+                    Password must include upper, lower, and a number.
+                  </p>
                   }
                 </div>
 
                 <!-- Employee Email -->
                 <div>
-                  <label [for]="'billingStaffEmail-' + billingStaffIndex">Email</label>
-                  <input [id]="'billingStaffEmail-' + billingStaffIndex" type="email" formControlName="email" />
+                  <label [for]="'billingStaffEmail-' + billingStaffIndex"
+                    >Email</label
+                  >
+                  <input
+                    [id]="'billingStaffEmail-' + billingStaffIndex"
+                    type="email"
+                    formControlName="email"
+                  />
                   @if (hasError(billingStaff.get('email'), 'required')) {
                   <p class="error">Email is required.</p>
-                  }
-                  @if (hasError(billingStaff.get('email'), 'email')) {
+                  } @if (hasError(billingStaff.get('email'), 'email')) {
                   <p class="error">Email is invalid.</p>
                   }
                 </div>
 
                 <!-- Employee First Name -->
                 <div>
-                  <label [for]="'billingStaffFirstName-' + billingStaffIndex">First Name</label>
-                  <input [id]="'billingStaffFirstName-' + billingStaffIndex" type="text" formControlName="firstName" />
+                  <label [for]="'billingStaffFirstName-' + billingStaffIndex"
+                    >First Name</label
+                  >
+                  <input
+                    [id]="'billingStaffFirstName-' + billingStaffIndex"
+                    type="text"
+                    formControlName="firstName"
+                  />
                   @if (hasError(billingStaff.get('firstName'), 'required')) {
                   <p class="error">First name is required.</p>
                   }
@@ -196,8 +239,14 @@
 
                 <!-- Employee Last Name -->
                 <div>
-                  <label [for]="'billingStaffLastName-' + billingStaffIndex">Last Name</label>
-                  <input [id]="'billingStaffLastName-' + billingStaffIndex" type="text" formControlName="lastName" />
+                  <label [for]="'billingStaffLastName-' + billingStaffIndex"
+                    >Last Name</label
+                  >
+                  <input
+                    [id]="'billingStaffLastName-' + billingStaffIndex"
+                    type="text"
+                    formControlName="lastName"
+                  />
                   @if (hasError(billingStaff.get('lastName'), 'required')) {
                   <p class="error">Last name is required.</p>
                   }
@@ -205,8 +254,13 @@
 
                 <!-- Employee Role -->
                 <div>
-                  <label [for]="'billingStaffRole-' + billingStaffIndex">Role</label>
-                  <select [id]="'billingStaffRole-' + billingStaffIndex" formControlName="role">
+                  <label [for]="'billingStaffRole-' + billingStaffIndex"
+                    >Role</label
+                  >
+                  <select
+                    [id]="'billingStaffRole-' + billingStaffIndex"
+                    formControlName="role"
+                  >
                     @for (role of roleOptions; track role.value) {
                     <option [value]="role.value">{{ role.label }}</option>
                     }
@@ -216,11 +270,16 @@
             </div>
             }
 
-            <button type="button" class="secondary" (click)="addBillingStaffMember()">
+            <button
+              type="button"
+              class="secondary"
+              (click)="addBillingStaffMember()"
+            >
               Add Staff Member
             </button>
 
-            @if (organizationForm.hasError('billingBranchNoStaffMembers') && (organizationForm.touched || submitted)) {
+            @if (organizationForm.hasError('billingBranchNoStaffMembers') &&
+            (organizationForm.touched || submitted)) {
             <p class="error">
               Every branch must have at least one staff member.
             </p>
@@ -241,13 +300,13 @@
     <!-- End of Billing Address -->
 
     <!-- Branches -->
-	 @if(!organizationForm.controls.disableAdditionalBranches.value ||
-      organizationForm.controls.disableAdditionalBranches.value === undefined) { 
-	  
+    @if(!organizationForm.controls.disableAdditionalBranches.value ||
+    organizationForm.controls.disableAdditionalBranches.value === undefined) {
+
     <fieldset formArrayName="branches">
       <legend>Branches</legend>
-      
-	  @for(branch of branches.controls; track branchTrackBy(branchIndex); let
+
+      @for(branch of branches.controls; track branchTrackBy(branchIndex); let
       branchIndex = $index) {
 
       <div
@@ -294,7 +353,6 @@
             [class.is-open]="isBranchDetailsOpen(branchIndex)"
           >
             <div class="accordion-inner">
-
               <!-- Branch Name -->
               <label [for]="'branchName-' + branchIndex">Branch Name</label>
               <input
@@ -305,9 +363,8 @@
               @if (hasError(branch.get('branchName'), 'required')) {
               <p class="error">Branch name is required.</p>
               }
-            
-              <div formGroupName="address" class="grid two-col">
 
+              <div formGroupName="address" class="grid two-col">
                 <!-- Branch Address -->
                 <!-- Branch Address Line 1 -->
                 <div>
@@ -345,16 +402,16 @@
                   }
                 </div>
 
-                <!-- Branch State -->
+                <!-- Branch County -->
                 <div>
-                  <label [for]="'branchState-' + branchIndex">State</label>
+                  <label [for]="'branchCounty-' + branchIndex">County</label>
                   <input
-                    [id]="'branchState-' + branchIndex"
+                    [id]="'branchCounty-' + branchIndex"
                     type="text"
-                    formControlName="state"
+                    formControlName="county"
                   />
-                  @if (hasError(branch.get('address.state'), 'required')) {
-                  <p class="error">State is required.</p>
+                  @if (hasError(branch.get('address.county'), 'required')) {
+                  <p class="error">County is required.</p>
                   }
                 </div>
 
@@ -459,7 +516,6 @@
                     [class.is-open]="isStaffMemberOpen(branchIndex, employeeIndex)"
                   >
                     <div class="accordion-inner">
-
                       <!-- Employee Username -->
                       <div class="grid two-col">
                         <div>
@@ -477,7 +533,7 @@
                           }
                         </div>
 
-                      <!-- Employee Password -->
+                        <!-- Employee Password -->
                         <div>
                           <label
                             [for]="'password-' + branchIndex + '-' + employeeIndex"
@@ -503,7 +559,7 @@
                           }
                         </div>
 
-                      <!-- Employee Email -->
+                        <!-- Employee Email -->
                         <div>
                           <label
                             [for]="'email-' + branchIndex + '-' + employeeIndex"
@@ -521,7 +577,7 @@
                           }
                         </div>
 
-                      <!-- Employee First Name -->
+                        <!-- Employee First Name -->
                         <div>
                           <label
                             [for]="'firstName-' + branchIndex + '-' + employeeIndex"
@@ -538,7 +594,7 @@
                           }
                         </div>
 
-                      <!-- Employee Last Name -->
+                        <!-- Employee Last Name -->
                         <div>
                           <label
                             [for]="'lastName-' + branchIndex + '-' + employeeIndex"
@@ -554,7 +610,7 @@
                           }
                         </div>
 
-                      <!-- Employee Role -->
+                        <!-- Employee Role -->
                         <div>
                           <label
                             [for]="'role-' + branchIndex + '-' + employeeIndex"
@@ -611,9 +667,8 @@
       >
         Add Branch
       </button>
-      
     </fieldset>
-}
+    }
     <button type="submit" class="primary">Create Organization</button>
   </form>
 

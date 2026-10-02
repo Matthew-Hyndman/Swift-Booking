@@ -52,6 +52,9 @@ public class Address {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "is_billing_address", nullable = false)
+    private boolean billingAddressIsWorkingBranch;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
     private Organization organization;

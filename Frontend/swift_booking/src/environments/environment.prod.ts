@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  testMode: false,
   apiBaseUrl: '{PRODUCTION_API_BASE_URL}',
   baseFrontendUrl: '{PRODUCTION_BASE_FRONTEND_URL}',
   keycloak: {
