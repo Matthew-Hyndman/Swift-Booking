@@ -1,4 +1,10 @@
 {
     "java.compile.nullAnalysis.mode": "disabled",
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "chat.tools.terminal.autoApprove": {
+        "/^Set-Location 'D:\\\\VSCode projects\\\\swift_booking\\\\Backend\\\\swift_booking\\\\swift_booking'; mvn -q -DskipTests compile$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }

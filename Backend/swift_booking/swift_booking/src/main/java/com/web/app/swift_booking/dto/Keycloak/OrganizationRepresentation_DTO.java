@@ -14,8 +14,6 @@ public class OrganizationRepresentation_DTO {
     private boolean enabled;
     private String description;
     private String redirectUrl;
-    private String userId; // ID of the user creating the organization
-    private Address_DTO billingAddress;
     private List<Address_DTO> branches;
     private List<MemberRepresentation_DTO> members;
     private List<GroupRepresentation_DTO> groups;
@@ -69,14 +67,6 @@ public class OrganizationRepresentation_DTO {
         this.redirectUrl = redirectUrl;
     }
 
-    public Address_DTO getBillingAddress() {
-        return billingAddress;
-    }
-
-    public void setBillingAddress(Address_DTO billingAddress) {
-        this.billingAddress = billingAddress;
-    }
-
     public List<Address_DTO> getBranches() {
         return branches;
     }
@@ -101,11 +91,4 @@ public class OrganizationRepresentation_DTO {
         this.groups = groups;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 }

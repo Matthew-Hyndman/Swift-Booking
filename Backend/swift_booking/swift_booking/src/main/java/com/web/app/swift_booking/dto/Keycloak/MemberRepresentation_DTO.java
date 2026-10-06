@@ -1,5 +1,7 @@
 package com.web.app.swift_booking.dto.Keycloak;
 
+import java.util.UUID;
+
 public record MemberRepresentation_DTO(
     String id,
     String username,
@@ -7,7 +9,9 @@ public record MemberRepresentation_DTO(
     String firstName,
     String lastName,
     boolean enabled,
-    boolean emailVerified    
+    boolean emailVerified,
+    UUID addressId,
+    String groupName
 ) {
     
 }

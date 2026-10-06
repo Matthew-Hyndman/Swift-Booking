@@ -3,6 +3,7 @@ package com.web.app.swift_booking.controller;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.web.app.swift_booking.dto.Address_DTO;
+import com.web.app.swift_booking.dto.Keycloak.EmptyOrg_DTO;
+import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.SimpleOrgDetail_DTO;
+import com.web.app.swift_booking.dto.Keycloak.UserAddressAssignment_DTO;
+import com.web.app.swift_booking.dto.Keycloak.UserGroupAssignment_DTO;
 import com.web.app.swift_booking.dto.Keycloak.UserRepresentation_DTO;
 import com.web.app.swift_booking.service.AddressService;
 import com.web.app.swift_booking.service.Keycloak.OrganizationService_Impl;
@@ -53,13 +58,59 @@ public class OrganizationController {
      * @param organizationData The data for the organization to be created.
      * @return A ResponseEntity containing a message indicating the result of the create operation.
      */
-    @PostMapping("create/{userId}")
+    /*@PostMapping("create/{userId}")
     public ResponseEntity<String> createOrganization(
         @PathVariable String userId,
         @RequestBody OrganizationRepresentation_DTO organizationData
     ) {
         return this.organizationService.createOrganization(userId, organizationData);
+    }*/
+
+    @PostMapping("create-empty")
+    public ResponseEntity<?> createEmptyOrg(@RequestBody EmptyOrg_DTO emptyOrgData){
+        return this.organizationService.createEmptyOrganization(emptyOrgData);
     }
+
+    @PostMapping("create-default-org-groups/{orgId}")
+    public ResponseEntity<?> createOrgGroups(@PathVariable String orgId) {
+        return this.organizationService.createDefaultOrganizationGroups(orgId);
+    }
+
+    @PostMapping("{organizationId}/addresses")
+    public ResponseEntity<?> addOrganizationAddresses(
+        @PathVariable String organizationId,
+        @RequestBody List<Address_DTO> addressData
+    ) {
+        return this.organizationService.addOrganizationAddresses(organizationId, addressData);
+    }
+
+    @PostMapping("create-users")
+    public ResponseEntity<?> createUsers(@RequestBody List<UserRepresentation_DTO> users) {
+        return this.organizationService.createUsers(users);
+    }
+
+    @PutMapping("assign-users-to-addresses")
+    public ResponseEntity<?> assignUsersToAddresses(@RequestBody List<UserAddressAssignment_DTO> assignments) {
+        return this.organizationService.assignUsersToAddresses(assignments);
+    }
+
+    @PutMapping("{organizationId}/assign-users-as-members")
+    public ResponseEntity<?> assignUsersAsMembers(
+        @PathVariable String organizationId,
+        @RequestBody List<String> userIds
+    ) {
+        return this.organizationService.assignUsersAsMembers(organizationId, userIds);
+    }
+
+    @PutMapping("{organizationId}/assign-users-to-groups")
+    public ResponseEntity<?> assignUsersToGroups(
+        @PathVariable String organizationId,
+        @RequestBody List<UserGroupAssignment_DTO> assignments
+    ) {
+        return this.organizationService.assignUsersAsMembersToGroups(organizationId, assignments);
+    }
+
+    // Address management endpoints for organizations
 
     @GetMapping("{organizationId}/addresses")
     public ResponseEntity<?> getOrganizationAddresses(@PathVariable String organizationId) {

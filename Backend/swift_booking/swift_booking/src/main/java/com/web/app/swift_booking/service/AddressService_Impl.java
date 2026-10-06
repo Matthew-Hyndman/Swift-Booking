@@ -132,7 +132,7 @@ public class AddressService_Impl implements AddressService {
     }
 
     private Address_DTO toAddressDto(Address address) {
-        return new Address_DTO(
+        /*return new Address_DTO(
                 address.getAddressId(),
                 address.getAddressName(),
                 address.getStreetLine1(),
@@ -143,6 +143,7 @@ public class AddressService_Impl implements AddressService {
                 address.getCountry(),
                 address.getCreatedAt(),
                 address.getOrganization() != null ? address.getOrganization().getId() : null
-        );
+        );*/
+        return null;
     }
 }

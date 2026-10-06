@@ -78,6 +78,41 @@ CREATE TABLE IF NOT EXISTS addresses (
         FOREIGN KEY (organization_id) REFERENCES org(id) ON DELETE CASCADE
 );
 
+-- user_entity is the child in a 1:1 user-to-address relationship.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'user_entity'
+          AND column_name = 'address_id'
+    ) THEN
+        ALTER TABLE user_entity
+            ADD COLUMN address_id UUID;
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'uq_user_entity_address_id'
+    ) THEN
+        ALTER TABLE user_entity
+            ADD CONSTRAINT uq_user_entity_address_id UNIQUE (address_id);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_user_entity_address'
+    ) THEN
+        ALTER TABLE user_entity
+            ADD CONSTRAINT fk_user_entity_address
+            FOREIGN KEY (address_id) REFERENCES addresses(address_id) ON DELETE SET NULL;
+    END IF;
+END
+$$;
+
 -- Customers belong to an organization; optionally linked to Keycloak user_entity.
 CREATE TABLE IF NOT EXISTS customers (
     customer_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -276,19 +311,23 @@ EXECUTE FUNCTION trg_bookings_validate_org_member();
 -- Minimal seed data (only if Keycloak already has at least one organization and member).
 INSERT INTO addresses (
     organization_id,
+    address_name,
     street_line1,
     city,
     county,
     postal_code,
-    country
+    country,
+    is_billing_address
 )
 SELECT
     o.id,
+    'Main Branch',
     '123 Main Street',
     'New York',
     'New York',
     '10001',
-    'USA'
+    'USA',
+    FALSE
 FROM org o
 ORDER BY o.id
 LIMIT 1;
