@@ -1,10 +1,14 @@
 package com.web.app.swift_booking.entity.Keycloak;
 
+import com.web.app.swift_booking.entity.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,5 +57,9 @@ public class User {
 
     @Column(name = "not_before")
     private Integer notBefore;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id", referencedColumnName = "address_id", unique = true)
+    private Address address;
 
 }

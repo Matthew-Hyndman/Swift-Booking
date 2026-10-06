@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.web.app.swift_booking.entity.Keycloak.Organization;
+import com.web.app.swift_booking.entity.Keycloak.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -58,6 +60,9 @@ public class Address {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
     private Organization organization;
+
+    @OneToOne(mappedBy = "address", fetch = FetchType.LAZY)
+    private User user;
 
     @PrePersist
     void prePersist() {
