@@ -1,0 +1,52 @@
+{"payload": {
+	"alias": "test-business-1",
+	"billingAddress": {
+		"addressName": "Billing Address",
+		"city":"City",
+		"country": "Country",
+		"county": "County",
+		"isBillingAddress": true,
+		"postalCode": "12345",
+		"street1": "123 Main St",
+		"street2": ""
+	},
+	"billingAddressIsWorkingBranch": true,
+	"billingStaffMembers": [],
+	"branches": [
+		{
+			"address": {
+			"addressName": "",
+			"city": "",
+			"country": "",
+			"county": "",
+			"postalCode": "",
+			"street1": "",
+			"street2": ""
+			},
+			"branchName": ""
+		}
+	],
+	"employees": [
+	{
+		"email": "",
+		"firstName": "",
+		"lastName": "",
+		"password": "",
+		"role": "employee",
+		"username": ""
+	}
+	],
+	"isBillingAddress": false,
+	"signedInUserIsStaffMember": false,
+	"length": 1,
+
+	"description": "Business created by dan-tester",
+	"disableAdditionalBranches": true,
+	"enabled": true,
+	"groups": [],
+	"id": "undefined",
+	"isUserStaffMemberAtBillingAddress": true,
+	"members": [],
+	"name": "Test Business 1",
+	"redirectUrl": ""
+}}

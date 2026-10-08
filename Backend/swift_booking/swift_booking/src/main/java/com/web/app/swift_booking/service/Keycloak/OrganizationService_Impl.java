@@ -92,7 +92,7 @@ public class OrganizationService_Impl implements OrganizationService {
          * @param userId           the ID of the user creating the organization
          * @param organizationData the organization data
          */
-        @Override
+        /*@Override
         public ResponseEntity<String> createOrganization(String userId,
                         OrganizationRepresentation_DTO organizationData) {
 
@@ -159,11 +159,11 @@ public class OrganizationService_Impl implements OrganizationService {
          * @return an Optional containing the organization if found, or empty if not
          *         found
          */
-        @Override
+        /*@Override
         public Optional<Organization> getOrganizationById(String organizationId) {
                 return Optional.ofNullable(orgRepo.findById(organizationId)
                                 .orElseThrow(() -> new RuntimeException("Organization not found")));
-        }
+        }*/
 
         @Override
         public List<SimpleOrgDetail_DTO> getSmallOrgInfo(String userId) {
@@ -206,7 +206,7 @@ public class OrganizationService_Impl implements OrganizationService {
                                 .collect(Collectors.toList());
         }
 
-        // not implemented yet
+        /*
         @Override
         public String updateOrganization(String organizationId, OrganizationRepresentation_DTO organizationData) {
                 try {
@@ -331,7 +331,7 @@ public class OrganizationService_Impl implements OrganizationService {
                 }
         }
 
-        private void persistOrganizationMetadata(String organizationId,
+        /*private void persistOrganizationMetadata(String organizationId,
                         OrganizationRepresentation_DTO organizationData) {
                 if (organizationData == null) {
                         return;
@@ -447,7 +447,7 @@ public class OrganizationService_Impl implements OrganizationService {
          * @param persistedAddresses - A list of addresses that have been persisted for
          *                           the organization.
          */
-        private void assignOrganizationMembers(String accessToken, String organizationId, String ownerUserId,
+        /*private void assignOrganizationMembers(String accessToken, String organizationId, String ownerUserId,
                         OrganizationRepresentation_DTO organizationData, Map<String, String> defaultGroupIds,
                         List<Address> persistedAddresses) {
                 String ownerGroupId = defaultGroupIds.get("Owner");
@@ -640,6 +640,7 @@ public class OrganizationService_Impl implements OrganizationService {
                 }
         }
 
+        /*
         private void addMemberToOrganizationGroup(String accessToken, String organizationId, String groupId,
                         String userId) {
 
@@ -713,7 +714,7 @@ public class OrganizationService_Impl implements OrganizationService {
                         return ResponseEntity.status(500)
                                         .body("Error removing employee from organization: " + e.getMessage());
                 }
-        }
+        }*/
 
         private String getAdminAccessToken() {
                 KeycloakTokenResponse tokenResponse = this.keycloakHttpClient.post()

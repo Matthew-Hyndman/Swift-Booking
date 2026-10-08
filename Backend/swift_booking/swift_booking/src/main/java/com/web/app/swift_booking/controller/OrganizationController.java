@@ -117,7 +117,7 @@ public class OrganizationController {
         return addressService.getAllBranchAddresses(organizationId);
     }
 
-    @PostMapping("{organizationId}/addresses")
+    @PostMapping("{organizationId}/address")
     public ResponseEntity<?> addOrganizationAddress(
         @PathVariable String organizationId,
         @RequestBody Address_DTO addressData

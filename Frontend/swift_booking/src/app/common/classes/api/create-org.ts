@@ -8,10 +8,15 @@ import {
     UserAddressAssignment,
     UserGroupAssignment
 } from '../models/org-models';
+import { inject } from '@angular/core/primitives/di';
+import { Injectable } from '@angular/core';
 
+@Injectable({
+    providedIn: 'root'
+})
 export class CreateOrg {
 
-    constructor(private http: HttpClient) {}
+    private http = inject(HttpClient);
 
     async createEmptyOrganization(org: EmptyOrg, token: string): Promise<string> {
         

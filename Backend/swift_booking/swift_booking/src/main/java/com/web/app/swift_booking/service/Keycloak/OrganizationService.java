@@ -32,17 +32,17 @@ public interface OrganizationService {
 
     // old create organization service methods
 
-    ResponseEntity<String> createOrganization(String userId, OrganizationRepresentation_DTO organizationData);    
+    /*ResponseEntity<String> createOrganization(String userId, OrganizationRepresentation_DTO organizationData);    
 
-    Optional<Organization> getOrganizationById(String organizationId);
+    Optional<Organization> getOrganizationById(String organizationId);*/
 
     List<SimpleOrgDetail_DTO> getSmallOrgInfo(String userId);
 
-    String updateOrganization(String organizationId, OrganizationRepresentation_DTO organizationData);
+    /*String updateOrganization(String organizationId, OrganizationRepresentation_DTO organizationData);
 
-    String deleteOrganization(String organizationId);
+    String deleteOrganization(String organizationId);*/
 
     ResponseEntity<String> addEmployeeToOrganization(String organizationId, String groupId, UserRepresentation_DTO userData);
 
-    ResponseEntity<String> removeEmployeeFromOrganization(String organizationId, String groupId, String userId);
+    //ResponseEntity<String> removeEmployeeFromOrganization(String organizationId, String groupId, String userId);
 }

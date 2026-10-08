@@ -10,6 +10,15 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { CreateOrg } from '../../../common/classes/api/create-org';
+import {
+  EmptyOrg,
+  OrganizationAddress,
+  UserRepresentation,
+  CredentialRepresentation,
+  UserAddressAssignment,
+  UserGroupAssignment
+} from '../../../common/classes/models/org-models'
 import Keycloak from 'keycloak-js';
 import { environment } from '../../../../environments/environment.local';
 import { AuthService } from '../../../services/auth';
@@ -23,7 +32,8 @@ import { AuthService } from '../../../services/auth';
 export class CreateOrganization {
 
   constructor(
-    private readonly auth: AuthService
+    private readonly auth: AuthService,
+    private readonly createOrgApi: CreateOrg
   ) {}
 
   testMode = environment.testMode;
@@ -416,42 +426,12 @@ export class CreateOrganization {
       payload['branches'] = [];
     }
 
-    // how do you know which staff members belong to which address?
-    // database should have a mapping of staff members to addresses
-    if (isUserStaffMemberAtBillingAddress) {
+    this.createOrganization(payload);
 
-    }
+  }
 
-    else if (isUserStaffMemberAtBranchAddress) {
-
-    }
-
+  createOrganization(payload: Record<string, any>): void {
     
-    this.submittedPayload = payload;
-
-    this.http
-      .post<string>(
-        `${environment.apiBaseUrl}/api/organizations/create/${userId}`,
-        payload,
-      )
-      .subscribe({
-        next: (response) => {
-          console.log('Organization created successfully', response);
-          this.submittedPayload = {
-            payload,
-            response,
-          };
-        },
-        error: (error) => {
-          const message =
-            error?.error ?? error?.message ?? 'Unable to create organization.';
-          console.error('Organization creation failed', error);
-          this.submittedPayload = {
-            payload,
-            error: message,
-          };
-        },
-      });
   }
 
   hasError(control: AbstractControl | null, code: string): boolean {
