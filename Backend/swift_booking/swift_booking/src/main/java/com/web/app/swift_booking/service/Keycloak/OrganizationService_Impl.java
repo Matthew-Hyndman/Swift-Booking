@@ -4,6 +4,7 @@ import com.web.app.swift_booking.DAO.AddressRepo;
 import com.web.app.swift_booking.DAO.OrganizationRepo;
 import com.web.app.swift_booking.DAO.UserRepo;
 import com.web.app.swift_booking.dto.Address_DTO;
+import com.web.app.swift_booking.dto.Address_DTO;
 import com.web.app.swift_booking.entity.Address;
 import com.web.app.swift_booking.entity.Keycloak.Organization;
 import com.web.app.swift_booking.entity.Keycloak.User;
@@ -19,7 +20,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,6 +45,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.web.app.swift_booking.dto.Keycloak.EmptyOrg_DTO;
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
+import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.SimpleOrgDetail_DTO;
@@ -117,9 +128,8 @@ public class OrganizationService_Impl implements OrganizationService {
                                         .toEntity(String.class)
                                         .block();
 
-                        // after creating the organization, extract the organization ID from the
-                        // response
-                        // then use it to create default groups and assign the owner and any other
+                        // after creating the organization, extract the organization ID from the response
+                        // then use it to create default groups and assign the owner and any other 
                         // members to the appropriate groups
 
                         String organizationId = extractResourceId(createResponse);
@@ -128,9 +138,8 @@ public class OrganizationService_Impl implements OrganizationService {
                                                 "Organization created but could not resolve organization ID from Keycloak response");
                         }
 
-                        // persistOrganizationMetadata(organizationId, organizationData);
-                        List<Address> persistedAddresses = persistOrganizationAddresses(organizationId,
-                                        organizationData);
+                        //persistOrganizationMetadata(organizationId, organizationData);
+                        List<Address> persistedAddresses = persistOrganizationAddresses(organizationId, organizationData);
                         Map<String, String> defaultGroupIds = createDefaultGroups(accessToken, organizationId);
                         assignOrganizationMembers(accessToken, organizationId, user.getId(), organizationData,
                                         defaultGroupIds, persistedAddresses);
@@ -346,6 +355,7 @@ public class OrganizationService_Impl implements OrganizationService {
                         OrganizationRepresentation_DTO organizationData) {
                 if (organizationId == null || organizationId.isBlank() || organizationData == null) {
                         return List.of();
+                        return List.of();
                 }
 
                 Organization organization = orgRepo.findById(organizationId)
@@ -357,8 +367,12 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 if (organizationData.getBranches() == null || organizationData.getBranches().isEmpty()) {
                         return List.of();
+                        return List.of();
                 }
 
+                List<Address> savedAddresses = new ArrayList<>();
+                for (Address_DTO branch : organizationData.getBranches()) {
+                        if (branch == null) {
                 List<Address> savedAddresses = new ArrayList<>();
                 for (Address_DTO branch : organizationData.getBranches()) {
                         if (branch == null) {
@@ -367,14 +381,23 @@ public class OrganizationService_Impl implements OrganizationService {
 
                         Address savedAddress = saveAddress(branch, organization);
                         if (savedAddress == null) {
+                        Address savedAddress = saveAddress(branch, organization);
+                        if (savedAddress == null) {
                                 continue;
                         }
                         savedAddresses.add(savedAddress);
                 }
 
                 return savedAddresses;
+                        savedAddresses.add(savedAddress);
+                }
+
+                return savedAddresses;
         }
 
+        private Address saveAddress(Address_DTO addressData, Organization organization) {
+                if (addressData == null) {
+                        return null;
         private Address saveAddress(Address_DTO addressData, Organization organization) {
                 if (addressData == null) {
                         return null;
@@ -458,6 +481,26 @@ public class OrganizationService_Impl implements OrganizationService {
                         return;
                 }
 
+                for (MemberRepresentation_DTO member : organizationData.getMembers()) {
+                        if (member == null || member.id() == null || member.id().isBlank()) {
+                                continue;
+                        }
+                        if (!processedUsers.add(member.id())) {
+                                continue;
+                        }
+
+                        String groupName = normalizeGroupName(member.groupName(), ownerUserId.equals(member.id()));
+                        String groupId = defaultGroupIds.get(groupName);
+                        if (groupId == null || groupId.isBlank()) {
+                                throw new RuntimeException("No group ID found for group: " + groupName);
+                        }
+
+                        addMemberToOrganizationGroup(accessToken, organizationId, groupId, member.id());
+
+                        if (member.addressId() != null) {
+                                attachAddressToUser(member.id(), organizationId, member.addressId(), validAddressIds);
+                        }
+                }
                 for (MemberRepresentation_DTO member : organizationData.getMembers()) {
                         if (member == null || member.id() == null || member.id().isBlank()) {
                                 continue;

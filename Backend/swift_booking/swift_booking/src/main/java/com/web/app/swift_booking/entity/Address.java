@@ -61,6 +61,9 @@ public class Address {
     @JoinColumn(name = "organization_id", referencedColumnName = "id", nullable = false)
     private Organization organization;
 
+    @OneToOne(mappedBy = "address", fetch = FetchType.LAZY)
+    private User user;
+
     @PrePersist
     void prePersist() {
         if (addressId == null) {
