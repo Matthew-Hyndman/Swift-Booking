@@ -355,7 +355,6 @@ public class OrganizationService_Impl implements OrganizationService {
                         OrganizationRepresentation_DTO organizationData) {
                 if (organizationId == null || organizationId.isBlank() || organizationData == null) {
                         return List.of();
-                        return List.of();
                 }
 
                 Organization organization = orgRepo.findById(organizationId)
@@ -367,37 +366,26 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 if (organizationData.getBranches() == null || organizationData.getBranches().isEmpty()) {
                         return List.of();
-                        return List.of();
                 }
-
-                List<Address> savedAddresses = new ArrayList<>();
-                for (Address_DTO branch : organizationData.getBranches()) {
-                        if (branch == null) {
+                
                 List<Address> savedAddresses = new ArrayList<>();
                 for (Address_DTO branch : organizationData.getBranches()) {
                         if (branch == null) {
                                 continue;
                         }
 
-                        Address savedAddress = saveAddress(branch, organization);
-                        if (savedAddress == null) {
+                        
                         Address savedAddress = saveAddress(branch, organization);
                         if (savedAddress == null) {
                                 continue;
                         }
-                        savedAddresses.add(savedAddress);
-                }
-
-                return savedAddresses;
                         savedAddresses.add(savedAddress);
                 }
 
                 return savedAddresses;
         }
 
-        private Address saveAddress(Address_DTO addressData, Organization organization) {
-                if (addressData == null) {
-                        return null;
+
         private Address saveAddress(Address_DTO addressData, Organization organization) {
                 if (addressData == null) {
                         return null;
