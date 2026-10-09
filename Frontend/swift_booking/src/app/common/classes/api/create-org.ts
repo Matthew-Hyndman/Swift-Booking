@@ -84,7 +84,7 @@ export class CreateOrg {
         ));
     }
 
-    async assignUsersAsMembers(orgId: string, users: Array<UserRepresentation>, token: string): Promise<void> {
+    async assignUsersAsMembers(orgId: string, users: Array<string>, token: string): Promise<void> {
         await firstValueFrom(this.http.post<void>(
             `${environment.apiBaseUrl}/api/organizations/${orgId}/assign-users-as-members`,
             users,

@@ -26,7 +26,7 @@ public interface OrganizationService {
 
     ResponseEntity<String> assignUsersToAddresses(List<UserAddressAssignment_DTO> assignments);
 
-    ResponseEntity<String> assignUsersAsMembers(String organizationId, List<UserRepresentation_DTO> users);
+    ResponseEntity<String> assignUsersAsMembers(String organizationId, List<String> users);
 
      ResponseEntity<String> assignUsersAsMembersToGroups(String organizationId, List<UserGroupAssignment_DTO> assignments);
 

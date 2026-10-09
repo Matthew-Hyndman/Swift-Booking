@@ -904,16 +904,16 @@ public class OrganizationService_Impl implements OrganizationService {
         }
 
         @Override
-        public ResponseEntity<String> assignUsersAsMembers(String organizationId, List<UserRepresentation_DTO> users) {
+        public ResponseEntity<String> assignUsersAsMembers(String organizationId, List<String> users) {
                 
                 String accessToken = getAdminAccessToken();
 
-                for (UserRepresentation_DTO user : users) {
+                for (String userId : users) {
                         
                         ResponseEntity<String> response = this.keycloakHttpClient.put()
                                         .uri(this.origin + "/admin/realms/{realm}/users", realm)
                                         .headers(headers -> headers.setBearerAuth(accessToken))
-                                        .bodyValue(user.id())
+                                        .bodyValue(userId)
                                         .retrieve()
                                         .onStatus(HttpStatusCode::is4xxClientError, response1 -> response1
                                                         .bodyToMono(String.class)
@@ -927,7 +927,7 @@ public class OrganizationService_Impl implements OrganizationService {
                                         .block();
 
                         if (response == null) {
-                                throw new RuntimeException("Failed to create user: " + response.getBody());
+                                throw new RuntimeException("Failed to assign user as member: " + response.getBody());
                         }                       
                 }
 

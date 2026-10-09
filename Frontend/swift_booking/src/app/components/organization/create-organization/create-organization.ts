@@ -571,7 +571,17 @@ export class CreateOrganization {
 
             //assign users as members to the organization
 
-            this.createOrgApi.assignUsersAsMembers(org.id!, org.users!, token)
+            let usersIds = org.users!.map(user => user.userId!); 
+
+            this.createOrgApi.assignUsersAsMembers(org.id!, usersIds, token)
+              .then(() => {
+                console.log('Users assigned as members for organization ID:', org.id);
+              })
+              .catch(error => {
+                console.error('Error assigning users as members:', error);
+                this.displayError('Failed to assign users as members', 'Error assigning users as members: ' + error);
+                return;
+              });
 
             //assign users to default organization groups
             let userGroups: Array<UserGroupAssignment> = [];
