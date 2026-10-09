@@ -13,15 +13,18 @@ import {
 import { CreateOrg } from '../../../common/classes/api/create-org';
 import {
   EmptyOrg,
-  OrganizationAddress,
+  AddressRepresentation,
   UserRepresentation,
   CredentialRepresentation,
   UserAddressAssignment,
-  UserGroupAssignment
+  UserGroupAssignment,
+  OrganizationRepresentation,
+  SimpleGroupRepresentation
 } from '../../../common/classes/models/org-models'
 import Keycloak from 'keycloak-js';
 import { environment } from '../../../../environments/environment.local';
 import { AuthService } from '../../../services/auth';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-create-organization',
@@ -68,9 +71,9 @@ export class CreateOrganization {
   private nextStaffId = 1;
 
   readonly roleOptions: { value: string; label: string }[] = [
-    { value: 'employee', label: 'employee' },
-    { value: 'manger', label: 'Manger' },
-    { value: 'owner', label: 'Owner' },
+    { value: 'Employee', label: 'Employee' },
+    { value: 'Manager', label: 'Manager' },
+    { value: 'Owner', label: 'Owner' },
   ];
 
   readonly organizationForm = this.fb.group(
@@ -118,6 +121,14 @@ export class CreateOrganization {
     return this.organizationForm.get(
       'billingStaffMembers',
     ) as FormArray<FormGroup>;
+  }
+
+  get isAdditionalBranchesDisabled(): boolean {
+        return this.organizationForm.controls.disableAdditionalBranches?.value ?? false;
+  }
+
+  get noAdditionalUsers(): boolean {
+    return this.billingStaffMembers.length === 0 || this.isAdditionalBranchesDisabled;
   }
 
   branchEmployees(index: number): FormArray<FormGroup> {
@@ -394,11 +405,10 @@ export class CreateOrganization {
     this.submitted = true;
     this.organizationForm.markAllAsTouched();
 
-    const isAdditionalBranchesDisabled = this.organizationForm.controls.disableAdditionalBranches?.value ?? false;
     const isUserStaffMemberAtBillingAddress = this.organizationForm.get('isUserStaffMemberAtBillingAddress')?.value ?? false;
     const isUserStaffMemberAtBranchAddress = this.organizationForm.get('isUserStaffMemberAtBranchAddress')?.value ?? false;
 
-    if (isAdditionalBranchesDisabled) {
+    if (this.isAdditionalBranchesDisabled) {
       if (
         this.organizationForm.controls.billingAddress.invalid ||
         this.organizationForm.controls.billingStaffMembers.invalid
@@ -422,7 +432,7 @@ export class CreateOrganization {
 
     let payload = this.buildOrganizationPayload();
 
-    if (isAdditionalBranchesDisabled) {
+    if (this.isAdditionalBranchesDisabled) {
       payload['branches'] = [];
     }
 
@@ -431,7 +441,184 @@ export class CreateOrganization {
   }
 
   createOrganization(payload: Record<string, any>): void {
+    let token = this.keycloak.token ?? '';
+
+    let branches: Array<AddressRepresentation> = [];
+
+    let userProfileData: UserRepresentation | undefined;
+    this.auth.userProfile$.subscribe(userProfile => {
+      userProfileData = {
+        userId: userProfile?.id ?? '',
+        username: userProfile?.username ?? '',
+        email: userProfile?.email ?? '',
+        firstName: userProfile?.firstName ?? '',
+        lastName: userProfile?.lastName ?? '',
+        enabled: true,
+        emailVerified: userProfile?.emailVerified ?? false
+      };
+    });
+
+    if (!this.isAdditionalBranchesDisabled) {
+      let signleBranch: AddressRepresentation = {
+        addressName: payload['billingAddress'].addressName,
+        streetLine1: payload['billingAddress'].street1,
+        streetLine2: payload['billingAddress'].street2,
+        city: payload['billingAddress'].city,
+        county: payload['billingAddress'].county,
+        postalCode: payload['billingAddress'].postalCode,
+        country: payload['billingAddress'].country,
+        createTime: undefined,
+        isBillingAddress: true,
+        members:  [ { ...userProfileData! } ]
+      };
+      branches.push(signleBranch);
+    }
     
+    let org: OrganizationRepresentation = {
+      name: payload['name'],
+      alias: payload['alias'],
+      enabled: payload['enabled'],
+      description: payload['description'],
+      redirectUri: payload['redirectUri'],
+      branches: branches
+    };
+
+    // Creating an empty organization
+    let EmptyOrgPayload: EmptyOrg = {
+      name: payload['name'],
+      alias: payload['alias'],
+      enabled: payload['enabled'],
+      description: payload['description'],
+      redirectUri: payload['redirectUri'],
+    };
+
+    // Create an empty organization 
+    this.createOrgApi.createEmptyOrganization(EmptyOrgPayload, token)
+      .then(orgId => {
+        console.log('Organization created with ID:', orgId);
+        org.id = orgId;
+      })
+      .catch(error => {
+        console.error('Error creating organization:', error);
+        this.displayError('Failed to create organization', 'Error creating organization: ' + error);
+        return;
+      });
+
+      // Create default organization groups
+      let orgGroups: Array<SimpleGroupRepresentation> = [];
+
+      this.createOrgApi.createDefaultOrganizationGroups(org.id!, token)
+        .then(groupIds => {
+          console.log('Default organization groups created for organization ID:', org.id);
+          orgGroups = groupIds;
+        })
+        .catch(error => {
+          console.error('Error creating default organization groups:', error);
+          this.displayError('Failed to create default organization groups', 'Error creating default organization groups: ' + error);
+          return;
+        });
+      
+      // Add organization addresses
+      this.createOrgApi.addOrganizationAddresses(org.id!, branches, token)
+        .then(addressIds => {
+          console.log('Organization addresses added for organization ID:', org.id);
+          org.branches = org.branches?.map((branch, index) => ({
+            ...branch,
+            addressId: addressIds[index]
+          }));
+        })
+        .catch(error => {
+          console.error('Error adding organization addresses:', error);
+          this.displayError('Failed to add organization addresses', 'Error adding organization addresses: ' + error);
+          return;
+        });
+        
+        // Create organization users if there are additional users
+        if(!this.noAdditionalUsers) {
+
+          this.createOrgApi.createUsers(org.id!, org.users!, token)
+            .then(users => {
+              console.log('Organization users added for organization ID:', org.id);
+              org.users = users;
+            })
+            .catch(error => {
+              console.error('Error adding organization users:', error);
+              this.displayError('Failed to add organization users', 'Error adding organization users: ' + error);
+              return;
+            });
+
+            //add users to addresses
+            
+            let userAddresses: Array<UserAddressAssignment> = [];
+            org.branches?.forEach(branch => {
+              branch.members?.forEach(member => {
+                userAddresses.push({
+                  userId: member.userId!,
+                  addressId: branch.addressId!
+                });
+              });
+            });
+
+            this.createOrgApi.assignUsersToAddresses(userAddresses, token)
+              .then(() => {
+                console.log('Users assigned to addresses for organization ID:', org.id);
+              })
+              .catch(error => {
+                console.error('Error assigning users to addresses:', error);
+                this.displayError('Failed to assign users to addresses', 'Error assigning users to addresses: ' + error);
+                return;
+              });
+
+            //assign users as members to the organization
+
+            this.createOrgApi.assignUsersAsMembers(org.id!, org.users!, token)
+
+            //assign users to default organization groups
+            let userGroups: Array<UserGroupAssignment> = [];
+
+            org.branches?.forEach(branch => {
+              branch.members!.forEach(member => {
+                switch(member.Roles) {
+                  case 'Employee':
+                    userGroups.push({
+                      userId: member.userId!,
+                      groupId: orgGroups.find(group => group.name === 'Employees')!.groupId
+                    });
+                    break;
+                  case 'Manager':
+                    userGroups.push({
+                      userId: member.userId!,
+                      groupId: orgGroups.find(group => group.name === 'Managers')!.groupId
+                    });
+                    break;
+                  case 'Owner':
+                    userGroups.push({
+                      userId: member.userId!,
+                      groupId: orgGroups.find(group => group.name === 'Admins')!.groupId
+                    });
+                    break;
+                }
+              });
+            });
+            this.createOrgApi.assignUsersToGroups(org.id!, userGroups, token)
+              .then(() => {
+                console.log('Users assigned to groups for organization ID:', org.id);
+              })
+              .catch(error => {
+                console.error('Error assigning users to groups:', error);
+                this.displayError('Failed to assign users to groups', 'Error assigning users to groups: ' + error);
+                return;
+              });
+      }
+      
+  }
+
+  displayError(header: string, message: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: header,
+      text: message,
+    });
   }
 
   hasError(control: AbstractControl | null, code: string): boolean {

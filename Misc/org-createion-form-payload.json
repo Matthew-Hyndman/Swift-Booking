@@ -23,7 +23,10 @@
 			"street1": "",
 			"street2": ""
 			},
-			"branchName": ""
+			"branchName": "",
+			"employees": [],
+			"signedInUserIsStaffMember": false,
+			"isBillingAddress": false
 		}
 	],
 	"employees": [

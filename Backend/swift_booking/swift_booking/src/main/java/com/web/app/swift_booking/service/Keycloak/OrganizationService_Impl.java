@@ -904,16 +904,16 @@ public class OrganizationService_Impl implements OrganizationService {
         }
 
         @Override
-        public ResponseEntity<String> assignUsersAsMembers(String organizationId, List<String> userIds) {
+        public ResponseEntity<String> assignUsersAsMembers(String organizationId, List<UserRepresentation_DTO> users) {
                 
                 String accessToken = getAdminAccessToken();
 
-                for (String userId : userIds) {
+                for (UserRepresentation_DTO user : users) {
                         
                         ResponseEntity<String> response = this.keycloakHttpClient.put()
                                         .uri(this.origin + "/admin/realms/{realm}/users", realm)
                                         .headers(headers -> headers.setBearerAuth(accessToken))
-                                        .bodyValue(userId)
+                                        .bodyValue(user.id())
                                         .retrieve()
                                         .onStatus(HttpStatusCode::is4xxClientError, response1 -> response1
                                                         .bodyToMono(String.class)

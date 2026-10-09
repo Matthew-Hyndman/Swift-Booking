@@ -3,10 +3,11 @@ import { environment } from '../../../../environments/environment.local';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { 
     EmptyOrg,
-    OrganizationAddress, 
+    AddressRepresentation, 
     UserRepresentation, 
     UserAddressAssignment,
-    UserGroupAssignment
+    UserGroupAssignment,
+    SimpleGroupRepresentation
 } from '../models/org-models';
 import { inject } from '@angular/core/primitives/di';
 import { Injectable } from '@angular/core';
@@ -32,8 +33,8 @@ export class CreateOrg {
         return orgId;
     }
 
-    async createDefaultOrganizationGroups(orgId: string, token: string): Promise<Array<string>> {
-        const groupIds = await firstValueFrom(this.http.post<Array<string>>(
+    async createDefaultOrganizationGroups(orgId: string, token: string): Promise<Array<SimpleGroupRepresentation>> {
+        const groups = await firstValueFrom(this.http.post<Array<SimpleGroupRepresentation>>(
             `${environment.apiBaseUrl}/api/organizations/create-default-groups/${orgId}`,
             {},
             {
@@ -42,10 +43,10 @@ export class CreateOrg {
                 }
             }
         ));
-        return groupIds;
+        return groups;
     }
 
-    async addOrganizationAddresses(orgId: string, addresses: Array<OrganizationAddress>, token: string): Promise<Array<string>> {
+    async addOrganizationAddresses(orgId: string, addresses: Array<AddressRepresentation>, token: string): Promise<Array<string>> {
         const addressIds = await firstValueFrom(this.http.post<Array<string>>(
             `${environment.apiBaseUrl}/api/organizations/${orgId}/addresses`,
             addresses,
@@ -83,10 +84,10 @@ export class CreateOrg {
         ));
     }
 
-    async assignUsersAsMembers(orgId: string, userIds: Array<string>, token: string): Promise<void> {
+    async assignUsersAsMembers(orgId: string, users: Array<UserRepresentation>, token: string): Promise<void> {
         await firstValueFrom(this.http.post<void>(
             `${environment.apiBaseUrl}/api/organizations/${orgId}/assign-users-as-members`,
-            userIds,
+            users,
             {
                 headers: {
                     Authorization: `Bearer ${token}`
