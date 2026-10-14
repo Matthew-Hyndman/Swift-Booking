@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.web.app.swift_booking.dto.Address_DTO;
+import com.web.app.swift_booking.dto.Keycloak.CreateOrganizationResponse_DTO;
 import com.web.app.swift_booking.dto.Keycloak.EmptyOrg_DTO;
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.OrganizationRepresentation_DTO;
@@ -67,7 +68,7 @@ public class OrganizationController {
     }*/
 
     @PostMapping("create-empty")
-    public ResponseEntity<?> createEmptyOrg(@RequestBody EmptyOrg_DTO emptyOrgData){
+    public ResponseEntity<CreateOrganizationResponse_DTO> createEmptyOrg(@RequestBody EmptyOrg_DTO emptyOrgData){
         return this.organizationService.createEmptyOrganization(emptyOrgData);
     }
 
@@ -94,7 +95,7 @@ public class OrganizationController {
         return this.organizationService.assignUsersToAddresses(assignments);
     }
 
-    @PutMapping("{organizationId}/assign-users-as-members")
+    @PostMapping("{organizationId}/assign-users-as-members")
     public ResponseEntity<?> assignUsersAsMembers(
         @PathVariable String organizationId,
         @RequestBody List<String> userIds
@@ -159,5 +160,10 @@ public class OrganizationController {
     @DeleteMapping("{organizationId}/addresses")
     public ResponseEntity<?> deleteAllOrganizationAddresses(@PathVariable String organizationId) {
         return addressService.deleteAllBranchAddresses(organizationId);
+    }
+
+    @DeleteMapping("{organizationId}/delete")
+    public ResponseEntity<?> deleteOrganization(@PathVariable String organizationId) {
+        return this.organizationService.deleteOrganization(organizationId);
     }
 }

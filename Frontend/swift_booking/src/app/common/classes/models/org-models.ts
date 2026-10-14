@@ -1,9 +1,14 @@
 export interface EmptyOrg {
+    id?: string,
     name: string,
     alias: string,
     enabled: boolean,
     description: string,
-    redirectUri: string,
+    redirectUrl: string,
+}
+
+export interface CreateOrganizationResponse {
+    organizationId: string
 }
 
 export interface AddressRepresentation {
@@ -52,7 +57,7 @@ export interface UserAddressAssignment {
 }
 
 export interface SimpleGroupRepresentation {
-    groupId: string,
+    id: string,
     name: string,
     description?: string
 }
@@ -68,7 +73,7 @@ export interface OrganizationRepresentation {
     alias: string,
     enabled: boolean,
     description: string,
-    redirectUri: string,
+    redirectUrl: string,
     branches?: Array<AddressRepresentation>,
     users?: Array<UserRepresentation>
 }

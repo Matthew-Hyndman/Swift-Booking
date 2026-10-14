@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment.local';
 import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
-import { 
+import {
     EmptyOrg,
-    AddressRepresentation, 
-    UserRepresentation, 
+    CreateOrganizationResponse,
+    AddressRepresentation,
+    UserRepresentation,
     UserAddressAssignment,
     UserGroupAssignment,
     SimpleGroupRepresentation
@@ -20,22 +21,27 @@ export class CreateOrg {
     private http = inject(HttpClient);
 
     async createEmptyOrganization(org: EmptyOrg, token: string): Promise<string> {
-        
-        const orgId = await firstValueFrom(this.http.post<string>(
-            `${environment.apiBaseUrl}/api/organizations/create-empty`, 
-            org,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
+        try {
+            const response = await firstValueFrom(this.http.post<CreateOrganizationResponse>(
+                `${environment.apiBaseUrl}/api/organizations/create-empty`,
+                org,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            }
-        ));
-        return orgId;
+            ));
+
+            return response.organizationId;
+        } catch (error) {
+            console.error('Error creating empty organization:', error);
+            throw error;
+        }
     }
 
     async createDefaultOrganizationGroups(orgId: string, token: string): Promise<Array<SimpleGroupRepresentation>> {
         const groups = await firstValueFrom(this.http.post<Array<SimpleGroupRepresentation>>(
-            `${environment.apiBaseUrl}/api/organizations/create-default-groups/${orgId}`,
+            `${environment.apiBaseUrl}/api/organizations/create-default-org-groups/${orgId}`,
             {},
             {
                 headers: {
@@ -46,8 +52,8 @@ export class CreateOrg {
         return groups;
     }
 
-    async addOrganizationAddresses(orgId: string, addresses: Array<AddressRepresentation>, token: string): Promise<Array<string>> {
-        const addressIds = await firstValueFrom(this.http.post<Array<string>>(
+    async addOrganizationAddresses(orgId: string, addresses: Array<AddressRepresentation>, token: string): Promise<Array<AddressRepresentation>> {
+        const addressesResponse = await firstValueFrom(this.http.post<Array<AddressRepresentation>>(
             `${environment.apiBaseUrl}/api/organizations/${orgId}/addresses`,
             addresses,
             {
@@ -56,7 +62,7 @@ export class CreateOrg {
                 }
             }
         ));
-        return addressIds;
+        return addressesResponse;
     }
 
     async createUsers(orgId: string, users: Array<UserRepresentation>, token: string): Promise<Array<UserRepresentation>> {
@@ -73,7 +79,7 @@ export class CreateOrg {
     }
 
     async assignUsersToAddresses(assignments: Array<UserAddressAssignment>, token: string): Promise<void> {
-        await firstValueFrom(this.http.post<void>(
+        await firstValueFrom(this.http.put<void>(
             `${environment.apiBaseUrl}/api/organizations/assign-users-to-addresses`,
             assignments,
             {
@@ -97,7 +103,7 @@ export class CreateOrg {
     }
 
     async assignUsersToGroups(orgId: string, assignments: Array<UserGroupAssignment>, token: string): Promise<void> {
-        await firstValueFrom(this.http.post<void>(
+        await firstValueFrom(this.http.put<void>(
             `${environment.apiBaseUrl}/api/organizations/${orgId}/assign-users-to-groups`,
             assignments,
             {
@@ -107,6 +113,17 @@ export class CreateOrg {
             }
         ));
     }
+
+    async resetCreation(orgId: string, token: string): Promise<void> {
+        await firstValueFrom(this.http.delete<void>(
+            `${environment.apiBaseUrl}/api/organizations/${orgId}/delete`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )).catch(error => {
+            console.error('Failed to reset creation:', error);
+        });
+    }
 }
-
-

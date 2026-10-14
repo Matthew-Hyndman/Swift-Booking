@@ -15,4 +15,6 @@ public record Address_DTO(
     LocalDateTime createdAt,
     String organizationId,
     boolean isBillingAddress
-) { }
+) {
+
+ }

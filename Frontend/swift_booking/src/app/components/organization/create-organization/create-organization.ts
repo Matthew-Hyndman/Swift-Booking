@@ -25,6 +25,7 @@ import Keycloak from 'keycloak-js';
 import { environment } from '../../../../environments/environment.local';
 import { AuthService } from '../../../services/auth';
 import Swal from 'sweetalert2';
+import { routes } from '../../../app-routing.module';
 
 @Component({
   selector: 'app-create-organization',
@@ -440,7 +441,7 @@ export class CreateOrganization {
 
   }
 
-  createOrganization(payload: Record<string, any>): void {
+  async createOrganization(payload: Record<string, any>): Promise<void> {
     let token = this.keycloak.token ?? '';
 
     let branches: Array<AddressRepresentation> = [];
@@ -454,11 +455,12 @@ export class CreateOrganization {
         firstName: userProfile?.firstName ?? '',
         lastName: userProfile?.lastName ?? '',
         enabled: true,
-        emailVerified: userProfile?.emailVerified ?? false
+        emailVerified: userProfile?.emailVerified ?? false,
+        Roles: 'Owner'
       };
     });
 
-    if (!this.isAdditionalBranchesDisabled) {
+    if (this.isAdditionalBranchesDisabled) {
       let signleBranch: AddressRepresentation = {
         addressName: payload['billingAddress'].addressName,
         streetLine1: payload['billingAddress'].street1,
@@ -479,74 +481,72 @@ export class CreateOrganization {
       alias: payload['alias'],
       enabled: payload['enabled'],
       description: payload['description'],
-      redirectUri: payload['redirectUri'],
+      redirectUrl: payload['redirectUrl'],
       branches: branches
     };
 
     // Creating an empty organization
     let EmptyOrgPayload: EmptyOrg = {
+      id: '',
       name: payload['name'],
       alias: payload['alias'],
       enabled: payload['enabled'],
       description: payload['description'],
-      redirectUri: payload['redirectUri'],
+      redirectUrl: payload['redirectUrl'] ?? '',
     };
 
+    try {
     // Create an empty organization 
-    this.createOrgApi.createEmptyOrganization(EmptyOrgPayload, token)
-      .then(orgId => {
-        console.log('Organization created with ID:', orgId);
-        org.id = orgId;
+    await this.createOrgApi.createEmptyOrganization(EmptyOrgPayload, token)
+      .then(response => {
+        console.log('Organization created with ID:', response);
+        org.id = response;
       })
       .catch(error => {
         console.error('Error creating organization:', error);
-        this.displayError('Failed to create organization', 'Error creating organization: ' + error);
-        return;
+        throw new Error('Error creating organization: ' + error);        
       });
 
       // Create default organization groups
       let orgGroups: Array<SimpleGroupRepresentation> = [];
 
-      this.createOrgApi.createDefaultOrganizationGroups(org.id!, token)
+      await this.createOrgApi.createDefaultOrganizationGroups(org.id!, token)
         .then(groupIds => {
           console.log('Default organization groups created for organization ID:', org.id);
           orgGroups = groupIds;
         })
         .catch(error => {
           console.error('Error creating default organization groups:', error);
-          this.displayError('Failed to create default organization groups', 'Error creating default organization groups: ' + error);
-          return;
+          throw new Error('Error creating default organization groups: ' + error);
         });
       
       // Add organization addresses
-      this.createOrgApi.addOrganizationAddresses(org.id!, branches, token)
-        .then(addressIds => {
+      await this.createOrgApi.addOrganizationAddresses(org.id!, branches, token)
+        .then(addressesResponse => {
           console.log('Organization addresses added for organization ID:', org.id);
           org.branches = org.branches?.map((branch, index) => ({
             ...branch,
-            addressId: addressIds[index]
+            addressId: addressesResponse[index].addressId
           }));
         })
         .catch(error => {
           console.error('Error adding organization addresses:', error);
-          this.displayError('Failed to add organization addresses', 'Error adding organization addresses: ' + error);
-          return;
+          throw new Error('Error adding organization addresses: ' + error);
         });
         
         // Create organization users if there are additional users
         if(!this.noAdditionalUsers) {
 
-          this.createOrgApi.createUsers(org.id!, org.users!, token)
+          await this.createOrgApi.createUsers(org.id!, org.users!, token)
             .then(users => {
               console.log('Organization users added for organization ID:', org.id);
               org.users = users;
             })
             .catch(error => {
               console.error('Error adding organization users:', error);
-              this.displayError('Failed to add organization users', 'Error adding organization users: ' + error);
-              return;
+              throw new Error('Error adding organization users: ' + error);
             });
-
+          }
             //add users to addresses
             
             let userAddresses: Array<UserAddressAssignment> = [];
@@ -559,28 +559,30 @@ export class CreateOrganization {
               });
             });
 
-            this.createOrgApi.assignUsersToAddresses(userAddresses, token)
+            await this.createOrgApi.assignUsersToAddresses(userAddresses, token)
               .then(() => {
                 console.log('Users assigned to addresses for organization ID:', org.id);
               })
               .catch(error => {
                 console.error('Error assigning users to addresses:', error);
-                this.displayError('Failed to assign users to addresses', 'Error assigning users to addresses: ' + error);
-                return;
+                throw new Error('Error assigning users to addresses: ' + error);
               });
 
             //assign users as members to the organization
 
-            let usersIds = org.users!.map(user => user.userId!); 
+            let usersIds = org.branches!.map(branch => {
+              return branch.members!.map(member => {
+                return member.userId!
+              })
+            }).flat();
 
-            this.createOrgApi.assignUsersAsMembers(org.id!, usersIds, token)
+            await this.createOrgApi.assignUsersAsMembers(org.id!, usersIds, token)
               .then(() => {
                 console.log('Users assigned as members for organization ID:', org.id);
               })
               .catch(error => {
                 console.error('Error assigning users as members:', error);
-                this.displayError('Failed to assign users as members', 'Error assigning users as members: ' + error);
-                return;
+                throw new Error('Error assigning users as members: ' + error);
               });
 
             //assign users to default organization groups
@@ -592,35 +594,47 @@ export class CreateOrganization {
                   case 'Employee':
                     userGroups.push({
                       userId: member.userId!,
-                      groupId: orgGroups.find(group => group.name === 'Employees')!.groupId
+                      groupId: orgGroups.find(group => group.name === 'Employee')!.id
                     });
                     break;
                   case 'Manager':
                     userGroups.push({
                       userId: member.userId!,
-                      groupId: orgGroups.find(group => group.name === 'Managers')!.groupId
+                      groupId: orgGroups.find(group => group.name === 'Manager')!.id
                     });
                     break;
                   case 'Owner':
                     userGroups.push({
                       userId: member.userId!,
-                      groupId: orgGroups.find(group => group.name === 'Admins')!.groupId
+                      groupId: orgGroups.find(group => group.name === 'Owner')!.id
                     });
                     break;
                 }
               });
             });
-            this.createOrgApi.assignUsersToGroups(org.id!, userGroups, token)
+
+            await this.createOrgApi.assignUsersToGroups(org.id!, userGroups, token)
               .then(() => {
                 console.log('Users assigned to groups for organization ID:', org.id);
               })
               .catch(error => {
                 console.error('Error assigning users to groups:', error);
-                this.displayError('Failed to assign users to groups', 'Error assigning users to groups: ' + error);
-                return;
+                throw new Error('Error assigning users to groups: ' + error);
               });
-      }
       
+              console.log('Organization creation process completed for organization ID:', org.id);
+      
+    } catch (error) {
+              console.error('Error during organization creation process:', error);
+              await this.resetCreation(org.id!, token);
+              this.displayError('Organization Creation Failed', 'An error occurred during the organization creation process: ' + error);
+              return;
+            }
+      
+  }
+
+  resetCreation(orgId: string, token: string): Promise<void> {
+    return this.createOrgApi.resetCreation(orgId, token);
   }
 
   displayError(header: string, message: string): void {

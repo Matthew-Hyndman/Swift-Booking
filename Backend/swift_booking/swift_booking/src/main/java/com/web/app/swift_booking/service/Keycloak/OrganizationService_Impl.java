@@ -44,6 +44,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.web.app.swift_booking.dto.Keycloak.EmptyOrg_DTO;
+import com.web.app.swift_booking.dto.Keycloak.CreateOrganizationResponse_DTO;
 import com.web.app.swift_booking.dto.Keycloak.GroupRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
 import com.web.app.swift_booking.dto.Keycloak.MemberRepresentation_DTO;
@@ -738,7 +739,7 @@ public class OrganizationService_Impl implements OrganizationService {
         // new methods for creating an organization
 
         @Override
-        public ResponseEntity<String> createEmptyOrganization(EmptyOrg_DTO emptyOrgData) {
+        public ResponseEntity<CreateOrganizationResponse_DTO> createEmptyOrganization(EmptyOrg_DTO emptyOrgData) {
 
                 String accessToken = getAdminAccessToken();
 
@@ -758,11 +759,14 @@ public class OrganizationService_Impl implements OrganizationService {
                                 .toEntity(String.class)
                                 .block();
 
-                if (createResponse == null) {
+                String organizationId = extractResourceId(createResponse);
+                if (organizationId == null) {
                         throw new RuntimeException("Failed to create empty organization");
                 }
 
-                return new ResponseEntity<>(extractResourceId(createResponse), createResponse.getStatusCode());
+                return ResponseEntity
+                                .status(createResponse.getStatusCode())
+                                .body(new CreateOrganizationResponse_DTO(organizationId));
 
         }
 
@@ -815,14 +819,14 @@ public class OrganizationService_Impl implements OrganizationService {
         }
 
         @Override
-        public ResponseEntity<String> addOrganizationAddresses(String organizationId, List<Address_DTO> addressData) {
-
-                try {
+        public ResponseEntity<List<Address_DTO>> addOrganizationAddresses(String organizationId, List<Address_DTO> addressData) {
 
                         List<Address> addressCollection = new ArrayList<>();
 
                         for (Address_DTO address_dto : addressData) {
+                                UUID addressId = UUID.randomUUID();
                                 Address address = new Address();
+                                address.setAddressId(addressId);
                                 address.setAddressName(address_dto.addressName());
                                 address.setStreetLine1(address_dto.streetLine1());
                                 address.setStreetLine2(address_dto.streetLine2());
@@ -839,19 +843,27 @@ public class OrganizationService_Impl implements OrganizationService {
                                 address.setOrganization(organization);
 
                                 addressCollection.add(address);
+                                addressData.set(addressData.indexOf(address_dto), new Address_DTO(
+                                                addressId,
+                                                address_dto.addressName(),
+                                                address_dto.streetLine1(),
+                                                address_dto.streetLine2(),
+                                                address_dto.city(),
+                                                address_dto.county(),
+                                                address_dto.postalCode(),
+                                                address_dto.country(),
+                                                address_dto.createdAt(),
+                                                address_dto.organizationId(),
+                                                address_dto.isBillingAddress()
+                                ));
                         }
 
                         // Save all addresses to the repository
-                        return ResponseEntity.ok(addressRepo.saveAll(addressCollection).toString());
+                        
+                        addressRepo.saveAll(addressCollection);
+                        
+                        return ResponseEntity.ok(addressData);
 
-                } catch (Exception e) {
-                        return ResponseEntity.status(500)
-                                        .body("Error adding organization addresses: " + e.getMessage());
-                }
-
-                // TODO Auto-generated method stub
-                // throw new UnsupportedOperationException("Unimplemented method
-                // 'addOrganizationAddresses'");
         }
 
         @Override
@@ -882,13 +894,10 @@ public class OrganizationService_Impl implements OrganizationService {
                 }
 
                 return ResponseEntity.ok("Users created successfully");
-
-                // TODO Auto-generated method stub
-                // throw new UnsupportedOperationException("Unimplemented method 'createUsers'");
         }
 
         @Override
-        public ResponseEntity<String> assignUsersToAddresses(List<UserAddressAssignment_DTO> assignments) {
+        public ResponseEntity<?> assignUsersToAddresses(List<UserAddressAssignment_DTO> assignments) {
                 
                 for (UserAddressAssignment_DTO assignment : assignments) {
                         User user = userRepo.findById(assignment.userId())
@@ -899,8 +908,7 @@ public class OrganizationService_Impl implements OrganizationService {
                         );
                         userRepo.save(user);
                 }
-
-                return ResponseEntity.ok("Users assigned to addresses successfully");
+                return ResponseEntity.ok().build();
         }
 
         @Override
@@ -910,8 +918,8 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 for (String userId : users) {
                         
-                        ResponseEntity<String> response = this.keycloakHttpClient.put()
-                                        .uri(this.origin + "/admin/realms/{realm}/users", realm)
+                        ResponseEntity<String> response = this.keycloakHttpClient.post()
+                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/members", realm, organizationId)
                                         .headers(headers -> headers.setBearerAuth(accessToken))
                                         .bodyValue(userId)
                                         .retrieve()
@@ -931,10 +939,7 @@ public class OrganizationService_Impl implements OrganizationService {
                         }                       
                 }
 
-                return ResponseEntity.ok("Users assigned as members successfully.");
-
-                // TODO Auto-generated method stub
-                // throw new UnsupportedOperationException("Unimplemented method 'assignUsersAsMembers'");
+                return ResponseEntity.ok().build();
         }
 
         @Override
@@ -945,7 +950,8 @@ public class OrganizationService_Impl implements OrganizationService {
 
                 for (UserGroupAssignment_DTO assignment : assignments) {
                         ResponseEntity<String> response = this.keycloakHttpClient.put()
-                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/groups/{groupId}/members/{userId}", realm, organizationId, assignment.groupId(), assignment.userId())
+                                        .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}/groups/{groupId}/members/{userId}", 
+                                        realm, organizationId, assignment.groupId(), assignment.userId())
                                         .headers(headers -> headers.setBearerAuth(accessToken))
                                         .retrieve()
                                         .onStatus(HttpStatusCode::is4xxClientError, response1 -> response1
@@ -963,9 +969,48 @@ public class OrganizationService_Impl implements OrganizationService {
                         }
                 }
                 
-                return ResponseEntity.ok("Users assigned to groups successfully.");
+                return ResponseEntity.ok().build();
 
-                // TODO Auto-generated method stub
-                // throw new UnsupportedOperationException("Unimplemented method 'assignUsersAsMembersToGroups'");
+        }
+
+        @Override
+        public ResponseEntity<Void> deleteOrganization(String organizationId) {
+                String accessToken = getAdminAccessToken();
+
+                List<Address> addresses = addressRepo.findAllByOrganization_Id(organizationId);
+
+                for (Address address : addresses) {
+                        List<User> users = userRepo.findAllByAddressAddressId(address.getAddressId());
+                        for (User user : users) {
+                                user.setAddress(null);
+                                userRepo.save(user);
+                        }
+                        this.addressRepo.delete(address);
+                }
+
+
+
+                ResponseEntity<String> response = this.keycloakHttpClient.delete()
+                                .uri(this.origin + "/admin/realms/{realm}/organizations/{organizationId}", realm, organizationId)
+                                .headers(headers -> headers.setBearerAuth(accessToken))
+                                .retrieve()
+                                .onStatus(HttpStatusCode::is4xxClientError, response1 -> response1
+                                                .bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(
+                                                                new RuntimeException("Client Error: " + body))))
+                                .onStatus(HttpStatusCode::is5xxServerError, response1 -> response1
+                                                .bodyToMono(String.class)
+                                                .flatMap(body -> Mono.error(
+                                                                new RuntimeException("Server Error: " + body))))
+                                .toEntity(String.class)
+                                .block();
+
+                this.addressRepo.deleteByOrganization_Id(organizationId);
+
+                if (response == null) {
+                        throw new RuntimeException("Failed to delete organization: " + organizationId);
+                }
+
+                return ResponseEntity.ok().build();
         }
 }

@@ -63,7 +63,7 @@ DROP FUNCTION IF EXISTS trg_bookings_validate_org_member() CASCADE;
 
 -- Addresses are now directly scoped to a Keycloak organization.
 CREATE TABLE IF NOT EXISTS addresses (
-    address_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    AddressId UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     organization_id VARCHAR(36) NOT NULL,
     address_name VARCHAR(255) NOT NULL,
     street_line1 VARCHAR(255) NOT NULL,
@@ -86,19 +86,19 @@ BEGIN
         FROM information_schema.columns
         WHERE table_schema = 'public'
           AND table_name = 'user_entity'
-          AND column_name = 'address_id'
+          AND column_name = 'AddressId'
     ) THEN
         ALTER TABLE user_entity
-            ADD COLUMN address_id UUID;
+            ADD COLUMN AddressId UUID;
     END IF;
 
     IF NOT EXISTS (
         SELECT 1
         FROM pg_constraint
-        WHERE conname = 'uq_user_entity_address_id'
+        WHERE conname = 'uq_user_entity_AddressId'
     ) THEN
         ALTER TABLE user_entity
-            ADD CONSTRAINT uq_user_entity_address_id UNIQUE (address_id);
+            ADD CONSTRAINT uq_user_entity_AddressId UNIQUE (AddressId);
     END IF;
 
     IF NOT EXISTS (
@@ -108,7 +108,7 @@ BEGIN
     ) THEN
         ALTER TABLE user_entity
             ADD CONSTRAINT fk_user_entity_address
-            FOREIGN KEY (address_id) REFERENCES addresses(address_id) ON DELETE SET NULL;
+            FOREIGN KEY (AddressId) REFERENCES addresses(AddressId) ON DELETE SET NULL;
     END IF;
 END
 $$;
