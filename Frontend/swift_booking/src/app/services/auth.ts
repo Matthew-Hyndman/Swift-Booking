@@ -2,11 +2,18 @@ import { Injectable, Inject, PLATFORM_ID, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 import Keycloak from 'keycloak-js';
-import { BehaviorSubject, fromEvent, merge, Subscription } from 'rxjs';
+import { BehaviorSubject, fromEvent, merge, Subscription, map } from 'rxjs';
 import Swal from 'sweetalert2';
 import { HttpClient } from '@angular/common/http';
 import { KeycloakProfile } from 'keycloak-js';
+import { KeycloakFeature } from 'keycloak-angular';
 import { environment } from '../../environments/environment.local';
+import { 
+  KeycloakTokenOrganization, 
+  KeycloakTokenOrgData,
+  KeycloakTokenOrg_Groups
+  } from '../common/classes/models/keycloak-token';
+import { OrganizationAndRoleModule } from '../common/classes/models/org-models';
 
 
 
@@ -89,6 +96,7 @@ export class AuthService {
       if (this._isLoggedIn$.value) {
         await this.refreshUserProfile();
       }
+      this.mapOrganizationAndRole();
     } catch (err) {
       console.error('Login failed', err);
       // leave state consistent or set to false
@@ -400,6 +408,44 @@ export class AuthService {
 
   setClientId(clientId: string): void {
     this.keycloak.clientId = clientId;
+  }
+
+  private stripLeadingSlash(value: string): string {
+    return value.replace(/^\/+/, '');
+  }
+
+  mapOrganizationAndRole(): OrganizationAndRoleModule[] {
+
+    const token = this.keycloak.tokenParsed as any;
+    if (!token) {
+      return [];
+    }
+
+    const orgGroups = token.org_groups as KeycloakTokenOrg_Groups[] ?? [];
+    const organizations = token.organization as KeycloakTokenOrganization[] ?? [];
+
+    const tokenOrgData: KeycloakTokenOrgData = {
+      org_groups: Object.entries(orgGroups).map(([key, value]) => value),
+      organization: Object.entries(organizations).map(([key, value]) => value)
+    };
+
+    const organizationAndRoles: OrganizationAndRoleModule[] = [];
+
+    for (let i = 0; i < tokenOrgData.organization.length; i++) {
+      const organization = tokenOrgData.organization[i];
+      const organizationId = tokenOrgData.org_groups[i]?.id;
+      const role = organization.groups?.[0];
+
+      if (organizationId && role) {
+        organizationAndRoles.push({
+          organizationId: organizationId,
+          roles: this.stripLeadingSlash(String(role)),
+        });
+      }
+    }
+    
+    return organizationAndRoles;
+
   }
 
 }

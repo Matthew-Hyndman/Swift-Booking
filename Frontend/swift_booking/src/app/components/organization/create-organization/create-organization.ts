@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {
   AbstractControl,
@@ -37,7 +38,8 @@ export class CreateOrganization {
 
   constructor(
     private readonly auth: AuthService,
-    private readonly createOrgApi: CreateOrg
+    private readonly createOrgApi: CreateOrg,
+    private readonly route: Router
   ) {}
 
   testMode = environment.testMode;
@@ -62,6 +64,47 @@ export class CreateOrganization {
       billingAddressIsWorkingBranch: true,
       isUserStaffMemberAtBillingAddress: true,
       disableAdditionalBranches: true,
+    });
+  }
+
+  populateFormWithBranchAndEmployees() {
+    this.organizationForm.patchValue({
+      businessName: 'Test Business 2',
+      billingAddress: {
+        addressName: 'Billing Address 2',
+        street1: '456 Second Rd',
+        street2: '',
+        city: 'Genaric City',
+        county: 'Another County',
+        postalCode: '56789',
+        country: 'Another Country',
+      },
+      billingAddressIsWorkingBranch: true,
+      isUserStaffMemberAtBillingAddress: true,
+      disableAdditionalBranches: false,
+      branches: [
+        {
+          branchName: 'Main Branch',
+          address: {
+            street1: '456 Main St',
+            street2: '',
+            city: 'City',
+            county: 'County',
+            postalCode: '12345',
+            country: 'Country',
+          },
+          employees: [
+            {
+              email: 'john.doe@example.com',
+              firstName: 'John',
+              lastName: 'Doe',
+              password: 'Password123!',
+              role: 'Employee',
+              username: 'john.doe'
+            },
+          ],
+        },
+      ],
     });
   }
 
@@ -623,6 +666,8 @@ export class CreateOrganization {
               });
       
               console.log('Organization creation process completed for organization ID:', org.id);
+
+              this.route.navigate(['/manage-organization']);
       
     } catch (error) {
               console.error('Error during organization creation process:', error);

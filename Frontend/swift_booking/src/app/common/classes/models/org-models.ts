@@ -67,6 +67,11 @@ export interface UserGroupAssignment {
     groupId: string
 }
 
+export interface OrganizationAndRoleModule {
+  organizationId: string;
+  roles: string[] | string;
+}
+
 export interface OrganizationRepresentation {
     id?: string,
     name: string,

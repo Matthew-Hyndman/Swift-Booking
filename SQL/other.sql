@@ -34,7 +34,7 @@ FROM public.user_entity
 LIMIT 1000;
 
 SELECT *
-FROM public.org
+FROM public.keycloak_group
 --WHERE AddressId IS NOT NULL
 LIMIT 1000;
 
